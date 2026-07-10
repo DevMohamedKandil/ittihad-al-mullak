@@ -1,6 +1,6 @@
--- مثال على سكريبت DbUp: View لأرصدة الفواتير
+-- مثال على سكريبت DbUp: View لأرصدة الفواتير (T-SQL)
 -- أي ملف .sql هنا بيتنفذ مرة واحدة بس (بيتسجل في جدول SchemaVersions)
-CREATE VIEW IF NOT EXISTS vw_InvoiceBalances AS
+CREATE OR ALTER VIEW vw_InvoiceBalances AS
 SELECT
     i.Id,
     i.Number,

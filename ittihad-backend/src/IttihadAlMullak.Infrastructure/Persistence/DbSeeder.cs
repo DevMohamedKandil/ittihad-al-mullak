@@ -209,31 +209,45 @@ public static class DbSeeder
                 CreatedAt = now.AddDays(-8),
             });
 
+        Announcement NewAnnouncement(string title, string content, AnnouncementType type, int daysAgo, bool pinned = false) => new()
+        {
+            BuildingId = building.Id,
+            Title = title,
+            Content = content,
+            Type = type,
+            IsPinned = pinned,
+            CreatedById = admin.Id,
+            CreatedAt = now.AddDays(-daysAgo),
+        };
+
         db.Announcements.AddRange(
-            new Announcement
-            {
-                BuildingId = building.Id,
-                Title = "موعد صيانة المصعد",
-                Content = "سيتم إيقاف المصعد يوم الخميس من الساعة ١٠ صباحاً حتى ٤ عصراً للصيانة الدورية",
-                Type = AnnouncementType.General, IsPinned = true,
-                CreatedById = admin.Id, CreatedAt = now.AddDays(-1),
-            },
-            new Announcement
-            {
-                BuildingId = building.Id,
-                Title = "تذكير بسداد الاشتراكات",
-                Content = $"نذكر السادة الملاك بسداد اشتراكات الشهر قبل يوم {building.DueDay}",
-                Type = AnnouncementType.Financial,
-                CreatedById = admin.Id, CreatedAt = now.AddDays(-2),
-            },
-            new Announcement
-            {
-                BuildingId = building.Id,
-                Title = "انقطاع المياه",
-                Content = "سيتم قطع المياه غداً من ٩ صباحاً حتى ١٢ ظهراً بسبب أعمال الصيانة",
-                Type = AnnouncementType.Urgent,
-                CreatedById = admin.Id, CreatedAt = now.AddDays(-4),
-            });
+            NewAnnouncement("اجتماع اتحاد الملاك السنوي",
+                "يسعدنا دعوتكم لحضور الاجتماع السنوي لاتحاد الملاك يوم الجمعة القادمة بعد صلاة العصر في مدخل العمارة لمناقشة ميزانية العام الجديد وانتخاب أعضاء اللجنة",
+                AnnouncementType.General, 1, pinned: true),
+            NewAnnouncement("موعد صيانة المصعد",
+                "سيتم إيقاف المصعد يوم الخميس من الساعة ١٠ صباحاً حتى ٤ عصراً للصيانة الدورية",
+                AnnouncementType.General, 1),
+            NewAnnouncement("تذكير بسداد الاشتراكات",
+                $"نذكر السادة الملاك بسداد اشتراكات الشهر قبل يوم {building.DueDay} تجنباً لغرامة التأخير",
+                AnnouncementType.Financial, 2),
+            NewAnnouncement("تركيب كاميرات مراقبة جديدة",
+                "تم بحمد الله الانتهاء من تركيب ٨ كاميرات مراقبة حديثة تغطي المدخل والجراج وجميع الأدوار، ويمكن للجنة الإدارة متابعتها مباشرة",
+                AnnouncementType.General, 3),
+            NewAnnouncement("انقطاع المياه",
+                "سيتم قطع المياه غداً من ٩ صباحاً حتى ١٢ ظهراً بسبب أعمال الصيانة",
+                AnnouncementType.Urgent, 4),
+            NewAnnouncement("تعيين شركة نظافة جديدة",
+                "تعاقدت اللجنة مع شركة النظافة الجديدة (النخبة كلين) بداية من أول الشهر — النظافة اليومية للسلم والمدخل ومرتين أسبوعياً للجراج",
+                AnnouncementType.General, 6),
+            NewAnnouncement("تنبيه هام: ممنوع ترك الكراتين في السلم",
+                "برجاء عدم ترك الكراتين أو الأثاث القديم في بسطات السلم لأنها تعيق الحركة وتخالف اشتراطات الدفاع المدني — سيتم التخلص من أي متروكات خلال ٤٨ ساعة",
+                AnnouncementType.Urgent, 8),
+            NewAnnouncement("تحديث قيمة الاشتراك الشهري",
+                "بعد موافقة الجمعية العمومية، سيتم تعديل الاشتراك الشهري ليصبح ٦٠٠ ج.م بداية من الشهر القادم لتغطية زيادة تكاليف الصيانة والنظافة",
+                AnnouncementType.Financial, 10),
+            NewAnnouncement("مبروك! تجديد واجهة العمارة اكتمل",
+                "انتهت أعمال دهان وتجديد واجهة العمارة بالكامل — شكراً لالتزام جميع الملاك بسداد المساهمات في موعدها",
+                AnnouncementType.General, 14));
         await db.SaveChangesAsync();
 
         // مجموعة العمارة + محادثة مباشرة بين محمد والإدارة

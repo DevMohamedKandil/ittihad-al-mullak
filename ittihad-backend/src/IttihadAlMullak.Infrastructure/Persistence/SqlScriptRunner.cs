@@ -1,5 +1,5 @@
 using DbUp;
-using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
 namespace IttihadAlMullak.Infrastructure.Persistence;
@@ -28,7 +28,7 @@ public static class SqlScriptRunner
         }
 
         var upgrader = DeployChanges.To
-            .SqliteDatabase(connectionString)
+            .SqlDatabase(connectionString)
             .WithScriptsFromFileSystem(scriptsPath)
             .LogToConsole()
             .Build();
@@ -48,27 +48,32 @@ public static class SqlScriptRunner
 
     /// <summary>
     /// تسجيل الـ EF Migrations المتطبقة في SchemaVersions بنفس صيغة أسماء السكريبتات المولدة
-    /// — عشان لو نفس الـ migration موجود كسكريبت، DbUp يعتبره متنفذ ويعدّيه.
+    /// — نفس فكرة MoveMigrationsToSchemaVersions في Afzaz بالظبط.
     /// </summary>
     private static void BridgeEfHistoryToSchemaVersions(string connectionString)
     {
-        using var connection = new SqliteConnection(connectionString);
+        using var connection = new SqlConnection(connectionString);
         connection.Open();
         using var command = connection.CreateCommand();
-        // نفس تعريف جدول dbup-sqlite بالظبط عشان يتعرف عليه
         command.CommandText = """
-            CREATE TABLE IF NOT EXISTS SchemaVersions (
-                SchemaVersionID INTEGER CONSTRAINT PK_SchemaVersions PRIMARY KEY AUTOINCREMENT NOT NULL,
-                ScriptName TEXT NOT NULL,
-                Applied DATETIME NOT NULL
-            );
+            IF OBJECT_ID(N'dbo.SchemaVersions', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [dbo].[SchemaVersions] (
+                    [Id] INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+                    [ScriptName] NVARCHAR(255) NOT NULL,
+                    [Applied] DATETIME NOT NULL
+                );
+            END;
 
-            INSERT INTO SchemaVersions (ScriptName, Applied)
-            SELECT h.MigrationId || '.sql', datetime('now')
-            FROM __EFMigrationsHistory h
-            WHERE NOT EXISTS (
-                SELECT 1 FROM SchemaVersions s WHERE s.ScriptName = h.MigrationId || '.sql'
-            );
+            IF OBJECT_ID(N'dbo.__EFMigrationsHistory', N'U') IS NOT NULL
+            BEGIN
+                INSERT INTO [dbo].[SchemaVersions] (ScriptName, Applied)
+                SELECT h.MigrationId + '.sql', GETDATE()
+                FROM [dbo].[__EFMigrationsHistory] h
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM [dbo].[SchemaVersions] s WHERE s.ScriptName = h.MigrationId + '.sql'
+                );
+            END;
             """;
         command.ExecuteNonQuery();
     }

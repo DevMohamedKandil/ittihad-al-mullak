@@ -118,7 +118,7 @@ using (var scope = app.Services.CreateScope())
 
     // DbUp: تنفيذ سكريبتات SQL اليدوية من فولدر SqlScripts (مرة واحدة لكل سكريبت)
     SqlScriptRunner.Run(
-        builder.Configuration.GetConnectionString("Default")!,
+        builder.Configuration.GetConnectionString("DefaultConnection")!,
         Path.Combine(app.Environment.ContentRootPath, "SqlScripts"),
         app.Logger);
 }

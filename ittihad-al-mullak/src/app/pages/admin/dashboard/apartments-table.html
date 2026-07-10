@@ -22,6 +22,9 @@
     </div>
   </div>
   <div class="p-6 pt-0">
+    @if (success()) {
+      <p class="text-sm text-success mb-2 bg-success/10 rounded-md px-3 py-2">{{ success() }}</p>
+    }
     @if (error()) {
       <p class="text-sm text-destructive mb-2">{{ error() }}</p>
     }
@@ -43,7 +46,7 @@
             <tr class="border-b transition-colors hover:bg-muted/50">
               <td class="p-2 align-middle font-medium">{{ apt.number }}</td>
               <td class="p-2 align-middle">{{ apt.floor }}</td>
-              <td class="p-2 align-middle">{{ apt.residentType === 'tenant' ? (apt.tenantName ?? apt.ownerName ?? '-') : (apt.ownerName ?? '-') }}</td>
+              <td class="p-2 align-middle">{{ residentName(apt) }}</td>
               <td class="p-2 align-middle">
                 <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold text-foreground">
                   {{ apt.residentType === 'owner' ? 'مالك' : 'مستأجر' }}
@@ -64,6 +67,7 @@
                 <button
                   type="button"
                   (click)="toggleMenu(apt.id)"
+                  title="خيارات الشقة"
                   class="inline-flex items-center justify-center rounded-md h-8 w-8 transition-colors hover:bg-accent hover:text-accent-foreground"
                 >
                   <lucide-angular [img]="icons.moreVertical" [size]="16" />
@@ -71,15 +75,15 @@
                 @if (openMenuId() === apt.id) {
                   <div class="fixed inset-0 z-40" (click)="closeMenu()"></div>
                   <div class="absolute left-0 top-10 z-50 w-44 rounded-md border bg-popover text-popover-foreground p-1 shadow-md">
-                    <button type="button" (click)="closeMenu()" class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground">
+                    <button type="button" (click)="openDetails(apt)" class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground">
                       <lucide-angular [img]="icons.eye" [size]="16" />
                       عرض التفاصيل
                     </button>
-                    <button type="button" (click)="closeMenu()" class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground">
+                    <button type="button" (click)="openInvoice(apt)" class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground">
                       <lucide-angular [img]="icons.receipt" [size]="16" />
                       إرسال فاتورة
                     </button>
-                    <button type="button" (click)="closeMenu()" class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground">
+                    <button type="button" (click)="openMessage(apt)" class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground">
                       <lucide-angular [img]="icons.messageSquare" [size]="16" />
                       إرسال رسالة
                     </button>
@@ -100,3 +104,101 @@
     </div>
   </div>
 </div>
+
+<!-- Dialog: عرض التفاصيل -->
+@if (detailsFor(); as apt) {
+  <div class="fixed inset-0 bg-black/50 z-40" (click)="detailsFor.set(null)"></div>
+  <div class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md rounded-xl border bg-card text-card-foreground shadow-lg p-6 space-y-4">
+    <div class="flex items-center justify-between">
+      <h3 class="text-lg font-semibold">شقة {{ apt.number }}</h3>
+      <button type="button" (click)="detailsFor.set(null)" class="rounded-md p-1 hover:bg-accent" title="إغلاق">
+        <lucide-angular [img]="icons.x" [size]="18" />
+      </button>
+    </div>
+    <div class="grid grid-cols-2 gap-4 text-sm">
+      <div><p class="text-muted-foreground">الطابق</p><p class="font-medium">{{ apt.floor }}</p></div>
+      <div><p class="text-muted-foreground">نوع الساكن</p><p class="font-medium">{{ apt.residentType === 'owner' ? 'مالك' : 'مستأجر' }}</p></div>
+      <div><p class="text-muted-foreground">الساكن</p><p class="font-medium">{{ residentName(apt) }}</p></div>
+      <div><p class="text-muted-foreground">الهاتف</p><p class="font-medium" dir="ltr">{{ apt.ownerPhone ?? '-' }}</p></div>
+      <div><p class="text-muted-foreground">حالة الدفع</p>
+        <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold" [class]="statusConfig[apt.paymentStatus].class">
+          {{ statusConfig[apt.paymentStatus].label }}
+        </span>
+      </div>
+      <div><p class="text-muted-foreground">المستحق</p><p class="font-medium">{{ formatDue(apt.dueAmount) }}</p></div>
+    </div>
+  </div>
+}
+
+<!-- Dialog: إرسال فاتورة -->
+@if (invoiceFor(); as apt) {
+  <div class="fixed inset-0 bg-black/50 z-40" (click)="invoiceFor.set(null)"></div>
+  <div class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md rounded-xl border bg-card text-card-foreground shadow-lg p-6 space-y-4">
+    <h3 class="text-lg font-semibold">فاتورة جديدة — شقة {{ apt.number }}</h3>
+    <div class="space-y-3">
+      <div class="space-y-1">
+        <label class="text-sm font-medium" for="inv-title">البيان</label>
+        <input id="inv-title" type="text" [ngModel]="invoiceTitle()" (ngModelChange)="invoiceTitle.set($event)"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1">
+          <label class="text-sm font-medium" for="inv-amount">المبلغ (ج.م)</label>
+          <input id="inv-amount" type="number" min="1" [ngModel]="invoiceAmount()" (ngModelChange)="invoiceAmount.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-sm font-medium" for="inv-due">تاريخ الاستحقاق</label>
+          <input id="inv-due" type="date" [ngModel]="invoiceDueDate()" (ngModelChange)="invoiceDueDate.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+        </div>
+      </div>
+      <div class="space-y-1">
+        <label class="text-sm font-medium" for="inv-period">الفترة</label>
+        <input id="inv-period" type="text" [ngModel]="invoicePeriod()" (ngModelChange)="invoicePeriod.set($event)"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+      </div>
+    </div>
+    @if (dialogError()) {
+      <p class="text-sm text-destructive">{{ dialogError() }}</p>
+    }
+    <div class="flex gap-2">
+      <button type="button" (click)="invoiceFor.set(null)"
+        class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-4 border border-input bg-transparent hover:bg-accent hover:text-accent-foreground">
+        إلغاء
+      </button>
+      <button type="button" (click)="submitInvoice()" [disabled]="submitting()"
+        class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-4 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+        {{ submitting() ? 'جاري الإصدار...' : 'إصدار الفاتورة' }}
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Dialog: إرسال رسالة -->
+@if (messageFor(); as apt) {
+  <div class="fixed inset-0 bg-black/50 z-40" (click)="messageFor.set(null)"></div>
+  <div class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md rounded-xl border bg-card text-card-foreground shadow-lg p-6 space-y-4">
+    <h3 class="text-lg font-semibold">رسالة إلى {{ residentName(apt) }} — شقة {{ apt.number }}</h3>
+    <textarea
+      rows="4"
+      placeholder="اكتب رسالتك..."
+      [ngModel]="messageText()"
+      (ngModelChange)="messageText.set($event)"
+      class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+    ></textarea>
+    @if (dialogError()) {
+      <p class="text-sm text-destructive">{{ dialogError() }}</p>
+    }
+    <div class="flex gap-2">
+      <button type="button" (click)="messageFor.set(null)"
+        class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-4 border border-input bg-transparent hover:bg-accent hover:text-accent-foreground">
+        إلغاء
+      </button>
+      <button type="button" (click)="sendMessage()" [disabled]="submitting() || !messageText().trim()"
+        class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-4 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+        {{ submitting() ? 'جاري الإرسال...' : 'إرسال' }}
+      </button>
+    </div>
+  </div>
+}
