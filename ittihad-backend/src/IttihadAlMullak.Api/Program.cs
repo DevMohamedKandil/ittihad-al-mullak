@@ -10,11 +10,16 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 // لازم wwwroot يكون موجود قبل بناء التطبيق — غير كده الـ Static Files بتشتغل بـ NullFileProvider
 Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads"));
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Serilog من الـ appsettings (نفس نمط Afzaz: كونسول + ملف يومي في Logs/)
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
 
 // الطبقات: Application (البيزنس) + Infrastructure (قاعدة البيانات والتوكن)
 builder.Services.AddApplication();
