@@ -9,6 +9,7 @@ import {
   Bell,
   Users,
   Settings,
+  Shield,
   LogOut,
   Menu,
   X,
@@ -57,6 +58,7 @@ export class AdminSidebar {
     { label: 'طلبات الصيانة', href: '/admin/maintenance', icon: Wrench, exact: false },
     { label: 'الإعلانات', href: '/admin/announcements', icon: Bell, exact: false },
     { label: 'المستخدمين', href: '/admin/users', icon: Users, exact: false },
+    { label: 'الصلاحيات', href: '/admin/permissions', icon: Shield, exact: false },
     { label: 'الإعدادات', href: '/admin/settings', icon: Settings, exact: false },
   ];
 

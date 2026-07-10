@@ -1,13 +1,14 @@
 using IttihadAlMullak.Application.Dtos;
 using IttihadAlMullak.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using IttihadAlMullak.Api.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IttihadAlMullak.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/expenses")]
-[Authorize(Roles = "Admin")]
+[HasPermission("Expenses.View")]
 public class ExpensesController(IExpenseService expenses) : ControllerBase
 {
     [HttpGet]

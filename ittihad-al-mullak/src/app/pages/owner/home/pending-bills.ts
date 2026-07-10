@@ -4,6 +4,7 @@ import { LucideAngularModule, ChevronLeft, CreditCard, Calendar } from 'lucide-a
 import { Invoice, PaymentStatusString } from '../../../core/models';
 import { formatDate } from '../../../core/format';
 import { AuthService } from '../../../core/auth.service';
+import { PermissionsService } from '../../../core/permissions.service';
 
 @Component({
   selector: 'app-pending-bills',
@@ -14,6 +15,7 @@ export class PendingBills {
   readonly bills = input.required<Invoice[]>();
 
   private readonly auth = inject(AuthService);
+  private readonly permissions = inject(PermissionsService);
 
   protected readonly icons = {
     chevronLeft: ChevronLeft,
@@ -23,7 +25,7 @@ export class PendingBills {
 
   protected readonly formatDate = formatDate;
 
-  protected readonly canPay = computed(() => this.auth.currentUser()?.role !== 'Tenant');
+  protected readonly canPay = computed(() => this.permissions.all().has('Invoices.Pay'));
 
   protected readonly totalDue = computed(() =>
     this.bills().reduce((acc, bill) => acc + (bill.amount - bill.paidAmount), 0),

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { AuthResponse, User } from './models';
 import { APP_CONFIG } from './app-config';
+import { PermissionsService } from './permissions.service';
 
 const ACCESS_KEY = 'ittihad_access_token';
 const REFRESH_KEY = 'ittihad_refresh_token';
@@ -13,8 +14,14 @@ const USER_KEY = 'ittihad_user';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly permissions = inject(PermissionsService);
 
   readonly currentUser = signal<User | null>(this.readStoredUser());
+
+  constructor() {
+    // جلسة موجودة من قبل؟ حمّل صلاحياتها
+    if (this.currentUser() !== null) this.permissions.load();
+  }
   readonly isLoggedIn = computed(() => this.currentUser() !== null);
   readonly isAdmin = computed(() => this.currentUser()?.role === 'Admin');
 
@@ -41,6 +48,7 @@ export class AuthService {
     localStorage.removeItem(REFRESH_KEY);
     localStorage.removeItem(USER_KEY);
     this.currentUser.set(null);
+    this.permissions.clear();
     this.router.navigate(['/login']);
   }
 
@@ -54,6 +62,7 @@ export class AuthService {
     localStorage.setItem(REFRESH_KEY, res.refreshToken);
     localStorage.setItem(USER_KEY, JSON.stringify(res.user));
     this.currentUser.set(res.user);
+    this.permissions.load();
   }
 
   private readStoredUser(): User | null {

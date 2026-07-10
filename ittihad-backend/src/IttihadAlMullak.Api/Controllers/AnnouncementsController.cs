@@ -1,6 +1,7 @@
 using IttihadAlMullak.Application.Dtos;
 using IttihadAlMullak.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using IttihadAlMullak.Api.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IttihadAlMullak.Api.Controllers;
@@ -15,17 +16,17 @@ public class AnnouncementsController(IAnnouncementService announcements) : Contr
         => announcements.ListAsync(ct);
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [HasPermission("Announcements.Create")]
     public Task<AnnouncementDto> Create(CreateAnnouncementRequest request, CancellationToken ct)
         => announcements.CreateAsync(request, ct);
 
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "Admin")]
+    [HasPermission("Announcements.Edit")]
     public Task<AnnouncementDto> Update(int id, CreateAnnouncementRequest request, CancellationToken ct)
         => announcements.UpdateAsync(id, request, ct);
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Admin")]
+    [HasPermission("Announcements.Delete")]
     public Task Delete(int id, CancellationToken ct)
         => announcements.DeleteAsync(id, ct);
 }

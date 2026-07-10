@@ -20,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<IOwnerService, OwnerService>();
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddMemoryCache();
+        services.AddScoped<IPermissionService, PermissionService>();
         return services;
     }
 }

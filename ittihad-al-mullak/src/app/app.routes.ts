@@ -43,6 +43,10 @@ export const routes: Routes = [
         path: 'settings',
         loadComponent: () => import('./pages/admin/settings/settings').then((m) => m.SettingsPage),
       },
+      {
+        path: 'permissions',
+        loadComponent: () => import('./pages/admin/permissions/permissions').then((m) => m.PermissionsPage),
+      },
       { path: '**', redirectTo: '' },
     ],
   },

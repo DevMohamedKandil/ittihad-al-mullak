@@ -2,13 +2,14 @@ using IttihadAlMullak.Application.Dtos;
 using IttihadAlMullak.Application.Interfaces;
 using IttihadAlMullak.Domain;
 using Microsoft.AspNetCore.Authorization;
+using IttihadAlMullak.Api.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IttihadAlMullak.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/users")]
-[Authorize(Roles = "Admin")]
+[HasPermission("Users.View")]
 public class UsersController(IUserService users) : ControllerBase
 {
     [HttpGet]

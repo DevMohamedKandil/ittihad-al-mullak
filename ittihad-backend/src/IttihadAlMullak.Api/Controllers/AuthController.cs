@@ -23,6 +23,15 @@ public class AuthController(IAuthService auth) : ControllerBase
     [Authorize]
     public Task<UserDto> Me(CancellationToken ct) => auth.MeAsync(ct);
 
+    /// <summary>مفاتيح صلاحيات المستخدم الحالي — الفرونت بيستخدمها لإخفاء الأزرار.</summary>
+    [HttpGet("my-permissions")]
+    [Authorize]
+    public Task<IReadOnlyList<string>> MyPermissions(
+        [FromServices] IttihadAlMullak.Application.Interfaces.IPermissionService permissions,
+        [FromServices] IttihadAlMullak.Application.Interfaces.ICurrentUser currentUser,
+        CancellationToken ct)
+        => permissions.GetKeysForRoleAsync(currentUser.Role, ct);
+
     [HttpPost("change-password")]
     [Authorize]
     public Task ChangePassword(ChangePasswordRequest request, CancellationToken ct)

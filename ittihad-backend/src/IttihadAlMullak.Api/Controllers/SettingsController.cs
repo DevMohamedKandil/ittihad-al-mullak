@@ -1,13 +1,14 @@
 using IttihadAlMullak.Application.Dtos;
 using IttihadAlMullak.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using IttihadAlMullak.Api.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IttihadAlMullak.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/settings")]
-[Authorize(Roles = "Admin")]
+[HasPermission("Settings.View")]
 public class SettingsController(ISettingsService settings) : ControllerBase
 {
     [HttpGet]

@@ -1,13 +1,14 @@
 using IttihadAlMullak.Application.Dtos;
 using IttihadAlMullak.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using IttihadAlMullak.Api.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IttihadAlMullak.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/dashboard")]
-[Authorize(Roles = "Admin")]
+[HasPermission("Dashboard.View")]
 public class DashboardController(IDashboardService dashboard) : ControllerBase
 {
     [HttpGet("stats")]

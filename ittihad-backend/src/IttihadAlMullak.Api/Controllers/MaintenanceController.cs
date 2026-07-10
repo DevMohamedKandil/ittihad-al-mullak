@@ -2,6 +2,7 @@ using IttihadAlMullak.Application.Dtos;
 using IttihadAlMullak.Application.Interfaces;
 using IttihadAlMullak.Domain;
 using Microsoft.AspNetCore.Authorization;
+using IttihadAlMullak.Api.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IttihadAlMullak.Api.Controllers;
@@ -25,7 +26,7 @@ public class MaintenanceController(IMaintenanceService maintenance) : Controller
         => maintenance.CreateAsync(request, ct);
 
     [HttpPatch("{id:int}/status")]
-    [Authorize(Roles = "Admin")]
+    [HasPermission("Maintenance.ChangeStatus")]
     public Task<MaintenanceDto> UpdateStatus(int id, UpdateMaintenanceStatusRequest request, CancellationToken ct)
         => maintenance.UpdateStatusAsync(id, request, ct);
 

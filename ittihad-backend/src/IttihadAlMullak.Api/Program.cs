@@ -45,6 +45,10 @@ builder.Services
     });
 builder.Services.AddAuthorization();
 
+// نظام الصلاحيات الديناميكي: [HasPermission("Screen.Action")] بيتحقق من قاعدة البيانات (بكاش)
+builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationPolicyProvider, IttihadAlMullak.Api.Authorization.PermissionPolicyProvider>();
+builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, IttihadAlMullak.Api.Authorization.PermissionAuthorizationHandler>();
+
 // CORS: الويب (ng serve) + الموبايل (Capacitor)
 builder.Services.AddCors(options => options.AddPolicy("Frontend", policy => policy
     .WithOrigins(
@@ -105,6 +109,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
     await DbSeeder.SeedAsync(db, scope.ServiceProvider.GetRequiredService<IPasswordHasherService>());
+    await PermissionSeeder.SeedAsync(db); // منفصل — بيشتغل حتى على قواعد بيانات قديمة
 
     // DbUp: تنفيذ سكريبتات SQL اليدوية من فولدر SqlScripts (مرة واحدة لكل سكريبت)
     SqlScriptRunner.Run(

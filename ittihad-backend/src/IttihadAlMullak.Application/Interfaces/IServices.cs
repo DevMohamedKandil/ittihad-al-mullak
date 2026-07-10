@@ -90,6 +90,16 @@ public interface IMessageService
     Task<ConversationDto> StartAsync(StartConversationRequest request, CancellationToken ct = default);
 }
 
+public interface IPermissionService
+{
+    /// <summary>هل الدور معاه الصلاحية دي؟ (مفتاح بصيغة "Screen.Action") — بكاش في الميموري.</summary>
+    Task<bool> HasPermissionAsync(UserRole role, string permissionKey, CancellationToken ct = default);
+    /// <summary>كل مفاتيح صلاحيات الدور — للفرونت عشان يخفي الأزرار.</summary>
+    Task<IReadOnlyList<string>> GetKeysForRoleAsync(UserRole role, CancellationToken ct = default);
+    Task<PermissionMatrixDto> GetMatrixAsync(CancellationToken ct = default);
+    Task UpdateAsync(UpdatePermissionRequest request, CancellationToken ct = default);
+}
+
 public interface INotificationService
 {
     Task<IReadOnlyList<NotificationDto>> MyNotificationsAsync(CancellationToken ct = default);

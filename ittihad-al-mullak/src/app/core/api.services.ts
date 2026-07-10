@@ -200,3 +200,19 @@ export class NotificationsApi {
     return this.http.post<void>(`${APP_CONFIG.apiUrl}/notifications/read-all`, {});
   }
 }
+
+export interface PermissionScreen { id: number; key: string; nameAr: string; nameEn: string; sortOrder: number }
+export interface PermissionAction { id: number; key: string; nameAr: string; nameEn: string }
+export interface PermissionMatrixCell { screenId: number; actionId: number; admin: boolean; owner: boolean; tenant: boolean }
+export interface PermissionMatrix { screens: PermissionScreen[]; actions: PermissionAction[]; cells: PermissionMatrixCell[] }
+
+@Injectable({ providedIn: 'root' })
+export class PermissionsApi {
+  private readonly http = inject(HttpClient);
+  matrix(): Observable<PermissionMatrix> {
+    return this.http.get<PermissionMatrix>(`${APP_CONFIG.apiUrl}/permissions/matrix`);
+  }
+  update(body: { role: UserRole; screenId: number; actionId: number; granted: boolean }): Observable<void> {
+    return this.http.put<void>(`${APP_CONFIG.apiUrl}/permissions`, body);
+  }
+}

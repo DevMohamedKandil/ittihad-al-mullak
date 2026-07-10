@@ -23,6 +23,9 @@ public interface IApplicationDbContext
     DbSet<Conversation> Conversations { get; }
     DbSet<ConversationParticipant> ConversationParticipants { get; }
     DbSet<Message> Messages { get; }
+    DbSet<Screen> Screens { get; }
+    DbSet<PermissionAction> PermissionActions { get; }
+    DbSet<RolePermission> RolePermissions { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

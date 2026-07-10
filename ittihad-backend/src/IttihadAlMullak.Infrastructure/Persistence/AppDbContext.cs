@@ -21,6 +21,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Conversation> Conversations => Set<Conversation>();
     public DbSet<ConversationParticipant> ConversationParticipants => Set<ConversationParticipant>();
     public DbSet<Message> Messages => Set<Message>();
+    public DbSet<Screen> Screens => Set<Screen>();
+    public DbSet<PermissionAction> PermissionActions => Set<PermissionAction>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -61,5 +64,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
         modelBuilder.Entity<ConversationParticipant>()
             .HasIndex(p => new { p.ConversationId, p.UserId }).IsUnique();
+
+        modelBuilder.Entity<Screen>()
+            .HasIndex(s => s.Key).IsUnique();
+        modelBuilder.Entity<PermissionAction>()
+            .HasIndex(a => a.Key).IsUnique();
+        modelBuilder.Entity<RolePermission>()
+            .HasIndex(p => new { p.Role, p.ScreenId, p.ActionId }).IsUnique();
     }
 }

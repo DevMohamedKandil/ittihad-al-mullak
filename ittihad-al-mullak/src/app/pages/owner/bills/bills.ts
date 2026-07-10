@@ -16,6 +16,7 @@ import {
 import { OwnerHeader } from '../header';
 import { InvoicesApi, OwnerApi } from '../../../core/api.services';
 import { AuthService } from '../../../core/auth.service';
+import { PermissionsService } from '../../../core/permissions.service';
 import { Invoice, PaymentMethod, PaymentStatusString } from '../../../core/models';
 import { formatDate } from '../../../core/format';
 
@@ -30,6 +31,7 @@ export class OwnerBills {
   private readonly ownerApi = inject(OwnerApi);
   private readonly invoicesApi = inject(InvoicesApi);
   private readonly auth = inject(AuthService);
+  private readonly permissions = inject(PermissionsService);
 
   protected readonly icons = {
     creditCard: CreditCard,
@@ -86,7 +88,7 @@ export class OwnerBills {
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
 
-  protected readonly canPay = computed(() => this.auth.currentUser()?.role !== 'Tenant');
+  protected readonly canPay = computed(() => this.permissions.all().has('Invoices.Pay'));
 
   protected readonly pendingBills = computed(() =>
     this.bills().filter((bill) => bill.status !== 'paid'),
