@@ -1,0 +1,212 @@
+<app-owner-header title="الفواتير" />
+
+<div class="p-4 space-y-6">
+  @if (successMessage()) {
+    <div class="rounded-xl border border-success/30 bg-success/10 text-success p-4 text-sm font-medium">
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="text-center text-sm text-muted-foreground py-12">جاري التحميل...</p>
+  } @else if (error()) {
+    <p class="text-center text-sm text-destructive py-12">{{ error() }}</p>
+  } @else {
+    <!-- Summary Card -->
+    <div class="rounded-xl bg-gradient-to-l from-primary to-primary/80 text-primary-foreground shadow-sm border-0">
+      <div class="p-5">
+        <p class="text-sm opacity-90">إجمالي المستحق</p>
+        <p class="text-3xl font-bold mt-1">{{ totalDue().toLocaleString('ar-EG') }} ج.م</p>
+        <p class="text-sm opacity-90 mt-2">{{ pendingBills().length }} فواتير مستحقة</p>
+        @if (canPay() && totalDue() > 0 && pendingBills().length > 0) {
+          <button
+            type="button"
+            (click)="openPayment(pendingBills()[0])"
+            class="w-full mt-4 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-8 bg-secondary text-secondary-foreground hover:bg-secondary/80"
+          >
+            <lucide-angular [img]="icons.creditCard" [size]="20" />
+            ادفع كل المستحقات
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Bills Tabs -->
+    <div class="w-full">
+      <div class="w-full grid grid-cols-2 h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
+        <button
+          type="button"
+          (click)="activeTab.set('pending')"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
+          [class]="activeTab() === 'pending' ? 'bg-background text-foreground shadow' : ''"
+        >
+          مستحقة
+          @if (pendingBills().length > 0) {
+            <span class="inline-flex items-center justify-center rounded-md border border-transparent bg-secondary text-secondary-foreground text-xs font-semibold h-5 w-5 p-0">
+              {{ pendingBills().length }}
+            </span>
+          }
+        </button>
+        <button
+          type="button"
+          (click)="activeTab.set('paid')"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
+          [class]="activeTab() === 'paid' ? 'bg-background text-foreground shadow' : ''"
+        >
+          مدفوعة
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-4">
+        @if (activeTab() === 'pending' && pendingBills().length === 0) {
+          <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+            <div class="flex flex-col items-center justify-center py-12">
+              <lucide-angular [img]="icons.checkCircle2" [size]="48" class="text-success mb-4" />
+              <p class="font-medium text-lg">لا توجد فواتير مستحقة</p>
+              <p class="text-sm text-muted-foreground">جميع الفواتير مدفوعة</p>
+            </div>
+          </div>
+        }
+        @if (activeTab() === 'paid' && paidBills().length === 0) {
+          <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+            <div class="flex flex-col items-center justify-center py-12">
+              <p class="font-medium text-lg">لا توجد فواتير</p>
+              <p class="text-sm text-muted-foreground">لا توجد فواتير مدفوعة بعد</p>
+            </div>
+          </div>
+        }
+        @for (bill of shownBills(); track bill.id) {
+          <div class="rounded-xl border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow">
+            <div class="p-4">
+              <div class="flex items-start gap-4">
+                <div
+                  class="flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0"
+                  [class]="statusConfig[bill.status].class"
+                >
+                  <lucide-angular [img]="statusConfig[bill.status].icon" [size]="24" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1">
+                    <h3 class="font-medium truncate">{{ bill.title }}</h3>
+                    <span
+                      class="inline-flex items-center rounded-md border border-transparent px-2.5 py-0.5 font-semibold text-xs"
+                      [class]="statusConfig[bill.status].badgeClass"
+                    >
+                      {{ statusConfig[bill.status].label }}
+                    </span>
+                  </div>
+                  <p class="text-sm text-muted-foreground mb-2">فاتورة رقم {{ bill.number }} - الفترة {{ bill.period }}</p>
+                  <div class="flex items-center gap-1 text-sm text-muted-foreground">
+                    <lucide-angular [img]="icons.calendar" [size]="16" />
+                    <span>تاريخ الاستحقاق: {{ formatDate(bill.dueDate) }}</span>
+                  </div>
+                </div>
+                <div class="text-left">
+                  <p class="font-bold text-xl">{{ bill.amount.toLocaleString('ar-EG') }}</p>
+                  <p class="text-xs text-muted-foreground">جنيه</p>
+                </div>
+              </div>
+
+              @if (bill.status !== 'paid') {
+                @if (canPay()) {
+                  <div class="flex gap-2 mt-4 pt-4 border-t">
+                    <button
+                      type="button"
+                      (click)="openPayment(bill)"
+                      class="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                      <lucide-angular [img]="icons.creditCard" [size]="16" />
+                      ادفع الآن
+                    </button>
+                    <button
+                      type="button"
+                      title="تحميل الفاتورة"
+                      class="inline-flex items-center justify-center rounded-md h-9 w-9 border border-input bg-transparent shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <lucide-angular [img]="icons.download" [size]="16" />
+                    </button>
+                  </div>
+                }
+
+                @if (paymentBillId() === bill.id) {
+                  <div class="fixed inset-0 bg-black/50 z-40" (click)="closePayment()"></div>
+                  <div class="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-6 shadow-lg">
+                    <div class="flex flex-col space-y-1.5">
+                      <h2 class="text-lg font-semibold">اختر طريقة الدفع</h2>
+                      <p class="text-sm text-muted-foreground">
+                        المبلغ المستحق: {{ remaining(bill).toLocaleString('ar-EG') }} ج.م
+                      </p>
+                    </div>
+                    <div class="space-y-3 mt-4">
+                      @for (method of paymentMethods; track method.id) {
+                        <button
+                          type="button"
+                          (click)="selectedMethod.set(method.id)"
+                          class="w-full flex items-center gap-4 p-4 rounded-xl border hover:bg-accent transition-colors text-right"
+                          [class]="selectedMethod() === method.id ? 'border-primary bg-primary/5' : ''"
+                        >
+                          <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+                            <lucide-angular [img]="method.icon" [size]="24" class="text-primary" />
+                          </div>
+                          <div class="flex-1">
+                            <p class="font-medium">{{ method.name }}</p>
+                            <p class="text-sm text-muted-foreground">{{ method.description }}</p>
+                          </div>
+                        </button>
+                      }
+                    </div>
+                    <div class="space-y-2 mt-4">
+                      <label for="pay-amount" class="text-sm font-medium leading-none">المبلغ</label>
+                      <input
+                        id="pay-amount"
+                        type="number"
+                        min="1"
+                        [max]="remaining(bill)"
+                        [ngModel]="payAmount()"
+                        (ngModelChange)="payAmount.set($event)"
+                        class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      />
+                    </div>
+                    @if (payError()) {
+                      <p class="text-sm text-destructive mt-3">{{ payError() }}</p>
+                    }
+                    <div class="flex gap-2 mt-4">
+                      <button
+                        type="button"
+                        (click)="closePayment()"
+                        class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
+                      >
+                        إلغاء
+                      </button>
+                      <button
+                        type="button"
+                        (click)="confirmPayment(bill)"
+                        [disabled]="!selectedMethod() || !payAmount() || paying()"
+                        class="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
+                      >
+                        <lucide-angular [img]="icons.creditCard" [size]="16" />
+                        {{ paying() ? 'جاري الدفع...' : 'تأكيد الدفع' }}
+                      </button>
+                    </div>
+                  </div>
+                }
+              }
+
+              @if (bill.status === 'paid') {
+                <div class="flex gap-2 mt-4 pt-4 border-t">
+                  <button
+                    type="button"
+                    class="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <lucide-angular [img]="icons.download" [size]="16" />
+                    تحميل الإيصال
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

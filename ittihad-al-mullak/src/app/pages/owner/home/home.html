@@ -1,0 +1,31 @@
+<app-owner-header />
+
+<div class="p-4 space-y-6">
+  @if (loading()) {
+    <p class="text-center text-sm text-muted-foreground py-12">جاري التحميل...</p>
+  } @else if (error()) {
+    <p class="text-center text-sm text-destructive py-12">{{ error() }}</p>
+  } @else if (summary(); as s) {
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-l from-primary to-primary/80 text-primary-foreground rounded-2xl p-5">
+      <p class="text-sm opacity-90">مرحباً</p>
+      <h2 class="text-xl font-bold mt-1">{{ s.name }}</h2>
+      <p class="text-sm opacity-90 mt-1">
+        @if (s.apartmentNumber) {
+          شقة {{ s.apartmentNumber }}@if (s.floor !== null) { - الطابق {{ s.floor }}} - {{ s.buildingName }}
+        } @else {
+          {{ s.buildingName }}
+        }
+      </p>
+    </div>
+
+    <!-- Quick Stats -->
+    <app-quick-stats [summary]="s" />
+
+    <!-- Pending Bills -->
+    <app-pending-bills [bills]="s.pendingBills" />
+
+    <!-- Announcements -->
+    <app-announcements-list [announcements]="s.latestAnnouncements" />
+  }
+</div>

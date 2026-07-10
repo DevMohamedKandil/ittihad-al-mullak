@@ -1,0 +1,679 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-bold">الإعدادات</h1>
+    <p class="text-muted-foreground">إعدادات النظام والعمارة</p>
+  </div>
+
+  <div class="space-y-6">
+    <!-- Tabs -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-2 h-auto rounded-lg bg-muted p-1 text-muted-foreground">
+      @for (tab of tabs; track tab.id) {
+        <button
+          type="button"
+          (click)="activeTab.set(tab.id)"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-all"
+          [class.bg-background]="activeTab() === tab.id"
+          [class.text-foreground]="activeTab() === tab.id"
+          [class.shadow]="activeTab() === tab.id"
+        >
+          <lucide-angular [img]="tab.icon" [size]="16" />
+          <span class="hidden sm:inline">{{ tab.label }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Building Settings -->
+    @if (activeTab() === 'building') {
+      <div class="space-y-6">
+        @if (loading()) {
+          <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+            <div class="p-8 text-center text-muted-foreground">جاري التحميل...</div>
+          </div>
+        }
+        @if (error()) {
+          <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+            <div class="p-4 text-center text-destructive">{{ error() }}</div>
+          </div>
+        }
+        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div class="p-6">
+            <h3 class="text-xl font-semibold">معلومات العمارة</h3>
+            <p class="text-sm text-muted-foreground">البيانات الأساسية للعمارة</p>
+          </div>
+          <div class="p-6 pt-0 space-y-4">
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label for="building-name" class="text-sm font-medium leading-none">اسم العمارة</label>
+                <input
+                  id="building-name"
+                  type="text"
+                  [ngModel]="buildingName()"
+                  (ngModelChange)="buildingName.set($event)"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              </div>
+              <div class="space-y-2">
+                <label for="building-code" class="text-sm font-medium leading-none">كود العمارة</label>
+                <input
+                  id="building-code"
+                  type="text"
+                  [value]="buildingCode()"
+                  disabled
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label for="address" class="text-sm font-medium leading-none">العنوان</label>
+              <div class="relative">
+                <lucide-angular
+                  [img]="icons.mapPin"
+                  [size]="16"
+                  class="absolute right-3 top-3 text-muted-foreground"
+                />
+                <textarea
+                  id="address"
+                  rows="2"
+                  [ngModel]="address()"
+                  (ngModelChange)="address.set($event)"
+                  class="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 pr-10 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                ></textarea>
+              </div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label for="floors" class="text-sm font-medium leading-none">عدد الأدوار</label>
+                <input
+                  id="floors"
+                  type="number"
+                  [ngModel]="floorsCount()"
+                  (ngModelChange)="floorsCount.set($event)"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              </div>
+              <div class="space-y-2">
+                <label for="apartments" class="text-sm font-medium leading-none">عدد الشقق</label>
+                <input
+                  id="apartments"
+                  type="number"
+                  [ngModel]="apartmentsCount()"
+                  (ngModelChange)="apartmentsCount.set($event)"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              </div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label for="monthly-subscription" class="text-sm font-medium leading-none">الاشتراك الشهري (ج.م)</label>
+                <input
+                  id="monthly-subscription"
+                  type="number"
+                  [ngModel]="monthlySubscription()"
+                  (ngModelChange)="monthlySubscription.set($event)"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              </div>
+              <div class="space-y-2">
+                <label for="due-day" class="text-sm font-medium leading-none">يوم الاستحقاق الشهري</label>
+                <input
+                  id="due-day"
+                  type="number"
+                  min="1"
+                  max="28"
+                  [ngModel]="dueDay()"
+                  (ngModelChange)="dueDay.set($event)"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div class="p-6">
+            <h3 class="text-xl font-semibold">بيانات التواصل</h3>
+            <p class="text-sm text-muted-foreground">معلومات الاتصال الخاصة بالإدارة</p>
+          </div>
+          <div class="p-6 pt-0 space-y-4">
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label for="contact-phone" class="text-sm font-medium leading-none">رقم الهاتف</label>
+                <div class="relative">
+                  <lucide-angular
+                    [img]="icons.phone"
+                    [size]="16"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  />
+                  <input
+                    id="contact-phone"
+                    type="text"
+                    [ngModel]="phone()"
+                    (ngModelChange)="phone.set($event)"
+                    dir="ltr"
+                    class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  />
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label for="contact-email" class="text-sm font-medium leading-none">البريد الإلكتروني</label>
+                <div class="relative">
+                  <lucide-angular
+                    [img]="icons.mail"
+                    [size]="16"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  />
+                  <input
+                    id="contact-email"
+                    type="email"
+                    [ngModel]="email()"
+                    (ngModelChange)="email.set($event)"
+                    dir="ltr"
+                    class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label for="whatsapp" class="text-sm font-medium leading-none">رقم الواتساب</label>
+              <input
+                id="whatsapp"
+                type="text"
+                [ngModel]="whatsApp()"
+                (ngModelChange)="whatsApp.set($event)"
+                dir="ltr"
+                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Notifications Settings -->
+    @if (activeTab() === 'notifications') {
+      <div class="space-y-6">
+        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div class="p-6">
+            <h3 class="text-xl font-semibold">إعدادات الإشعارات</h3>
+            <p class="text-sm text-muted-foreground">تحكم في طريقة إرسال الإشعارات للمستخدمين</p>
+          </div>
+          <div class="p-6 pt-0 space-y-6">
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">إشعارات التطبيق</label>
+                <p class="text-sm text-muted-foreground">إرسال إشعارات داخل التطبيق</p>
+              </div>
+              <button
+                type="button"
+                (click)="appNotifications.set(!appNotifications())"
+                [class.bg-primary]="appNotifications()"
+                [class.bg-input]="!appNotifications()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="appNotifications()"
+                  [class.-translate-x-0.5]="!appNotifications()"
+                ></span>
+              </button>
+            </div>
+            <div class="shrink-0 bg-border h-px w-full"></div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">إشعارات واتساب</label>
+                <p class="text-sm text-muted-foreground">إرسال رسائل عبر واتساب</p>
+              </div>
+              <button
+                type="button"
+                (click)="whatsappNotifications.set(!whatsappNotifications())"
+                [class.bg-primary]="whatsappNotifications()"
+                [class.bg-input]="!whatsappNotifications()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="whatsappNotifications()"
+                  [class.-translate-x-0.5]="!whatsappNotifications()"
+                ></span>
+              </button>
+            </div>
+            <div class="shrink-0 bg-border h-px w-full"></div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">رسائل SMS</label>
+                <p class="text-sm text-muted-foreground">إرسال رسائل نصية قصيرة</p>
+              </div>
+              <button
+                type="button"
+                (click)="smsNotifications.set(!smsNotifications())"
+                [class.bg-primary]="smsNotifications()"
+                [class.bg-input]="!smsNotifications()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="smsNotifications()"
+                  [class.-translate-x-0.5]="!smsNotifications()"
+                ></span>
+              </button>
+            </div>
+            <div class="shrink-0 bg-border h-px w-full"></div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">البريد الإلكتروني</label>
+                <p class="text-sm text-muted-foreground">إرسال إشعارات عبر البريد</p>
+              </div>
+              <button
+                type="button"
+                (click)="emailNotifications.set(!emailNotifications())"
+                [class.bg-primary]="emailNotifications()"
+                [class.bg-input]="!emailNotifications()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="emailNotifications()"
+                  [class.-translate-x-0.5]="!emailNotifications()"
+                ></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div class="p-6">
+            <h3 class="text-xl font-semibold">تذكيرات الدفع التلقائية</h3>
+            <p class="text-sm text-muted-foreground">إعدادات التذكيرات التلقائية للمتأخرين</p>
+          </div>
+          <div class="p-6 pt-0 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">تفعيل التذكيرات التلقائية</label>
+                <p class="text-sm text-muted-foreground">إرسال تذكيرات للمتأخرين تلقائياً</p>
+              </div>
+              <button
+                type="button"
+                (click)="autoReminders.set(!autoReminders())"
+                [class.bg-primary]="autoReminders()"
+                [class.bg-input]="!autoReminders()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="autoReminders()"
+                  [class.-translate-x-0.5]="!autoReminders()"
+                ></span>
+              </button>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="text-sm font-medium leading-none">التذكير الأول بعد</label>
+                <select class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <option value="1">يوم واحد</option>
+                  <option value="3" selected>3 أيام</option>
+                  <option value="5">5 أيام</option>
+                  <option value="7">أسبوع</option>
+                </select>
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium leading-none">التذكير الثاني بعد</label>
+                <select class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <option value="5">5 أيام</option>
+                  <option value="7" selected>أسبوع</option>
+                  <option value="14">أسبوعين</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Payments Settings -->
+    @if (activeTab() === 'payments') {
+      <div class="space-y-6">
+        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div class="p-6">
+            <h3 class="text-xl font-semibold">طرق الدفع</h3>
+            <p class="text-sm text-muted-foreground">تفعيل وإعداد طرق الدفع المتاحة</p>
+          </div>
+          <div class="p-6 pt-0 space-y-6">
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">الدفع عبر فوري</label>
+                <p class="text-sm text-muted-foreground">السماح بالدفع من خلال منافذ فوري</p>
+              </div>
+              <button
+                type="button"
+                (click)="fawryEnabled.set(!fawryEnabled())"
+                [class.bg-primary]="fawryEnabled()"
+                [class.bg-input]="!fawryEnabled()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="fawryEnabled()"
+                  [class.-translate-x-0.5]="!fawryEnabled()"
+                ></span>
+              </button>
+            </div>
+            <div class="shrink-0 bg-border h-px w-full"></div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">البطاقات الائتمانية</label>
+                <p class="text-sm text-muted-foreground">قبول الدفع ببطاقات Visa و Mastercard</p>
+              </div>
+              <button
+                type="button"
+                (click)="cardsEnabled.set(!cardsEnabled())"
+                [class.bg-primary]="cardsEnabled()"
+                [class.bg-input]="!cardsEnabled()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="cardsEnabled()"
+                  [class.-translate-x-0.5]="!cardsEnabled()"
+                ></span>
+              </button>
+            </div>
+            <div class="shrink-0 bg-border h-px w-full"></div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">التحويل البنكي</label>
+                <p class="text-sm text-muted-foreground">السماح بالتحويل البنكي المباشر</p>
+              </div>
+              <button
+                type="button"
+                (click)="bankTransferEnabled.set(!bankTransferEnabled())"
+                [class.bg-primary]="bankTransferEnabled()"
+                [class.bg-input]="!bankTransferEnabled()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="bankTransferEnabled()"
+                  [class.-translate-x-0.5]="!bankTransferEnabled()"
+                ></span>
+              </button>
+            </div>
+            <div class="shrink-0 bg-border h-px w-full"></div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">الدفع النقدي</label>
+                <p class="text-sm text-muted-foreground">تسجيل المدفوعات النقدية يدوياً</p>
+              </div>
+              <button
+                type="button"
+                (click)="cashEnabled.set(!cashEnabled())"
+                [class.bg-primary]="cashEnabled()"
+                [class.bg-input]="!cashEnabled()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="cashEnabled()"
+                  [class.-translate-x-0.5]="!cashEnabled()"
+                ></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div class="p-6">
+            <h3 class="text-xl font-semibold">إعدادات الفواتير</h3>
+            <p class="text-sm text-muted-foreground">ضبط إعدادات إصدار الفواتير</p>
+          </div>
+          <div class="p-6 pt-0 space-y-4">
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="text-sm font-medium leading-none">يوم إصدار الفواتير الشهرية</label>
+                <select class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <option value="1" selected>اليوم الأول</option>
+                  <option value="15">اليوم الخامس عشر</option>
+                  <option value="25">اليوم الخامس والعشرين</option>
+                </select>
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium leading-none">مهلة السداد (بالأيام)</label>
+                <select class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <option value="7">7 أيام</option>
+                  <option value="15" selected>15 يوم</option>
+                  <option value="30">30 يوم</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-2">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">إصدار الفواتير تلقائياً</label>
+                <p class="text-sm text-muted-foreground">إنشاء الفواتير الشهرية تلقائياً</p>
+              </div>
+              <button
+                type="button"
+                (click)="autoInvoices.set(!autoInvoices())"
+                [class.bg-primary]="autoInvoices()"
+                [class.bg-input]="!autoInvoices()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="autoInvoices()"
+                  [class.-translate-x-0.5]="!autoInvoices()"
+                ></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Security Settings -->
+    @if (activeTab() === 'security') {
+      <div class="space-y-6">
+        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div class="p-6">
+            <h3 class="text-xl font-semibold">إعدادات الأمان</h3>
+            <p class="text-sm text-muted-foreground">ضبط إعدادات أمان الحسابات</p>
+          </div>
+          <div class="p-6 pt-0 space-y-6">
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">المصادقة الثنائية</label>
+                <p class="text-sm text-muted-foreground">طلب رمز تأكيد عند تسجيل الدخول</p>
+              </div>
+              <button
+                type="button"
+                (click)="twoFactor.set(!twoFactor())"
+                [class.bg-primary]="twoFactor()"
+                [class.bg-input]="!twoFactor()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="twoFactor()"
+                  [class.-translate-x-0.5]="!twoFactor()"
+                ></span>
+              </button>
+            </div>
+            <div class="shrink-0 bg-border h-px w-full"></div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">تسجيل الخروج التلقائي</label>
+                <p class="text-sm text-muted-foreground">تسجيل الخروج بعد فترة عدم نشاط</p>
+              </div>
+              <button
+                type="button"
+                (click)="autoLogout.set(!autoLogout())"
+                [class.bg-primary]="autoLogout()"
+                [class.bg-input]="!autoLogout()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="autoLogout()"
+                  [class.-translate-x-0.5]="!autoLogout()"
+                ></span>
+              </button>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium leading-none">مدة الجلسة (بالدقائق)</label>
+              <select class="flex h-9 w-48 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                <option value="15">15 دقيقة</option>
+                <option value="30" selected>30 دقيقة</option>
+                <option value="60">ساعة</option>
+                <option value="120">ساعتين</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div class="p-6">
+            <h3 class="text-xl font-semibold">سياسة كلمة المرور</h3>
+            <p class="text-sm text-muted-foreground">متطلبات كلمة المرور للمستخدمين</p>
+          </div>
+          <div class="p-6 pt-0 space-y-4">
+            <div class="space-y-2">
+              <label class="text-sm font-medium leading-none">الحد الأدنى لطول كلمة المرور</label>
+              <select class="flex h-9 w-48 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                <option value="6">6 أحرف</option>
+                <option value="8" selected>8 أحرف</option>
+                <option value="10">10 أحرف</option>
+                <option value="12">12 حرف</option>
+              </select>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">اشتراط أحرف كبيرة وصغيرة</label>
+              </div>
+              <button
+                type="button"
+                (click)="requireMixedCase.set(!requireMixedCase())"
+                [class.bg-primary]="requireMixedCase()"
+                [class.bg-input]="!requireMixedCase()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="requireMixedCase()"
+                  [class.-translate-x-0.5]="!requireMixedCase()"
+                ></span>
+              </button>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">اشتراط أرقام</label>
+              </div>
+              <button
+                type="button"
+                (click)="requireNumbers.set(!requireNumbers())"
+                [class.bg-primary]="requireNumbers()"
+                [class.bg-input]="!requireNumbers()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="requireNumbers()"
+                  [class.-translate-x-0.5]="!requireNumbers()"
+                ></span>
+              </button>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">اشتراط رموز خاصة</label>
+              </div>
+              <button
+                type="button"
+                (click)="requireSymbols.set(!requireSymbols())"
+                [class.bg-primary]="requireSymbols()"
+                [class.bg-input]="!requireSymbols()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="requireSymbols()"
+                  [class.-translate-x-0.5]="!requireSymbols()"
+                ></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Appearance Settings -->
+    @if (activeTab() === 'appearance') {
+      <div class="space-y-6">
+        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div class="p-6">
+            <h3 class="text-xl font-semibold">المظهر العام</h3>
+            <p class="text-sm text-muted-foreground">تخصيص مظهر التطبيق</p>
+          </div>
+          <div class="p-6 pt-0 space-y-6">
+            <div class="space-y-2">
+              <label class="text-sm font-medium leading-none">الوضع الافتراضي</label>
+              <select class="flex h-9 w-48 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                <option value="light" selected>فاتح</option>
+                <option value="dark">داكن</option>
+                <option value="system">حسب النظام</option>
+              </select>
+            </div>
+            <div class="shrink-0 bg-border h-px w-full"></div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium leading-none">اللغة</label>
+              <div class="relative w-48">
+                <lucide-angular
+                  [img]="icons.globe"
+                  [size]="16"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                />
+                <select class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-9 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <option value="ar" selected>العربية</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+            </div>
+            <div class="shrink-0 bg-border h-px w-full"></div>
+            <div class="flex items-center justify-between">
+              <div class="space-y-0.5">
+                <label class="text-sm font-medium leading-none">عرض التاريخ الهجري</label>
+                <p class="text-sm text-muted-foreground">إظهار التاريخ الهجري بجانب الميلادي</p>
+              </div>
+              <button
+                type="button"
+                (click)="hijriDate.set(!hijriDate())"
+                [class.bg-primary]="hijriDate()"
+                [class.bg-input]="!hijriDate()"
+                class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+              >
+                <span
+                  class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+                  [class.-translate-x-4]="hijriDate()"
+                  [class.-translate-x-0.5]="!hijriDate()"
+                ></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Save Button -->
+  <div class="flex justify-end items-center gap-3">
+    @if (saveMessage()) {
+      <span class="text-sm text-success">{{ saveMessage() }}</span>
+    }
+    <button
+      type="button"
+      (click)="save()"
+      [disabled]="saving() || loading()"
+      class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+    >
+      <lucide-angular [img]="icons.save" [size]="16" />
+      {{ saving() ? 'جاري الحفظ...' : 'حفظ الإعدادات' }}
+    </button>
+  </div>
+</div>

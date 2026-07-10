@@ -1,0 +1,36 @@
+@if (error()) {
+  <p class="text-sm text-destructive mb-2">{{ error() }}</p>
+}
+<div class="grid gap-4 lg:grid-cols-2">
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-6 pb-2">
+      <h3 class="text-lg font-semibold">التحصيل الشهري</h3>
+      <p class="text-sm text-muted-foreground">مقارنة التحصيل بالمستهدف</p>
+    </div>
+    <div class="p-6 pt-4">
+      <div class="h-[250px] relative">
+        <canvas #areaCanvas></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-6 pb-2">
+      <h3 class="text-lg font-semibold">حالة السداد</h3>
+      <p class="text-sm text-muted-foreground">توزيع الشقق حسب حالة الدفع</p>
+    </div>
+    <div class="p-6 pt-4">
+      <div class="h-[220px] relative">
+        <canvas #pieCanvas></canvas>
+      </div>
+      <div class="flex justify-center gap-6 mt-4">
+        @for (item of paymentStatusData(); track item.name) {
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full" [style.background-color]="item.color"></div>
+            <span class="text-sm text-muted-foreground">{{ item.name }} ({{ item.value }})</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

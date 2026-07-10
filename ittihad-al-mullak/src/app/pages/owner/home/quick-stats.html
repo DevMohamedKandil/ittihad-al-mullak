@@ -1,0 +1,18 @@
+<div class="grid grid-cols-2 gap-3">
+  @for (stat of stats(); track stat.label) {
+    <div class="rounded-xl border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+      <div class="p-4 flex items-center gap-3">
+        <div
+          class="flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0"
+          [class]="stat.iconBg"
+        >
+          <lucide-angular [img]="stat.icon" [size]="20" [class]="stat.iconClass" />
+        </div>
+        <div class="min-w-0">
+          <p class="text-sm text-muted-foreground">{{ stat.label }}</p>
+          <p class="font-bold text-lg truncate">{{ stat.value }}</p>
+        </div>
+      </div>
+    </div>
+  }
+</div>

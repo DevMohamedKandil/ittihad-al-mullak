@@ -1,0 +1,349 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-bold">إدارة طلبات الصيانة</h1>
+    <p class="text-muted-foreground">متابعة وإدارة جميع طلبات الصيانة</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    @for (stat of stats(); track stat.label) {
+      <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+        <div class="p-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg" [class]="stat.bg">
+              <lucide-angular [img]="stat.icon" [size]="20" [class]="stat.color" />
+            </div>
+            <div>
+              <p class="text-sm text-muted-foreground">{{ stat.label }}</p>
+              <p class="text-xl font-bold">{{ stat.value }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Filters -->
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-4">
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="relative flex-1">
+          <lucide-angular
+            [img]="icons.search"
+            [size]="16"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
+          <input
+            type="text"
+            placeholder="بحث بعنوان الطلب أو رقمه أو اسم المالك..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+        <select
+          [ngModel]="statusFilter()"
+          (ngModelChange)="statusFilter.set($event)"
+          class="flex h-9 w-full sm:w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <option value="all">جميع الحالات</option>
+          <option value="Pending">جديد</option>
+          <option value="InProgress">قيد التنفيذ</option>
+          <option value="Completed">مكتمل</option>
+          <option value="Rejected">مرفوض</option>
+        </select>
+        <select
+          [ngModel]="categoryFilter()"
+          (ngModelChange)="categoryFilter.set($event)"
+          class="flex h-9 w-full sm:w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <option value="all">جميع الفئات</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading / Error -->
+  @if (loading()) {
+    <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+      <div class="p-8 text-center text-muted-foreground">جاري التحميل...</div>
+    </div>
+  } @else if (error()) {
+    <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+      <div class="p-8 text-center">
+        <p class="text-destructive mb-3">{{ error() }}</p>
+        <button
+          type="button"
+          (click)="load()"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+        >
+          إعادة المحاولة
+        </button>
+      </div>
+    </div>
+  } @else {
+    <!-- Requests -->
+    <div class="space-y-4">
+      <div class="inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
+        <button
+          type="button"
+          (click)="activeTab.set('new')"
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
+          [class]="activeTab() === 'new' ? 'bg-background text-foreground shadow' : ''"
+        >
+          جديد ({{ newCount() }})
+        </button>
+        <button
+          type="button"
+          (click)="activeTab.set('in-progress')"
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
+          [class]="activeTab() === 'in-progress' ? 'bg-background text-foreground shadow' : ''"
+        >
+          قيد التنفيذ ({{ inProgressCount() }})
+        </button>
+        <button
+          type="button"
+          (click)="activeTab.set('completed')"
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
+          [class]="activeTab() === 'completed' ? 'bg-background text-foreground shadow' : ''"
+        >
+          مكتمل ({{ completedCount() }})
+        </button>
+        <button
+          type="button"
+          (click)="activeTab.set('all')"
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
+          [class]="activeTab() === 'all' ? 'bg-background text-foreground shadow' : ''"
+        >
+          الكل ({{ filteredRequests().length }})
+        </button>
+      </div>
+
+      @if (visibleRequests().length === 0) {
+        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+          <div class="p-8 text-center">
+            <lucide-angular [img]="icons.wrench" [size]="48" class="text-muted-foreground mx-auto mb-4" />
+            <p class="text-muted-foreground">لا توجد طلبات صيانة</p>
+          </div>
+        </div>
+      }
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (request of visibleRequests(); track request.id) {
+          <div class="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="p-6 pb-3">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-base font-semibold truncate">{{ request.title }}</h3>
+                  <p class="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+                    <span class="text-xs">#{{ request.id }}</span>
+                    <span>•</span>
+                    <span class="text-xs">{{ request.category || 'أخرى' }}</span>
+                  </p>
+                </div>
+                <div class="relative">
+                  <button
+                    type="button"
+                    (click)="toggleMenu(request.id)"
+                    aria-label="خيارات الطلب"
+                    class="inline-flex items-center justify-center rounded-md h-8 w-8 transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <lucide-angular [img]="icons.moreVertical" [size]="16" />
+                  </button>
+                  @if (openMenuId() === request.id) {
+                    <div class="fixed inset-0 z-40" (click)="closeMenu()"></div>
+                    <div class="absolute left-0 top-9 z-50 w-40 rounded-md border bg-popover text-popover-foreground p-1 shadow-md">
+                      <button
+                        type="button"
+                        (click)="selectRequest(request)"
+                        class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                      >
+                        عرض التفاصيل
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="p-6 pt-0 space-y-3">
+              <p class="text-sm text-muted-foreground line-clamp-2">{{ request.description }}</p>
+
+              <div class="flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-1.5">
+                  <lucide-angular [img]="icons.user" [size]="14" class="text-muted-foreground" />
+                  <span class="truncate max-w-24">{{ request.requesterName }}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <lucide-angular [img]="icons.home" [size]="14" class="text-muted-foreground" />
+                  <span>{{ request.apartmentLabel }}</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-2 border-t">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+                    [class]="statusBadges[request.status].class"
+                  >
+                    <lucide-angular [img]="statusBadges[request.status].icon" [size]="12" class="ml-1" />
+                    {{ statusLabels[request.status] }}
+                  </span>
+                  <span
+                    class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+                    [class]="priorityBadges[request.priority].class"
+                  >
+                    <lucide-angular [img]="priorityBadges[request.priority].icon" [size]="12" />
+                    {{ priorityLabels[request.priority] }}
+                  </span>
+                </div>
+                <span class="text-xs text-muted-foreground">{{ formatRelative(request.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Details Dialog -->
+@if (dialogOpen() && selectedRequest(); as request) {
+  <div class="fixed inset-0 z-40 bg-black/50" (click)="closeDialog()"></div>
+  <div
+    class="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 border bg-background p-6 shadow-lg rounded-lg max-h-[90vh] flex flex-col gap-4"
+  >
+    <div class="flex flex-col space-y-1.5 text-right">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-semibold leading-none tracking-tight">{{ request.title }}</h2>
+          <p class="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+            <span>#{{ request.id }}</span>
+            <span>•</span>
+            <span>{{ request.category || 'أخرى' }}</span>
+            <span>•</span>
+            <span>{{ formatDate(request.createdAt) }}</span>
+          </p>
+        </div>
+        <div class="flex flex-col gap-2 items-end">
+          <span
+            class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+            [class]="statusBadges[request.status].class"
+          >
+            <lucide-angular [img]="statusBadges[request.status].icon" [size]="12" class="ml-1" />
+            {{ statusLabels[request.status] }}
+          </span>
+          <span
+            class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+            [class]="priorityBadges[request.priority].class"
+          >
+            <lucide-angular [img]="priorityBadges[request.priority].icon" [size]="12" />
+            {{ priorityLabels[request.priority] }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto -mx-6 px-6">
+      <div class="space-y-6 py-4">
+        <!-- Request Info -->
+        <div class="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+          <div class="flex items-center gap-2">
+            <lucide-angular [img]="icons.user" [size]="16" class="text-muted-foreground" />
+            <span class="text-sm">{{ request.requesterName }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <lucide-angular [img]="icons.home" [size]="16" class="text-muted-foreground" />
+            <span class="text-sm">
+              {{ request.apartmentLabel === 'عام' ? 'مناطق عامة' : 'شقة ' + request.apartmentLabel }}
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <lucide-angular [img]="icons.calendar" [size]="16" class="text-muted-foreground" />
+            <span class="text-sm">{{ formatRelative(request.createdAt) }}</span>
+          </div>
+          @if (request.assignedTo) {
+            <div class="flex items-center gap-2">
+              <lucide-angular [img]="icons.wrench" [size]="16" class="text-muted-foreground" />
+              <span class="text-sm">{{ request.assignedTo }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Description -->
+        <div>
+          <h4 class="font-medium mb-2">الوصف</h4>
+          <p class="text-muted-foreground">{{ request.description }}</p>
+        </div>
+
+        @if (request.rejectionReason) {
+          <div>
+            <h4 class="font-medium mb-2">سبب الرفض</h4>
+            <p class="text-muted-foreground">{{ request.rejectionReason }}</p>
+          </div>
+        }
+
+        <!-- Update Status -->
+        <div class="space-y-3 border-t pt-4">
+          <h4 class="font-medium">تحديث الحالة</h4>
+          <div class="flex gap-3">
+            <select
+              [ngModel]="newStatus()"
+              (ngModelChange)="newStatus.set($event)"
+              aria-label="الحالة الجديدة"
+              title="الحالة الجديدة"
+              class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="Pending">جديد</option>
+              <option value="InProgress">قيد التنفيذ</option>
+              <option value="Completed">مكتمل</option>
+              <option value="Rejected">مرفوض</option>
+            </select>
+            @if (newStatus() === 'InProgress') {
+              <input
+                type="text"
+                placeholder="الجهة المسؤولة"
+                [ngModel]="assignedTo()"
+                (ngModelChange)="assignedTo.set($event)"
+                class="flex h-9 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            }
+          </div>
+          @if (newStatus() === 'Rejected') {
+            <textarea
+              placeholder="سبب الرفض..."
+              rows="2"
+              [ngModel]="rejectionReason()"
+              (ngModelChange)="rejectionReason.set($event)"
+              class="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            ></textarea>
+          }
+          @if (saveError()) {
+            <p class="text-sm text-destructive">{{ saveError() }}</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-start gap-2 border-t pt-4">
+      <button
+        type="button"
+        (click)="closeDialog()"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+      >
+        إلغاء
+      </button>
+      <button
+        type="button"
+        (click)="saveStatus()"
+        [disabled]="saving()"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 disabled:opacity-50"
+      >
+        {{ saving() ? 'جاري الحفظ...' : 'حفظ التحديثات' }}
+      </button>
+    </div>
+  </div>
+}

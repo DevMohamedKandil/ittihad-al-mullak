@@ -1,0 +1,433 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold">إدارة المستخدمين</h1>
+      <p class="text-muted-foreground">إدارة حسابات الملاك والمستأجرين والمديرين</p>
+    </div>
+    <button
+      type="button"
+      (click)="openAddDialog()"
+      class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
+    >
+      <lucide-angular [img]="icons.plus" [size]="16" />
+      إضافة مستخدم
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    @for (stat of stats(); track stat.label) {
+      <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+        <div class="p-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg" [class]="stat.bg">
+              <lucide-angular [img]="stat.icon" [size]="20" [class]="stat.color" />
+            </div>
+            <div>
+              <p class="text-sm text-muted-foreground">{{ stat.label }}</p>
+              <p class="text-xl font-bold">{{ stat.value }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Users Table -->
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-6 pb-4">
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="relative flex-1">
+          <lucide-angular
+            [img]="icons.search"
+            [size]="16"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
+          <input
+            type="text"
+            placeholder="بحث بالاسم أو الهاتف أو البريد..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+        <div class="flex gap-2">
+          <select
+            [ngModel]="roleFilter()"
+            (ngModelChange)="roleFilter.set($event)"
+            aria-label="نوع المستخدم"
+            title="نوع المستخدم"
+            class="flex h-9 w-32 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <option value="all">الكل</option>
+            <option value="Admin">مدير</option>
+            <option value="Owner">مالك</option>
+            <option value="Tenant">مستأجر</option>
+          </select>
+          <div class="relative">
+            <lucide-angular
+              [img]="icons.filter"
+              [size]="16"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
+            <select
+              [ngModel]="statusFilter()"
+              (ngModelChange)="statusFilter.set($event)"
+              aria-label="حالة المستخدم"
+              title="حالة المستخدم"
+              class="flex h-9 w-32 rounded-md border border-input bg-transparent px-3 py-1 pr-9 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="all">الكل</option>
+              <option value="active">نشط</option>
+              <option value="inactive">غير نشط</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="p-6 pt-0">
+      <!-- Tabs -->
+      <div class="mb-4 inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
+        @for (tab of tabs(); track tab.id) {
+          <button
+            type="button"
+            (click)="activeTab.set(tab.id)"
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
+            [class.bg-background]="activeTab() === tab.id"
+            [class.text-foreground]="activeTab() === tab.id"
+            [class.shadow]="activeTab() === tab.id"
+          >
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+
+      @if (loading()) {
+        <div class="rounded-lg border p-8 text-center text-muted-foreground">جاري التحميل...</div>
+      } @else if (error()) {
+        <div class="rounded-lg border p-8 text-center">
+          <p class="text-destructive mb-3">{{ error() }}</p>
+          <button
+            type="button"
+            (click)="load()"
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+          >
+            إعادة المحاولة
+          </button>
+        </div>
+      } @else {
+        <div class="rounded-lg border overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full caption-bottom text-sm">
+              <thead>
+                <tr class="border-b transition-colors hover:bg-muted/50">
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">المستخدم</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">الهاتف</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">النوع</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">الشقة</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">الحالة</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">تاريخ التسجيل</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground w-12"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (user of visibleUsers(); track user.id) {
+                  <tr class="border-b transition-colors hover:bg-muted/50">
+                    <td class="p-2 align-middle">
+                      <div class="flex items-center gap-3">
+                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                          {{ user.name.charAt(0) }}
+                        </div>
+                        <div>
+                          <p class="font-medium">{{ user.name }}</p>
+                          <p class="text-xs text-muted-foreground" dir="ltr">{{ user.email ?? '-' }}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="p-2 align-middle text-right" dir="ltr">{{ user.phone }}</td>
+                    <td class="p-2 align-middle">
+                      <span
+                        class="inline-flex items-center gap-1 rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+                        [class]="roleConfig[user.role].class"
+                      >
+                        <lucide-angular [img]="roleConfig[user.role].icon" [size]="12" />
+                        {{ roleLabels[user.role] }}
+                      </span>
+                    </td>
+                    <td class="p-2 align-middle">
+                      @if (user.apartmentNumber) {
+                        <span>شقة {{ user.apartmentNumber }}</span>
+                      } @else {
+                        <span class="text-muted-foreground">-</span>
+                      }
+                    </td>
+                    <td class="p-2 align-middle">
+                      <span
+                        class="inline-flex items-center gap-1 rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+                        [class]="statusConfig[statusKey(user)].class"
+                      >
+                        <lucide-angular [img]="statusConfig[statusKey(user)].icon" [size]="12" />
+                        {{ statusConfig[statusKey(user)].label }}
+                      </span>
+                    </td>
+                    <td class="p-2 align-middle">
+                      <span class="text-sm">{{ formatDate(user.createdAt) }}</span>
+                    </td>
+                    <td class="p-2 align-middle relative">
+                      <button
+                        type="button"
+                        (click)="toggleMenu(user.id)"
+                        aria-label="خيارات المستخدم"
+                        class="inline-flex items-center justify-center rounded-md h-9 w-9 transition-colors hover:bg-accent hover:text-accent-foreground"
+                      >
+                        <lucide-angular [img]="icons.moreVertical" [size]="16" />
+                      </button>
+                      @if (openMenuId() === user.id) {
+                        <div class="fixed inset-0 z-40" (click)="closeMenu()"></div>
+                        <div class="absolute left-0 top-10 z-50 w-52 rounded-md border bg-popover text-popover-foreground p-1 shadow-md">
+                          <button type="button" (click)="showDetails(user)" class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground">
+                            <lucide-angular [img]="icons.user" [size]="16" />
+                            عرض التفاصيل
+                          </button>
+                          <div class="my-1 h-px bg-muted"></div>
+                          @if (user.isActive) {
+                            <button type="button" (click)="toggleActive(user)" class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-destructive hover:bg-accent hover:text-accent-foreground">
+                              <lucide-angular [img]="icons.xCircle" [size]="16" />
+                              إلغاء التفعيل
+                            </button>
+                          } @else {
+                            <button type="button" (click)="toggleActive(user)" class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground">
+                              <lucide-angular [img]="icons.checkCircle" [size]="16" />
+                              تفعيل الحساب
+                            </button>
+                          }
+                        </div>
+                      }
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="7" class="p-8 text-center text-muted-foreground">لا يوجد مستخدمون</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Add User Dialog -->
+@if (addDialogOpen()) {
+  <div class="fixed inset-0 bg-black/50 z-40" (click)="addDialogOpen.set(false)"></div>
+  <div class="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-6 shadow-lg max-h-[90vh] overflow-y-auto">
+    <div class="space-y-1.5">
+      <h2 class="text-lg font-semibold">إضافة مستخدم جديد</h2>
+      <p class="text-sm text-muted-foreground">أدخل بيانات المستخدم الجديد</p>
+    </div>
+    <div class="space-y-4 py-4">
+      <div class="space-y-2">
+        <label for="name" class="text-sm font-medium leading-none">الاسم بالكامل</label>
+        <input
+          id="name"
+          type="text"
+          placeholder="أدخل اسم المستخدم"
+          [ngModel]="addName()"
+          (ngModelChange)="addName.set($event)"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label for="phone" class="text-sm font-medium leading-none">رقم الهاتف</label>
+          <input
+            id="phone"
+            type="text"
+            placeholder="01xxxxxxxxx"
+            dir="ltr"
+            [ngModel]="addPhone()"
+            (ngModelChange)="addPhone.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+        <div class="space-y-2">
+          <label for="email" class="text-sm font-medium leading-none">البريد الإلكتروني</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="example&#64;email.com"
+            dir="ltr"
+            [ngModel]="addEmail()"
+            (ngModelChange)="addEmail.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label for="add-role" class="text-sm font-medium leading-none">نوع المستخدم</label>
+        <select
+          id="add-role"
+          [ngModel]="addRole()"
+          (ngModelChange)="addRole.set($event)"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <option value="Admin">مدير</option>
+          <option value="Owner">مالك</option>
+          <option value="Tenant">مستأجر</option>
+        </select>
+      </div>
+
+      @if (addRole() === 'Owner' || addRole() === 'Tenant') {
+        <div class="space-y-2">
+          <label for="add-apartment" class="text-sm font-medium leading-none">الشقة</label>
+          <select
+            id="add-apartment"
+            [ngModel]="addApartmentId()"
+            (ngModelChange)="setApartmentId($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <option [ngValue]="null">اختر الشقة</option>
+            @for (apartment of apartments(); track apartment.id) {
+              <option [ngValue]="apartment.id">شقة {{ apartment.number }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="space-y-2">
+        <label for="password" class="text-sm font-medium leading-none">كلمة المرور المؤقتة</label>
+        <input
+          id="password"
+          type="text"
+          value="123456"
+          disabled
+          dir="ltr"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+        />
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button
+          type="button"
+          (click)="sendInvite.set(!sendInvite())"
+          aria-label="إرسال دعوة تسجيل عبر SMS"
+          title="إرسال دعوة تسجيل عبر SMS"
+          [class.bg-primary]="sendInvite()"
+          [class.bg-input]="!sendInvite()"
+          class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+        >
+          <span
+            class="inline-block h-4 w-4 rounded-full bg-white transition-transform"
+            [class.-translate-x-4]="sendInvite()"
+            [class.-translate-x-0.5]="!sendInvite()"
+          ></span>
+        </button>
+        <label (click)="sendInvite.set(!sendInvite())" class="text-sm font-medium leading-none cursor-pointer">
+          إرسال دعوة تسجيل عبر SMS
+        </label>
+      </div>
+
+      @if (addError()) {
+        <p class="text-sm text-destructive">{{ addError() }}</p>
+      }
+    </div>
+    <div class="flex justify-end gap-2">
+      <button
+        type="button"
+        (click)="addDialogOpen.set(false)"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent hover:bg-accent hover:text-accent-foreground"
+      >
+        إلغاء
+      </button>
+      <button
+        type="button"
+        (click)="createUser()"
+        [disabled]="adding() || !addName().trim() || !addPhone().trim()"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+      >
+        {{ adding() ? 'جاري الإضافة...' : 'إضافة المستخدم' }}
+      </button>
+    </div>
+  </div>
+}
+
+<!-- User Details Dialog -->
+@if (selectedUser(); as user) {
+  <div class="fixed inset-0 bg-black/50 z-40" (click)="selectedUser.set(null)"></div>
+  <div class="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-6 shadow-lg max-h-[90vh] overflow-y-auto">
+    <div class="space-y-1.5">
+      <h2 class="text-lg font-semibold">تفاصيل المستخدم</h2>
+      <p class="text-sm text-muted-foreground">معلومات وإعدادات الحساب</p>
+    </div>
+    <div class="space-y-6 py-4">
+      <div class="flex items-center gap-4">
+        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-muted text-xl">
+          {{ user.name.charAt(0) }}
+        </div>
+        <div>
+          <h3 class="font-semibold text-lg">{{ user.name }}</h3>
+          <div class="flex items-center gap-2 mt-1">
+            <span
+              class="inline-flex items-center gap-1 rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+              [class]="roleConfig[user.role].class"
+            >
+              <lucide-angular [img]="roleConfig[user.role].icon" [size]="12" />
+              {{ roleLabels[user.role] }}
+            </span>
+            <span
+              class="inline-flex items-center gap-1 rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+              [class]="statusConfig[statusKey(user)].class"
+            >
+              <lucide-angular [img]="statusConfig[statusKey(user)].icon" [size]="12" />
+              {{ statusConfig[statusKey(user)].label }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground flex items-center gap-2">
+            <lucide-angular [img]="icons.phone" [size]="14" />
+            رقم الهاتف
+          </p>
+          <p class="font-medium" dir="ltr">{{ user.phone }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground flex items-center gap-2">
+            <lucide-angular [img]="icons.mail" [size]="14" />
+            البريد الإلكتروني
+          </p>
+          <p class="font-medium" dir="ltr">{{ user.email ?? '-' }}</p>
+        </div>
+        @if (user.apartmentNumber) {
+          <div class="space-y-1">
+            <p class="text-sm text-muted-foreground flex items-center gap-2">
+              <lucide-angular [img]="icons.home" [size]="14" />
+              الشقة
+            </p>
+            <p class="font-medium">شقة {{ user.apartmentNumber }}</p>
+          </div>
+        }
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground">تاريخ التسجيل</p>
+          <p class="font-medium">{{ formatDate(user.createdAt) }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col sm:flex-row justify-end gap-2">
+      <button
+        type="button"
+        (click)="selectedUser.set(null)"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent hover:bg-accent hover:text-accent-foreground w-full sm:w-auto"
+      >
+        إغلاق
+      </button>
+    </div>
+  </div>
+}

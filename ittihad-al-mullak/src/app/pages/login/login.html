@@ -1,0 +1,88 @@
+<div class="min-h-screen bg-background flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-gradient-to-bl from-primary/5 via-transparent to-secondary/5"></div>
+
+  <div class="relative w-full max-w-md">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-primary-foreground mb-4">
+        <lucide-angular [img]="icons.building2" [size]="32" />
+      </div>
+      <h1 class="text-2xl font-bold">اتحاد الملاك</h1>
+      <p class="text-muted-foreground mt-1">سجّل دخولك لإدارة عمارتك</p>
+    </div>
+
+    <!-- Card -->
+    <div class="rounded-xl border bg-card text-card-foreground shadow-lg">
+      <form class="p-6 space-y-4" (ngSubmit)="submit()">
+        <div class="space-y-2">
+          <label class="text-sm font-medium" for="phone">رقم الهاتف</label>
+          <div class="relative">
+            <lucide-angular [img]="icons.phone" [size]="16" class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              id="phone"
+              type="tel"
+              dir="ltr"
+              placeholder="01xxxxxxxxx"
+              [ngModel]="phone()"
+              (ngModelChange)="phone.set($event)"
+              name="phone"
+              class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm text-right shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-sm font-medium" for="password">كلمة المرور</label>
+          <div class="relative">
+            <lucide-angular [img]="icons.lock" [size]="16" class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              id="password"
+              type="password"
+              placeholder="••••••"
+              [ngModel]="password()"
+              (ngModelChange)="password.set($event)"
+              name="password"
+              class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+        </div>
+
+        @if (error(); as message) {
+          <div class="rounded-md bg-destructive/10 text-destructive text-sm px-4 py-3">
+            {{ message }}
+          </div>
+        }
+
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        >
+          <lucide-angular [img]="icons.logIn" [size]="16" />
+          {{ loading() ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول' }}
+        </button>
+      </form>
+
+      <!-- Demo accounts -->
+      <div class="border-t p-4">
+        <p class="text-xs text-muted-foreground text-center mb-3">حسابات تجريبية (كلمة المرور: 123456)</p>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="fillDemo('admin')"
+            class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
+          >
+            لجنة الإدارة
+          </button>
+          <button
+            type="button"
+            (click)="fillDemo('owner')"
+            class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
+          >
+            مالك شقة
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

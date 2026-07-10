@@ -1,0 +1,74 @@
+<!-- Mobile toggle -->
+<button
+  type="button"
+  (click)="toggle()"
+  class="fixed top-4 right-4 z-50 lg:hidden bg-card shadow-md inline-flex items-center justify-center rounded-md h-9 w-9 transition-colors hover:bg-accent hover:text-accent-foreground"
+>
+  @if (isOpen()) {
+    <lucide-angular [img]="icons.x" [size]="20" />
+  } @else {
+    <lucide-angular [img]="icons.menu" [size]="20" />
+  }
+</button>
+
+<!-- Overlay -->
+@if (isOpen()) {
+  <div class="fixed inset-0 bg-black/50 z-40 lg:hidden" (click)="close()"></div>
+}
+
+<!-- Sidebar -->
+<aside
+  class="fixed top-0 right-0 z-40 h-screen w-72 bg-sidebar text-sidebar-foreground transition-transform duration-300 lg:translate-x-0"
+  [class.translate-x-0]="isOpen()"
+  [class.translate-x-full]="!isOpen()"
+>
+  <div class="flex flex-col h-full">
+    <!-- Logo -->
+    <div class="flex items-center gap-3 p-6 border-b border-sidebar-border">
+      <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
+        <lucide-angular [img]="icons.building2" [size]="24" />
+      </div>
+      <div>
+        <h1 class="text-lg font-bold">اتحاد الملاك</h1>
+        <p class="text-sm text-sidebar-foreground/70">لوحة الإدارة</p>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+      @for (item of navItems; track item.href) {
+        <a
+          [routerLink]="item.href"
+          routerLinkActive="bg-sidebar-primary text-sidebar-primary-foreground"
+          [routerLinkActiveOptions]="{ exact: item.exact }"
+          (click)="close()"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-base text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        >
+          <lucide-angular [img]="item.icon" [size]="20" />
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <!-- User & Logout -->
+    <div class="p-4 border-t border-sidebar-border">
+      <div class="flex items-center gap-3 px-4 py-3 mb-2">
+        <div class="w-10 h-10 rounded-full bg-sidebar-accent flex items-center justify-center">
+          <span class="text-sm font-medium">{{ userInitials() }}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium truncate">{{ userName() }}</p>
+          <p class="text-xs text-sidebar-foreground/60 truncate">{{ roleLabel() }}</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        (click)="logout()"
+        class="w-full inline-flex items-center justify-start gap-3 rounded-md h-9 px-4 py-2 text-sm font-medium transition-colors text-sidebar-foreground/80 hover:text-destructive hover:bg-destructive/10"
+      >
+        <lucide-angular [img]="icons.logOut" [size]="20" />
+        <span>تسجيل الخروج</span>
+      </button>
+    </div>
+  </div>
+</aside>

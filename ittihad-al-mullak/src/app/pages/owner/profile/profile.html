@@ -1,0 +1,384 @@
+<app-owner-header title="حسابي" />
+
+<div class="p-4 space-y-6">
+  <!-- Profile Card -->
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-6">
+      <div class="flex flex-col items-center text-center">
+        <div class="relative">
+          <div class="h-24 w-24 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl">
+            {{ initial() }}
+          </div>
+          <button
+            type="button"
+            class="absolute bottom-0 left-0 h-8 w-8 rounded-full shadow-md inline-flex items-center justify-center bg-secondary text-secondary-foreground transition-colors hover:bg-secondary/80"
+          >
+            <lucide-angular [img]="icons.camera" [size]="16" />
+          </button>
+        </div>
+        <h2 class="text-xl font-bold mt-4">{{ user()?.name }}</h2>
+        <div class="flex items-center gap-2 mt-2">
+          @if (summary()?.apartmentNumber; as apartmentNumber) {
+            <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold text-foreground">
+              شقة {{ apartmentNumber }}
+            </span>
+          }
+          <span class="inline-flex items-center rounded-md border border-transparent px-2.5 py-0.5 text-xs font-semibold bg-success text-success-foreground">
+            {{ roleLabel() }}
+          </span>
+        </div>
+        @if (summary(); as s) {
+          <p class="text-sm text-muted-foreground mt-2">
+            {{ s.buildingName }} - {{ s.buildingAddress }}
+          </p>
+        }
+
+        <button
+          type="button"
+          (click)="openEditProfile()"
+          class="mt-4 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
+        >
+          <lucide-angular [img]="icons.pencil" [size]="16" />
+          تعديل الملف الشخصي
+        </button>
+
+        @if (isEditProfileOpen()) {
+          <div class="fixed inset-0 bg-black/50 z-40" (click)="closeEditProfile()"></div>
+          <div class="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-6 shadow-lg text-right">
+            <div class="flex flex-col space-y-1.5">
+              <h2 class="text-lg font-semibold">تعديل الملف الشخصي</h2>
+              <p class="text-sm text-muted-foreground">قم بتحديث بياناتك الشخصية</p>
+            </div>
+            <div class="space-y-4 mt-4">
+              <div class="space-y-2">
+                <label class="text-sm font-medium leading-none">الاسم</label>
+                <input
+                  type="text"
+                  [value]="user()?.name ?? ''"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium leading-none">رقم الهاتف</label>
+                <input
+                  type="text"
+                  [value]="user()?.phone ?? ''"
+                  dir="ltr"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-left"
+                />
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium leading-none">البريد الإلكتروني</label>
+                <input
+                  type="text"
+                  [value]="user()?.email ?? ''"
+                  dir="ltr"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-left"
+                />
+              </div>
+              <div class="flex gap-2 pt-4">
+                <button
+                  type="button"
+                  (click)="closeEditProfile()"
+                  class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="button"
+                  (click)="closeEditProfile()"
+                  class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  حفظ التغييرات
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Info -->
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-6 pb-2">
+      <h3 class="text-lg font-semibold">معلومات التواصل</h3>
+    </div>
+    <div class="p-0">
+      <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+          <lucide-angular [img]="icons.phone" [size]="20" class="text-muted-foreground" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium">{{ user()?.phone }}</p>
+          <p class="text-sm text-muted-foreground">رقم الهاتف</p>
+        </div>
+      </div>
+      <div class="h-px w-full bg-border"></div>
+      <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+          <lucide-angular [img]="icons.mail" [size]="20" class="text-muted-foreground" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium">{{ user()?.email || '-' }}</p>
+          <p class="text-sm text-muted-foreground">البريد الإلكتروني</p>
+        </div>
+      </div>
+      <div class="h-px w-full bg-border"></div>
+      <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+          <lucide-angular [img]="icons.home" [size]="20" class="text-muted-foreground" />
+        </div>
+        <div class="flex-1 min-w-0">
+          @if (summary(); as s) {
+            <p class="font-medium">
+              @if (s.apartmentNumber) {
+                شقة {{ s.apartmentNumber }}@if (s.floor !== null) { - الطابق {{ s.floor }}}
+              } @else {
+                {{ s.buildingName }}
+              }
+            </p>
+            <p class="text-sm text-muted-foreground">{{ s.buildingName }}</p>
+          } @else {
+            <p class="font-medium">-</p>
+            <p class="text-sm text-muted-foreground">بيانات السكن</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-6 pb-2">
+      <h3 class="text-lg font-semibold">الإشعارات</h3>
+    </div>
+    <div class="p-0">
+      <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+          <lucide-angular [img]="icons.bell" [size]="20" class="text-muted-foreground" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium">إشعارات الفواتير</p>
+          <p class="text-sm text-muted-foreground">تنبيهات عند استحقاق الفواتير</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="notifications().bills"
+          (click)="toggleNotification('bills')"
+          class="inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors"
+          [class]="notifications().bills ? 'bg-primary' : 'bg-input'"
+        >
+          <span
+            class="pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg transition-transform"
+            [class]="notifications().bills ? '-translate-x-4' : 'translate-x-0'"
+          ></span>
+        </button>
+      </div>
+      <div class="h-px w-full bg-border"></div>
+      <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+          <lucide-angular [img]="icons.bell" [size]="20" class="text-muted-foreground" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium">تحديثات الصيانة</p>
+          <p class="text-sm text-muted-foreground">متابعة حالة طلبات الصيانة</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="notifications().maintenance"
+          (click)="toggleNotification('maintenance')"
+          class="inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors"
+          [class]="notifications().maintenance ? 'bg-primary' : 'bg-input'"
+        >
+          <span
+            class="pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg transition-transform"
+            [class]="notifications().maintenance ? '-translate-x-4' : 'translate-x-0'"
+          ></span>
+        </button>
+      </div>
+      <div class="h-px w-full bg-border"></div>
+      <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+          <lucide-angular [img]="icons.bell" [size]="20" class="text-muted-foreground" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium">الإعلانات</p>
+          <p class="text-sm text-muted-foreground">إعلانات وأخبار العمارة</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="notifications().announcements"
+          (click)="toggleNotification('announcements')"
+          class="inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors"
+          [class]="notifications().announcements ? 'bg-primary' : 'bg-input'"
+        >
+          <span
+            class="pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg transition-transform"
+            [class]="notifications().announcements ? '-translate-x-4' : 'translate-x-0'"
+          ></span>
+        </button>
+      </div>
+      <div class="h-px w-full bg-border"></div>
+      <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+          <lucide-angular [img]="icons.messageSquare" [size]="20" class="text-success" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium">واتساب</p>
+          <p class="text-sm text-muted-foreground">استلام الإشعارات عبر واتساب</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="notifications().whatsapp"
+          (click)="toggleNotification('whatsapp')"
+          class="inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors"
+          [class]="notifications().whatsapp ? 'bg-primary' : 'bg-input'"
+        >
+          <span
+            class="pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg transition-transform"
+            [class]="notifications().whatsapp ? '-translate-x-4' : 'translate-x-0'"
+          ></span>
+        </button>
+      </div>
+      <div class="h-px w-full bg-border"></div>
+      <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+          <lucide-angular [img]="icons.phone" [size]="20" class="text-muted-foreground" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium">رسائل SMS</p>
+          <p class="text-sm text-muted-foreground">استلام الإشعارات عبر SMS</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="notifications().sms"
+          (click)="toggleNotification('sms')"
+          class="inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors"
+          [class]="notifications().sms ? 'bg-primary' : 'bg-input'"
+        >
+          <span
+            class="pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg transition-transform"
+            [class]="notifications().sms ? '-translate-x-4' : 'translate-x-0'"
+          ></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Settings -->
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-6 pb-2">
+      <h3 class="text-lg font-semibold">إعدادات التطبيق</h3>
+    </div>
+    <div class="p-0">
+      <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+          <lucide-angular [img]="icons.moon" [size]="20" class="text-muted-foreground" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium">الوضع الليلي</p>
+          <p class="text-sm text-muted-foreground">تفعيل الوضع الداكن</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="darkMode()"
+          (click)="toggleDarkMode()"
+          class="inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors"
+          [class]="darkMode() ? 'bg-primary' : 'bg-input'"
+        >
+          <span
+            class="pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg transition-transform"
+            [class]="darkMode() ? '-translate-x-4' : 'translate-x-0'"
+          ></span>
+        </button>
+      </div>
+      <div class="h-px w-full bg-border"></div>
+      <button type="button" class="w-full text-right hover:bg-accent transition-colors">
+        <div class="flex items-center gap-4 p-4">
+          <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+            <lucide-angular [img]="icons.globe" [size]="20" class="text-muted-foreground" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium">اللغة</p>
+            <p class="text-sm text-muted-foreground">العربية</p>
+          </div>
+          <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground" />
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Support -->
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-6 pb-2">
+      <h3 class="text-lg font-semibold">الدعم والمساعدة</h3>
+    </div>
+    <div class="p-0">
+      <button type="button" class="w-full text-right hover:bg-accent transition-colors">
+        <div class="flex items-center gap-4 p-4">
+          <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+            <lucide-angular [img]="icons.helpCircle" [size]="20" class="text-muted-foreground" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium">مركز المساعدة</p>
+            <p class="text-sm text-muted-foreground">الأسئلة الشائعة والدعم</p>
+          </div>
+          <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground" />
+        </div>
+      </button>
+      <div class="h-px w-full bg-border"></div>
+      <button type="button" class="w-full text-right hover:bg-accent transition-colors">
+        <div class="flex items-center gap-4 p-4">
+          <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+            <lucide-angular [img]="icons.fileText" [size]="20" class="text-muted-foreground" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium">الشروط والأحكام</p>
+          </div>
+          <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground" />
+        </div>
+      </button>
+      <div class="h-px w-full bg-border"></div>
+      <button type="button" class="w-full text-right hover:bg-accent transition-colors">
+        <div class="flex items-center gap-4 p-4">
+          <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
+            <lucide-angular [img]="icons.shield" [size]="20" class="text-muted-foreground" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium">سياسة الخصوصية</p>
+          </div>
+          <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground" />
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Logout -->
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-0">
+      <button type="button" (click)="logout()" class="w-full text-right hover:bg-accent transition-colors">
+        <div class="flex items-center gap-4 p-4">
+          <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-destructive/10">
+            <lucide-angular [img]="icons.logOut" [size]="20" class="text-destructive" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-destructive">تسجيل الخروج</p>
+          </div>
+          <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground" />
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Version -->
+  <p class="text-center text-xs text-muted-foreground pb-4">
+    اتحاد الملاك - الإصدار ١.٠.٠
+  </p>
+</div>

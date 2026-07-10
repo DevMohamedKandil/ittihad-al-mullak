@@ -1,0 +1,384 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold">إدارة الشقق</h1>
+      <p class="text-muted-foreground">إدارة بيانات الشقق والملاك والمستأجرين</p>
+    </div>
+    <button
+      type="button"
+      (click)="openAddDialog()"
+      class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+    >
+      <lucide-angular [img]="icons.plus" [size]="16" />
+      إضافة شقة
+    </button>
+  </div>
+
+  @if (error()) {
+    <p class="text-sm text-destructive">{{ error() }}</p>
+  }
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    @for (stat of stats(); track stat.label) {
+      <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+        <div class="p-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg" [class]="stat.bg">
+              <lucide-angular [img]="stat.icon" [size]="20" [class]="stat.color" />
+            </div>
+            <div>
+              <p class="text-sm text-muted-foreground">{{ stat.label }}</p>
+              <p class="text-xl font-bold">{{ stat.value }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Filters & Search -->
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-6 pb-4">
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="relative flex-1">
+          <lucide-angular
+            [img]="icons.search"
+            [size]="16"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
+          <input
+            type="text"
+            placeholder="بحث برقم الشقة أو اسم المالك أو الهاتف..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="onSearchChange($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+        <select
+          [ngModel]="statusFilter()"
+          (ngModelChange)="statusFilter.set($event)"
+          class="flex h-9 w-full sm:w-48 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <option value="all">جميع الحالات</option>
+          <option value="paid">مدفوع</option>
+          <option value="partial">جزئي</option>
+          <option value="unpaid">غير مدفوع</option>
+          <option value="overdue">متأخر</option>
+        </select>
+      </div>
+    </div>
+    <div class="p-6 pt-0">
+      <!-- Tabs -->
+      <div class="mb-4 inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
+        <button
+          type="button"
+          (click)="activeTab.set('table')"
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
+          [class]="activeTab() === 'table' ? 'bg-background text-foreground shadow' : ''"
+        >
+          عرض جدول
+        </button>
+        <button
+          type="button"
+          (click)="activeTab.set('cards')"
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
+          [class]="activeTab() === 'cards' ? 'bg-background text-foreground shadow' : ''"
+        >
+          عرض بطاقات
+        </button>
+      </div>
+
+      @if (!loading() && filteredApartments().length === 0) {
+        <p class="text-sm text-muted-foreground text-center py-6">لا توجد بيانات</p>
+      }
+
+      @if (activeTab() === 'table') {
+        <div class="rounded-lg border overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full caption-bottom text-sm">
+              <thead>
+                <tr class="border-b transition-colors hover:bg-muted/50">
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">الشقة</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">المقيم</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">الهاتف</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">النوع</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">الحالة</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">المستحق</th>
+                  <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground w-12"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (apt of filteredApartments(); track apt.id) {
+                  <tr class="border-b transition-colors hover:bg-muted/50">
+                    <td class="p-2 align-middle">
+                      <div>
+                        <p class="font-medium">شقة {{ apt.number }}</p>
+                        <p class="text-sm text-muted-foreground">الدور {{ apt.floor }}</p>
+                      </div>
+                    </td>
+                    <td class="p-2 align-middle">{{ residentName(apt) }}</td>
+                    <td class="p-2 align-middle text-right" dir="ltr">
+                      @if (apt.ownerPhone) {
+                        <a [href]="'tel:' + apt.ownerPhone" class="hover:underline">{{ apt.ownerPhone }}</a>
+                      } @else {
+                        <span class="text-muted-foreground">-</span>
+                      }
+                    </td>
+                    <td class="p-2 align-middle">
+                      <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold text-foreground">
+                        {{ apt.residentType === 'owner' ? 'مالك' : 'مستأجر' }}
+                      </span>
+                    </td>
+                    <td class="p-2 align-middle">
+                      <span
+                        class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+                        [class]="statusBadges[apt.paymentStatus].class"
+                      >
+                        <lucide-angular [img]="statusBadges[apt.paymentStatus].icon" [size]="12" class="ml-1" />
+                        {{ statusBadges[apt.paymentStatus].label }}
+                      </span>
+                    </td>
+                    <td class="p-2 align-middle">
+                      @if (apt.dueAmount > 0) {
+                        <span class="font-medium text-destructive">{{ formatAmount(apt.dueAmount) }}</span>
+                      } @else {
+                        <span class="text-muted-foreground">-</span>
+                      }
+                    </td>
+                    <td class="p-2 align-middle relative">
+                      <button
+                        type="button"
+                        (click)="toggleMenu(apt.id)"
+                        class="inline-flex items-center justify-center rounded-md h-9 w-9 transition-colors hover:bg-accent hover:text-accent-foreground"
+                      >
+                        <lucide-angular [img]="icons.moreVertical" [size]="16" />
+                      </button>
+                      @if (openMenuId() === apt.id) {
+                        <div class="fixed inset-0 z-40" (click)="closeMenu()"></div>
+                        <div class="absolute left-0 top-10 z-50 w-44 rounded-md border bg-popover text-popover-foreground p-1 shadow-md">
+                          <button
+                            type="button"
+                            (click)="openDetails(apt)"
+                            class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                          >
+                            <lucide-angular [img]="icons.eye" [size]="16" class="ml-2" />
+                            عرض التفاصيل
+                          </button>
+                          <a
+                            [href]="'tel:' + apt.ownerPhone"
+                            (click)="closeMenu()"
+                            class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                          >
+                            <lucide-angular [img]="icons.phone" [size]="16" class="ml-2" />
+                            اتصال
+                          </a>
+                          <div class="my-1 h-px bg-muted"></div>
+                          <button
+                            type="button"
+                            (click)="closeMenu()"
+                            class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-destructive hover:bg-accent hover:text-accent-foreground"
+                          >
+                            <lucide-angular [img]="icons.trash2" [size]="16" class="ml-2" />
+                            حذف
+                          </button>
+                        </div>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      } @else {
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for (apt of filteredApartments(); track apt.id) {
+            <div class="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
+              <div class="p-6 pb-3">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold">شقة {{ apt.number }}</h3>
+                    <p class="text-sm text-muted-foreground">الدور {{ apt.floor }}</p>
+                  </div>
+                  <span
+                    class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+                    [class]="statusBadges[apt.paymentStatus].class"
+                  >
+                    <lucide-angular [img]="statusBadges[apt.paymentStatus].icon" [size]="12" class="ml-1" />
+                    {{ statusBadges[apt.paymentStatus].label }}
+                  </span>
+                </div>
+              </div>
+              <div class="p-6 pt-0 space-y-3">
+                <div class="flex items-center gap-2">
+                  <lucide-angular [img]="icons.user" [size]="16" class="text-muted-foreground" />
+                  <span class="text-sm">{{ residentName(apt) }}</span>
+                  <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold text-foreground mr-auto">
+                    {{ apt.residentType === 'owner' ? 'مالك' : 'مستأجر' }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <lucide-angular [img]="icons.phone" [size]="16" class="text-muted-foreground" />
+                  @if (apt.ownerPhone) {
+                    <a [href]="'tel:' + apt.ownerPhone" class="text-sm hover:underline" dir="ltr">{{ apt.ownerPhone }}</a>
+                  } @else {
+                    <span class="text-sm text-muted-foreground">-</span>
+                  }
+                </div>
+                @if (apt.dueAmount > 0) {
+                  <div class="pt-3 border-t flex items-center justify-between">
+                    <span class="text-sm text-muted-foreground">المستحق</span>
+                    <span class="font-bold text-destructive">{{ formatAmount(apt.dueAmount) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Add Apartment Dialog -->
+@if (addDialogOpen()) {
+  <div class="fixed inset-0 z-40 bg-black/50" (click)="addDialogOpen.set(false)"></div>
+  <div
+    class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg rounded-lg max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex flex-col space-y-1.5 text-right">
+      <h2 class="text-lg font-semibold leading-none tracking-tight">إضافة شقة جديدة</h2>
+      <p class="text-sm text-muted-foreground">أدخل بيانات الشقة</p>
+    </div>
+    <div class="grid gap-6 py-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label for="apt-number" class="text-sm font-medium leading-none">رقم الشقة</label>
+          <input
+            id="apt-number"
+            type="text"
+            placeholder="مثال: ١٠١"
+            [ngModel]="newNumber()"
+            (ngModelChange)="newNumber.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+        <div class="space-y-2">
+          <label for="floor" class="text-sm font-medium leading-none">الدور</label>
+          <select
+            id="floor"
+            [ngModel]="newFloor()"
+            (ngModelChange)="newFloor.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <option [ngValue]="null" disabled>اختر الدور</option>
+            <option [ngValue]="0">الأرضي</option>
+            <option [ngValue]="1">الأول</option>
+            <option [ngValue]="2">الثاني</option>
+            <option [ngValue]="3">الثالث</option>
+            <option [ngValue]="4">الرابع</option>
+            <option [ngValue]="5">الخامس</option>
+          </select>
+        </div>
+      </div>
+      @if (addError()) {
+        <p class="text-sm text-destructive">{{ addError() }}</p>
+      }
+    </div>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-start gap-2">
+      <button
+        type="button"
+        (click)="addDialogOpen.set(false)"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+      >
+        إلغاء
+      </button>
+      <button
+        type="button"
+        (click)="saveApartment()"
+        [disabled]="saving()"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 disabled:opacity-50"
+      >
+        حفظ الشقة
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Apartment Details Dialog -->
+@if (selectedApartment(); as apartment) {
+  <div class="fixed inset-0 z-40 bg-black/50" (click)="selectedApartment.set(null)"></div>
+  <div
+    class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg rounded-lg max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex flex-col space-y-1.5 text-right">
+      <h2 class="text-lg font-semibold leading-none tracking-tight">تفاصيل الشقة {{ apartment.number }}</h2>
+      <p class="text-sm text-muted-foreground">معلومات الشقة والمقيم</p>
+    </div>
+    <div class="space-y-6 py-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground">رقم الشقة</p>
+          <p class="font-medium">{{ apartment.number }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground">الدور</p>
+          <p class="font-medium">{{ apartment.floor }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground">نوع المقيم</p>
+          <p class="font-medium">{{ apartment.residentType === 'owner' ? 'مالك' : 'مستأجر' }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground">حالة الدفع</p>
+          <span
+            class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+            [class]="statusBadges[apartment.paymentStatus].class"
+          >
+            <lucide-angular [img]="statusBadges[apartment.paymentStatus].icon" [size]="12" class="ml-1" />
+            {{ statusBadges[apartment.paymentStatus].label }}
+          </span>
+        </div>
+      </div>
+      <div class="border-t pt-4">
+        <h4 class="font-medium mb-3">بيانات المقيم</h4>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <lucide-angular [img]="icons.user" [size]="16" class="text-muted-foreground" />
+            <span>{{ apartment.ownerName ?? '-' }}</span>
+            <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold text-foreground mr-auto">
+              مالك
+            </span>
+          </div>
+          @if (apartment.tenantName) {
+            <div class="flex items-center gap-3">
+              <lucide-angular [img]="icons.user" [size]="16" class="text-muted-foreground" />
+              <span>{{ apartment.tenantName }}</span>
+              <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold text-foreground mr-auto">
+                مستأجر
+              </span>
+            </div>
+          }
+          <div class="flex items-center gap-3">
+            <lucide-angular [img]="icons.phone" [size]="16" class="text-muted-foreground" />
+            @if (apartment.ownerPhone) {
+              <a [href]="'tel:' + apartment.ownerPhone" class="hover:underline" dir="ltr">{{ apartment.ownerPhone }}</a>
+            } @else {
+              <span class="text-muted-foreground">-</span>
+            }
+          </div>
+        </div>
+      </div>
+      @if (apartment.dueAmount > 0) {
+        <div class="border-t pt-4">
+          <div class="flex items-center justify-between">
+            <span class="text-muted-foreground">المبلغ المستحق</span>
+            <span class="text-lg font-bold text-destructive">{{ formatAmount(apartment.dueAmount) }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

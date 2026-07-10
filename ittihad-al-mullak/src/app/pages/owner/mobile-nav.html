@@ -1,0 +1,28 @@
+<nav class="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom">
+  <div class="flex items-center justify-around h-16">
+    @for (item of navItems; track item.href) {
+      <a
+        [routerLink]="item.href"
+        routerLinkActive
+        #rla="routerLinkActive"
+        [routerLinkActiveOptions]="{ exact: item.exact }"
+        [attr.aria-current]="rla.isActive ? 'page' : null"
+        class="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 min-w-[64px] active:scale-95"
+        [class]="
+          rla.isActive
+            ? 'text-primary bg-primary/10'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+        "
+      >
+        <lucide-angular
+          [img]="item.icon"
+          [size]="20"
+          class="transition-transform"
+          [class.text-primary]="rla.isActive"
+          [class.scale-110]="rla.isActive"
+        />
+        <span class="text-[10px] font-medium">{{ item.label }}</span>
+      </a>
+    }
+  </div>
+</nav>

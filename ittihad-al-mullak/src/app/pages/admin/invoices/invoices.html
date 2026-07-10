@@ -1,0 +1,507 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold">إدارة الفواتير</h1>
+      <p class="text-muted-foreground">إنشاء ومتابعة فواتير المصاريف المشتركة</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        (click)="remindersDialogOpen.set(true)"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+      >
+        <lucide-angular [img]="icons.send" [size]="16" />
+        إرسال تذكيرات
+      </button>
+      <button
+        type="button"
+        (click)="openCreateDialog()"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+      >
+        <lucide-angular [img]="icons.plus" [size]="16" />
+        إنشاء فاتورة
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <p class="text-sm text-destructive">{{ error() }}</p>
+  }
+  @if (remindersResult()) {
+    <p class="text-sm text-success">{{ remindersResult() }}</p>
+  }
+
+  <!-- Stats -->
+  @if (summary(); as s) {
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+        <div class="p-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg bg-primary/10">
+              <lucide-angular [img]="icons.receipt" [size]="20" class="text-primary" />
+            </div>
+            <div>
+              <p class="text-sm text-muted-foreground">إجمالي الفواتير</p>
+              <p class="text-xl font-bold">{{ s.totalCount }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+        <div class="p-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg bg-secondary/10">
+              <lucide-angular [img]="icons.building2" [size]="20" class="text-secondary" />
+            </div>
+            <div>
+              <p class="text-sm text-muted-foreground">المطلوب</p>
+              <p class="text-xl font-bold">{{ formatAmount(s.totalAmount) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+        <div class="p-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg bg-success/10">
+              <lucide-angular [img]="icons.checkCircle" [size]="20" class="text-success" />
+            </div>
+            <div>
+              <p class="text-sm text-muted-foreground">المحصل</p>
+              <p class="text-xl font-bold">{{ formatAmount(s.collectedAmount) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+        <div class="p-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg bg-destructive/10">
+              <lucide-angular [img]="icons.clock" [size]="20" class="text-destructive" />
+            </div>
+            <div>
+              <p class="text-sm text-muted-foreground">المتأخر</p>
+              <p class="text-xl font-bold">{{ formatAmount(s.overdueAmount) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collection Progress -->
+    <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+      <div class="p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-medium">نسبة التحصيل هذا الشهر</span>
+          <span class="text-lg font-bold text-primary">{{ s.collectionRate }}%</span>
+        </div>
+        <div class="relative h-3 w-full overflow-hidden rounded-full bg-primary/20">
+          <div class="h-full bg-primary transition-all" [style.width.%]="s.collectionRate"></div>
+        </div>
+        <p class="text-sm text-muted-foreground mt-2">
+          تم تحصيل {{ formatAmount(s.collectedAmount) }} من أصل {{ formatAmount(s.totalAmount) }}
+        </p>
+      </div>
+    </div>
+  }
+
+  <!-- Invoices Table -->
+  <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
+    <div class="p-6 pb-4">
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="relative flex-1">
+          <lucide-angular
+            [img]="icons.search"
+            [size]="16"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
+          <input
+            type="text"
+            placeholder="بحث برقم الفاتورة أو الشقة أو اسم المالك..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="onSearchChange($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+        <div class="flex gap-2">
+          <select
+            [ngModel]="statusFilter()"
+            (ngModelChange)="onStatusChange($event)"
+            class="flex h-9 w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <option value="all">جميع الحالات</option>
+            <option value="paid">مدفوع</option>
+            <option value="partial">جزئي</option>
+            <option value="unpaid">غير مدفوع</option>
+            <option value="overdue">متأخر</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="p-6 pt-0">
+      <div class="rounded-lg border overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full caption-bottom text-sm">
+            <thead>
+              <tr class="border-b transition-colors hover:bg-muted/50">
+                <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">رقم الفاتورة</th>
+                <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">الشقة</th>
+                <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">المالك</th>
+                <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">الفترة</th>
+                <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">المبلغ</th>
+                <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">المدفوع</th>
+                <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">الحالة</th>
+                <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground w-12"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (inv of invoices(); track inv.id) {
+                <tr class="border-b transition-colors hover:bg-muted/50">
+                  <td class="p-2 align-middle font-medium">{{ inv.number }}</td>
+                  <td class="p-2 align-middle">شقة {{ inv.apartmentNumber }}</td>
+                  <td class="p-2 align-middle">{{ inv.ownerName ?? '-' }}</td>
+                  <td class="p-2 align-middle">{{ inv.period }}</td>
+                  <td class="p-2 align-middle">{{ formatAmount(inv.amount) }}</td>
+                  <td class="p-2 align-middle">
+                    <span
+                      [class]="
+                        inv.paidAmount === inv.amount
+                          ? 'text-success'
+                          : inv.paidAmount > 0
+                            ? 'text-warning-foreground'
+                            : 'text-muted-foreground'
+                      "
+                    >
+                      {{ formatAmount(inv.paidAmount) }}
+                    </span>
+                  </td>
+                  <td class="p-2 align-middle">
+                    <span
+                      class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+                      [class]="statusBadges[inv.status].class"
+                    >
+                      <lucide-angular [img]="statusBadges[inv.status].icon" [size]="12" class="ml-1" />
+                      {{ statusBadges[inv.status].label }}
+                    </span>
+                  </td>
+                  <td class="p-2 align-middle relative">
+                    <button
+                      type="button"
+                      (click)="toggleMenu(inv.id)"
+                      class="inline-flex items-center justify-center rounded-md h-9 w-9 transition-colors hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <lucide-angular [img]="icons.moreVertical" [size]="16" />
+                    </button>
+                    @if (openMenuId() === inv.id) {
+                      <div class="fixed inset-0 z-40" (click)="closeMenu()"></div>
+                      <div class="absolute left-0 top-10 z-50 w-44 rounded-md border bg-popover text-popover-foreground p-1 shadow-md">
+                        <button
+                          type="button"
+                          (click)="openDetails(inv)"
+                          class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                        >
+                          <lucide-angular [img]="icons.eye" [size]="16" class="ml-2" />
+                          عرض التفاصيل
+                        </button>
+                        <button
+                          type="button"
+                          (click)="closeMenu()"
+                          class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                        >
+                          <lucide-angular [img]="icons.download" [size]="16" class="ml-2" />
+                          تحميل PDF
+                        </button>
+                        <button
+                          type="button"
+                          (click)="closeMenu()"
+                          class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                        >
+                          <lucide-angular [img]="icons.send" [size]="16" class="ml-2" />
+                          إرسال تذكير
+                        </button>
+                        <div class="my-1 h-px bg-muted"></div>
+                        <button
+                          type="button"
+                          (click)="closeMenu()"
+                          class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-destructive hover:bg-accent hover:text-accent-foreground"
+                        >
+                          <lucide-angular [img]="icons.trash2" [size]="16" class="ml-2" />
+                          حذف
+                        </button>
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          @if (!loading() && invoices().length === 0) {
+            <p class="text-sm text-muted-foreground text-center py-6">لا توجد بيانات</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Invoice Dialog -->
+@if (createDialogOpen()) {
+  <div class="fixed inset-0 z-40 bg-black/50" (click)="createDialogOpen.set(false)"></div>
+  <div
+    class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg rounded-lg max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex flex-col space-y-1.5 text-right">
+      <h2 class="text-lg font-semibold leading-none tracking-tight">إنشاء فواتير جديدة</h2>
+      <p class="text-sm text-muted-foreground">إنشاء فواتير لجميع الشقق أو شقة محددة</p>
+    </div>
+    <div class="space-y-6 py-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label class="text-sm font-medium leading-none">نوع الفاتورة</label>
+          <select
+            [ngModel]="newType()"
+            (ngModelChange)="newType.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <option value="Monthly">شهرية</option>
+            <option value="Maintenance">صيانة</option>
+            <option value="Special">خاصة</option>
+          </select>
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-medium leading-none">الفترة</label>
+          <input
+            type="text"
+            placeholder="مثال: يوليو 2026"
+            [ngModel]="newPeriod()"
+            (ngModelChange)="newPeriod.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="text-sm font-medium leading-none">الشقق</label>
+        <select
+          [ngModel]="newApartmentId()"
+          (ngModelChange)="newApartmentId.set($event)"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <option [ngValue]="null">جميع الشقق</option>
+          @for (apt of apartments(); track apt.id) {
+            <option [ngValue]="apt.id">شقة {{ apt.number }} - {{ apt.ownerName ?? 'بدون مالك' }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label class="text-sm font-medium leading-none">عنوان الفاتورة</label>
+          <input
+            type="text"
+            placeholder="مثال: اشتراك شهري"
+            [ngModel]="newTitle()"
+            (ngModelChange)="newTitle.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-medium leading-none">المبلغ (ج.م)</label>
+          <input
+            type="number"
+            dir="ltr"
+            [ngModel]="newAmount()"
+            (ngModelChange)="newAmount.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="text-sm font-medium leading-none">تاريخ الاستحقاق</label>
+        <input
+          type="date"
+          [ngModel]="newDueDate()"
+          (ngModelChange)="newDueDate.set($event)"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        />
+      </div>
+
+      @if (createError()) {
+        <p class="text-sm text-destructive">{{ createError() }}</p>
+      }
+    </div>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-start gap-2">
+      <button
+        type="button"
+        (click)="createDialogOpen.set(false)"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+      >
+        إلغاء
+      </button>
+      <button
+        type="button"
+        (click)="createInvoice()"
+        [disabled]="creating()"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 disabled:opacity-50"
+      >
+        إنشاء الفواتير
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Send Reminders Dialog -->
+@if (remindersDialogOpen()) {
+  <div class="fixed inset-0 z-40 bg-black/50" (click)="remindersDialogOpen.set(false)"></div>
+  <div
+    class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg rounded-lg max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex flex-col space-y-1.5 text-right">
+      <h2 class="text-lg font-semibold leading-none tracking-tight">إرسال تذكيرات الدفع</h2>
+      <p class="text-sm text-muted-foreground">إرسال تذكيرات للملاك المتأخرين في الدفع</p>
+    </div>
+    <div class="space-y-4 py-4">
+      <p class="text-sm text-muted-foreground">
+        سيتم إرسال إشعار داخل التطبيق لجميع الملاك الذين لديهم فواتير غير مسددة.
+      </p>
+    </div>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-start gap-2">
+      <button
+        type="button"
+        (click)="remindersDialogOpen.set(false)"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+      >
+        إلغاء
+      </button>
+      <button
+        type="button"
+        (click)="sendReminders()"
+        [disabled]="sendingReminders()"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 disabled:opacity-50"
+      >
+        إرسال التذكيرات
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Invoice Details Dialog -->
+@if (selectedInvoice(); as invoice) {
+  <div class="fixed inset-0 z-40 bg-black/50" (click)="selectedInvoice.set(null)"></div>
+  <div
+    class="fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg rounded-lg max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex flex-col space-y-1.5 text-right">
+      <h2 class="text-lg font-semibold leading-none tracking-tight">تفاصيل الفاتورة {{ invoice.number }}</h2>
+      <p class="text-sm text-muted-foreground">شقة {{ invoice.apartmentNumber }} - {{ invoice.period }}</p>
+    </div>
+    <div class="space-y-6 py-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground">المالك</p>
+          <p class="font-medium">{{ invoice.ownerName ?? '-' }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground">نوع الفاتورة</p>
+          <p class="font-medium">{{ typeLabel(invoice.type) }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground">تاريخ الاستحقاق</p>
+          <p class="font-medium">{{ formatDate(invoice.dueDate) }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-sm text-muted-foreground">الحالة</p>
+          <span
+            class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold"
+            [class]="statusBadges[invoice.status].class"
+          >
+            <lucide-angular [img]="statusBadges[invoice.status].icon" [size]="12" class="ml-1" />
+            {{ statusBadges[invoice.status].label }}
+          </span>
+        </div>
+      </div>
+
+      <div class="border-t pt-4">
+        <h4 class="font-medium mb-3">{{ invoice.title }}</h4>
+        <div class="space-y-2">
+          <div class="flex justify-between font-medium">
+            <span>الإجمالي</span>
+            <span>{{ formatAmount(invoice.amount) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t pt-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-muted-foreground">المدفوع</span>
+          <span class="font-medium text-success">{{ formatAmount(invoice.paidAmount) }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-muted-foreground">المتبقي</span>
+          <span class="font-medium text-destructive">{{ formatAmount(invoice.amount - invoice.paidAmount) }}</span>
+        </div>
+      </div>
+
+      @if (invoice.status !== 'paid') {
+        <div class="border-t pt-4 space-y-3">
+          <h4 class="font-medium">تسجيل دفعة</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="text-sm font-medium leading-none">المبلغ (ج.م)</label>
+              <input
+                type="number"
+                dir="ltr"
+                [ngModel]="payAmount()"
+                (ngModelChange)="payAmount.set($event)"
+                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium leading-none">طريقة الدفع</label>
+              <select
+                [ngModel]="payMethod()"
+                (ngModelChange)="payMethod.set($event)"
+                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <option value="Cash">نقدي</option>
+                <option value="Fawry">فوري</option>
+                <option value="Card">بطاقة</option>
+                <option value="BankTransfer">تحويل بنكي</option>
+              </select>
+            </div>
+          </div>
+          @if (payError()) {
+            <p class="text-sm text-destructive">{{ payError() }}</p>
+          }
+          <button
+            type="button"
+            (click)="recordPayment(invoice)"
+            [disabled]="paying()"
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 disabled:opacity-50"
+          >
+            <lucide-angular [img]="icons.checkCircle" [size]="16" />
+            تسجيل الدفعة
+          </button>
+        </div>
+      }
+    </div>
+    <div class="flex flex-col sm:flex-row sm:justify-start gap-2">
+      <button
+        type="button"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full sm:w-auto"
+      >
+        <lucide-angular [img]="icons.download" [size]="16" />
+        تحميل PDF
+      </button>
+      <button
+        type="button"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full sm:w-auto"
+      >
+        <lucide-angular [img]="icons.messageSquare" [size]="16" />
+        تذكير بالدفع
+      </button>
+    </div>
+  </div>
+}

@@ -1,0 +1,29 @@
+# Node / Angular / Next
+node_modules/
+dist/
+.angular/
+/.next/
+/out/
+/build
+*.log
+*.tsbuildinfo
+next-env.d.ts
+
+# .NET
+bin/
+obj/
+out-tsc/
+*.user
+.vs/
+
+# قاعدة البيانات المحلية والملفات المرفوعة — مش بتدخل الريبو
+ittihad.db*
+wwwroot/uploads/
+
+# env / أسرار
+.env*
+
+# ملفات النظام
+.DS_Store
+Thumbs.db
+.vercel
