@@ -1,6 +1,7 @@
 using IttihadAlMullak.Application.Common;
 using IttihadAlMullak.Application.Interfaces;
 using IttihadAlMullak.Infrastructure.Auth;
+using IttihadAlMullak.Infrastructure.Payments;
 using IttihadAlMullak.Infrastructure.Persistence;
 using IttihadAlMullak.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ public static class DependencyInjection
         services.AddSingleton<ITokenService, TokenService>();
         services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
         services.AddSingleton<IFileStorage, LocalFileStorage>();
+        services.AddSingleton<IPaymentGateway, MockPaymentGateway>(); // يتبدل بتنفيذ فوري/Paymob لاحقاً
 
         return services;
     }

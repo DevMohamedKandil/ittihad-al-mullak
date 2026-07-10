@@ -36,8 +36,9 @@ export class Login {
   }
 
   /* اختصار للتجربة: ملء بيانات حسابات الـ demo */
-  protected fillDemo(role: 'admin' | 'owner'): void {
-    this.phone.set(role === 'admin' ? '01000000001' : '01012345678');
+  protected fillDemo(role: 'admin' | 'owner' | 'tenant'): void {
+    const phones = { admin: '01000000001', owner: '01012345678', tenant: '01666777888' };
+    this.phone.set(phones[role]);
     this.password.set('123456');
   }
 }

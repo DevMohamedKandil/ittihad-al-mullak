@@ -279,6 +279,20 @@
           <p class="text-muted-foreground">{{ request.description }}</p>
         </div>
 
+        <!-- Photos -->
+        @if (request.photos.length > 0) {
+          <div>
+            <h4 class="font-medium mb-2">الصور المرفقة</h4>
+            <div class="flex gap-2 flex-wrap">
+              @for (photo of request.photos; track photo) {
+                <a [href]="filesBaseUrl + photo" target="_blank">
+                  <img [src]="filesBaseUrl + photo" alt="صورة الطلب" class="w-20 h-20 rounded-lg object-cover border" />
+                </a>
+              }
+            </div>
+          </div>
+        }
+
         @if (request.rejectionReason) {
           <div>
             <h4 class="font-medium mb-2">سبب الرفض</h4>

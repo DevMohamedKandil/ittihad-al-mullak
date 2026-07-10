@@ -10,7 +10,8 @@ namespace IttihadAlMullak.Application.Services;
 public class InvoiceService(
     IApplicationDbContext db,
     ICurrentUser currentUser,
-    INotificationService notifications) : IInvoiceService
+    INotificationService notifications,
+    IPaymentGateway paymentGateway) : IInvoiceService
 {
     public async Task<PagedResult<InvoiceDto>> ListAsync(
         string? status, string? period, string? search, int page, int pageSize, CancellationToken ct = default)
@@ -115,13 +116,24 @@ public class InvoiceService(
         if (request.Amount > remaining)
             throw new BusinessRuleException(Msg.Format("AmountExceedsRemaining", remaining));
 
+        // الدفع الإلكتروني بيمر على بوابة الدفع (Mock حالياً — فوري/Paymob لاحقاً بنفس العقد)
+        var reference = request.Reference;
+        if (string.IsNullOrWhiteSpace(reference) && request.Method != PaymentMethod.Cash)
+        {
+            var payerPhone = await db.Users
+                .Where(u => u.Id == currentUser.UserId)
+                .Select(u => u.Phone)
+                .FirstAsync(ct);
+            reference = await paymentGateway.ChargeAsync(request.Amount, request.Method, payerPhone, ct);
+        }
+
         invoice.Payments.Add(new Payment
         {
             InvoiceId = invoice.Id,
             Amount = request.Amount,
             Method = request.Method,
             PaidById = currentUser.UserId,
-            Reference = request.Reference,
+            Reference = reference,
         });
         invoice.RecalculateStatus();
         await db.SaveChangesAsync(ct);

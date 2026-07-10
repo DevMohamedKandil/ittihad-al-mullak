@@ -88,11 +88,32 @@
 
         <!-- Image Upload -->
         <div class="space-y-2">
-          <label class="text-sm font-medium leading-none">صور (اختياري)</label>
-          <div class="border-2 border-dashed rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer">
+          <label class="text-sm font-medium leading-none">صور (اختياري — حتى ٥ صور)</label>
+          <input
+            #photoInput
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            class="hidden"
+            title="إضافة صور للمشكلة"
+            (change)="onPhotosSelected($event)"
+          />
+          <div
+            class="border-2 border-dashed rounded-xl p-8 text-center hover:bg-accent/50 transition-colors cursor-pointer"
+            (click)="photoInput.click()"
+          >
             <lucide-angular [img]="icons.camera" [size]="32" class="mx-auto text-muted-foreground mb-2" />
-            <p class="text-sm text-muted-foreground">اضغط لإضافة صور للمشكلة</p>
+            <p class="text-sm text-muted-foreground">
+              {{ selectedPhotos().length > 0 ? 'تم اختيار ' + selectedPhotos().length + ' صورة — اضغط للتغيير' : 'اضغط لإضافة صور للمشكلة' }}
+            </p>
           </div>
+          @if (photoPreviews().length > 0) {
+            <div class="flex gap-2 flex-wrap">
+              @for (preview of photoPreviews(); track preview) {
+                <img [src]="preview" alt="صورة مرفقة" class="w-16 h-16 rounded-lg object-cover border" />
+              }
+            </div>
+          }
         </div>
 
         @if (submitError()) {
@@ -269,6 +290,20 @@
                     {{ request.category || 'عام' }}
                   </span>
                 </div>
+
+                <!-- Photos -->
+                @if (request.photos.length > 0) {
+                  <div>
+                    <h4 class="font-medium mb-2">الصور المرفقة</h4>
+                    <div class="flex gap-2 flex-wrap">
+                      @for (photo of request.photos; track photo) {
+                        <a [href]="filesBaseUrl + photo" target="_blank">
+                          <img [src]="filesBaseUrl + photo" alt="صورة الطلب" class="w-20 h-20 rounded-lg object-cover border" />
+                        </a>
+                      }
+                    </div>
+                  </div>
+                }
 
                 <!-- Updates Timeline -->
                 @if (updatesFor(request).length > 0) {

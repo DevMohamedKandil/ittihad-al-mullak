@@ -25,6 +25,16 @@ public interface IFileStorage
 }
 
 /// <summary>
+/// بوابة الدفع الإلكتروني — التنفيذ الحالي Mock،
+/// ولما يتوفر حساب تاجر (فوري/Paymob) بنكتب تنفيذ جديد لنفس العقد ونبدّله في الـ DI بس.
+/// </summary>
+public interface IPaymentGateway
+{
+    /// <returns>مرجع عملية الدفع (Transaction Reference)</returns>
+    Task<string> ChargeAsync(decimal amount, PaymentMethod method, string payerPhone, CancellationToken ct = default);
+}
+
+/// <summary>
 /// بيانات المستخدم الحالي من التوكن — التنفيذ في Api (من الـ HttpContext).
 /// كل الخدمات بتعمل scoping بالعمارة من هنا (multi-tenant).
 /// </summary>

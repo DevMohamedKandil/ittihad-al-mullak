@@ -2,7 +2,8 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { API_URL, AuthResponse, User } from './models';
+import { AuthResponse, User } from './models';
+import { APP_CONFIG } from './app-config';
 
 const ACCESS_KEY = 'ittihad_access_token';
 const REFRESH_KEY = 'ittihad_refresh_token';
@@ -23,13 +24,13 @@ export class AuthService {
 
   login(phone: string, password: string): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${API_URL}/auth/login`, { phone, password })
+      .post<AuthResponse>(`${APP_CONFIG.apiUrl}/auth/login`, { phone, password })
       .pipe(tap((res) => this.storeSession(res)));
   }
 
   refresh(): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${API_URL}/auth/refresh`, {
+      .post<AuthResponse>(`${APP_CONFIG.apiUrl}/auth/refresh`, {
         refreshToken: localStorage.getItem(REFRESH_KEY),
       })
       .pipe(tap((res) => this.storeSession(res)));

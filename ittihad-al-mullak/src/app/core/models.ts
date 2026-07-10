@@ -104,9 +104,13 @@ export interface MaintenanceRequest {
   priority: MaintenancePriority;
   assignedTo: string | null;
   rejectionReason: string | null;
+  photos: string[];
   createdAt: string;
   resolvedAt: string | null;
 }
+
+/** أساس روابط الملفات المرفوعة (صور الصيانة) */
+export const FILES_BASE_URL = 'http://localhost:5301';
 
 export interface Announcement {
   id: number;

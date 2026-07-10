@@ -23,6 +23,7 @@ import {
 } from 'lucide-angular';
 import { MaintenanceApi } from '../../../core/api.services';
 import { MaintenanceRequest, MaintenanceStatus, MaintenancePriority } from '../../../core/models';
+import { APP_CONFIG } from '../../../core/app-config';
 import { formatRelative, formatDate } from '../../../core/format';
 
 @Component({
@@ -32,6 +33,8 @@ import { formatRelative, formatDate } from '../../../core/format';
 })
 export class MaintenancePage {
   private readonly api = inject(MaintenanceApi);
+
+  protected readonly filesBaseUrl = APP_CONFIG.filesUrl;
 
   protected readonly icons = {
     search: Search,

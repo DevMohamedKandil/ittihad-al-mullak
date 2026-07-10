@@ -18,6 +18,7 @@ out-tsc/
 
 # قاعدة البيانات المحلية والملفات المرفوعة — مش بتدخل الريبو
 ittihad.db*
+IttihadAlMullak.db*
 wwwroot/uploads/
 
 # env / أسرار

@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import {
   LucideAngularModule,
   LucideIconData,
@@ -23,6 +24,7 @@ import {
   MaintenanceRequest,
   MaintenanceStatus,
 } from '../../../core/models';
+import { APP_CONFIG } from '../../../core/app-config';
 import { formatRelative } from '../../../core/format';
 
 type RequestTab = 'active' | 'completed';
@@ -45,6 +47,7 @@ export class OwnerMaintenance {
   };
 
   protected readonly formatRelative = formatRelative;
+  protected readonly filesBaseUrl = APP_CONFIG.filesUrl;
 
   protected readonly statusConfig: Record<
     MaintenanceStatus,
@@ -121,6 +124,8 @@ export class OwnerMaintenance {
   protected readonly description = signal('');
   protected readonly submitting = signal(false);
   protected readonly submitError = signal<string | null>(null);
+  protected readonly selectedPhotos = signal<File[]>([]);
+  protected readonly photoPreviews = signal<string[]>([]);
 
   protected readonly shownRequests = computed(() =>
     this.activeTab() === 'active' ? this.activeRequests() : this.completedRequests(),
@@ -151,7 +156,16 @@ export class OwnerMaintenance {
     this.category.set('');
     this.priority.set('');
     this.submitError.set(null);
+    this.selectedPhotos.set([]);
+    this.photoPreviews.set([]);
     this.isNewRequestOpen.set(true);
+  }
+
+  protected onPhotosSelected(event: Event) {
+    const files = Array.from((event.target as HTMLInputElement).files ?? []).slice(0, 5);
+    this.selectedPhotos.set(files);
+    this.photoPreviews().forEach((url) => URL.revokeObjectURL(url));
+    this.photoPreviews.set(files.map((file) => URL.createObjectURL(file)));
   }
 
   protected closeNewRequest() {
@@ -173,10 +187,29 @@ export class OwnerMaintenance {
         apartmentId: null,
       })
       .subscribe({
-        next: () => {
-          this.submitting.set(false);
-          this.closeNewRequest();
-          this.load();
+        next: (created) => {
+          const photos = this.selectedPhotos();
+          if (photos.length === 0) {
+            this.submitting.set(false);
+            this.closeNewRequest();
+            this.load();
+            return;
+          }
+          // رفع الصور واحدة ورا التانية بعد إنشاء الطلب
+          forkJoin(photos.map((file) => this.maintenanceApi.uploadPhoto(created.id, file))).subscribe({
+            next: () => {
+              this.submitting.set(false);
+              this.closeNewRequest();
+              this.load();
+            },
+            error: (err) => {
+              // الطلب اتسجل بس صورة فشلت — نبلّغ ونكمل
+              this.submitting.set(false);
+              this.closeNewRequest();
+              this.load();
+              console.warn('photo upload failed:', err.error?.title);
+            },
+          });
         },
         error: (err) => {
           this.submitting.set(false);

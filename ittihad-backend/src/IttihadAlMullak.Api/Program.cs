@@ -102,6 +102,12 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
     await DbSeeder.SeedAsync(db, scope.ServiceProvider.GetRequiredService<IPasswordHasherService>());
+
+    // DbUp: تنفيذ سكريبتات SQL اليدوية من فولدر SqlScripts (مرة واحدة لكل سكريبت)
+    SqlScriptRunner.Run(
+        builder.Configuration.GetConnectionString("Default")!,
+        Path.Combine(app.Environment.ContentRootPath, "SqlScripts"),
+        app.Logger);
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
