@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
+// لازم wwwroot يكون موجود قبل بناء التطبيق — غير كده الـ Static Files بتشتغل بـ NullFileProvider
+Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads"));
+
 var builder = WebApplication.CreateBuilder(args);
 
 // الطبقات: Application (البيزنس) + Infrastructure (قاعدة البيانات والتوكن)
