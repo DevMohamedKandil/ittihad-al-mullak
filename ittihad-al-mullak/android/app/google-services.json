@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "657244528648",
+    "project_id": "itthad-mulaak",
+    "storage_bucket": "itthad-mulaak.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657244528648:android:31243ee8f77d380eba71bd",
+        "android_client_info": {
+          "package_name": "com.ittihadalmullak.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK3KiZHSf_d5_e0TRhLeiY3DQWzK-a-gM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
