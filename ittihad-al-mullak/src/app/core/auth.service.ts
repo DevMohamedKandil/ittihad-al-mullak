@@ -39,6 +39,18 @@ export class AuthService {
       .pipe(tap((res) => this.storeSession(res)));
   }
 
+  /** طلب كود دخول لمرة واحدة — عبر SMS أو الإيميل المسجّل على الحساب. */
+  requestOtp(phone: string, channel: 'Sms' | 'Email'): Observable<void> {
+    return this.http.post<void>(`${APP_CONFIG.apiUrl}/auth/otp/request`, { phone, channel });
+  }
+
+  /** تأكيد كود الـ OTP — بيسجّل الدخول زي أي طريقة تانية لو الكود صح. */
+  verifyOtp(phone: string, code: string): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${APP_CONFIG.apiUrl}/auth/otp/verify`, { phone, code })
+      .pipe(tap((res) => this.storeSession(res)));
+  }
+
   refresh(): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${APP_CONFIG.apiUrl}/auth/refresh`, {

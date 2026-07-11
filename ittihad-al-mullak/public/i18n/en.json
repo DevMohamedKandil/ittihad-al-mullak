@@ -538,5 +538,16 @@
   "buildingSwitcher.addNew": "Add new building",
   "buildingSwitcher.createTitle": "Register a new building",
   "buildingSwitcher.create": "Create building",
-  "buildingSwitcher.creating": "Creating..."
+  "buildingSwitcher.creating": "Creating...",
+  "login.useOtpInstead": "Log in with a one-time code instead",
+  "login.otpChannel": "Send code via",
+  "login.otpChannelSms": "SMS",
+  "login.otpChannelEmail": "Email",
+  "login.sending": "Sending...",
+  "login.sendCode": "Send code",
+  "login.backToPassword": "Back to password login",
+  "login.otpSentTo": "A code was sent to",
+  "login.otpCode": "Login code",
+  "login.confirmCode": "Confirm code",
+  "login.resendCode": "Resend code"
 }

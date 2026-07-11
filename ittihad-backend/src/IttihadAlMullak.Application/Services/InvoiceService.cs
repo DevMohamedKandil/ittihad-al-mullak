@@ -1,3 +1,4 @@
+using System.Text.Json;
 using IttihadAlMullak.Application.Common;
 using IttihadAlMullak.Application.Dtos;
 using IttihadAlMullak.Application.Interfaces;
@@ -139,6 +140,64 @@ public class InvoiceService(
         await db.SaveChangesAsync(ct);
 
         return invoice.ToDto();
+    }
+
+    public async Task<CheckoutResponseDto> CreateCheckoutAsync(int invoiceId, CreateCheckoutRequest request, CancellationToken ct = default)
+    {
+        var invoice = await BaseQuery().FirstOrDefaultAsync(i => i.Id == invoiceId, ct)
+            ?? throw new NotFoundException(Msg.Get("InvoiceNotFound"));
+
+        if (!currentUser.IsAdmin && invoice.Apartment.OwnerId != currentUser.UserId && invoice.Apartment.TenantId != currentUser.UserId)
+            throw new ForbiddenException(Msg.Get("NotYourInvoice"));
+
+        var remaining = invoice.Amount - invoice.PaidAmount;
+        if (remaining <= 0)
+            throw new BusinessRuleException(Msg.Get("AlreadyPaid"));
+        if (request.Amount > remaining)
+            throw new BusinessRuleException(Msg.Format("AmountExceedsRemaining", remaining));
+
+        var payer = await db.Users.FirstAsync(u => u.Id == currentUser.UserId, ct);
+        var specialReference = $"INV{invoice.Id}-{Guid.NewGuid():N}";
+
+        var checkoutUrl = await paymentGateway.CreateCheckoutAsync(
+            request.Amount, specialReference, payer.Name, payer.Phone, payer.Email, ct);
+
+        invoice.Payments.Add(new Payment
+        {
+            InvoiceId = invoice.Id,
+            Amount = request.Amount,
+            Method = PaymentMethod.Card,
+            PaidById = currentUser.UserId,
+            Reference = specialReference,
+            Status = PaymentStatus.Pending,
+        });
+        await db.SaveChangesAsync(ct);
+
+        return new CheckoutResponseDto(checkoutUrl);
+    }
+
+    public async Task HandlePaymentWebhookAsync(JsonElement transaction, string providedHmac, CancellationToken ct = default)
+    {
+        if (!paymentGateway.VerifyWebhookSignature(transaction, providedHmac))
+            throw new ForbiddenException(Msg.Get("InvalidWebhookSignature"));
+
+        if (!transaction.TryGetProperty("order", out var order) || !order.TryGetProperty("merchant_order_id", out var referenceProp))
+            return; // شكل غير متوقع للـ webhook — يتجاهل بدل ما يكسر
+
+        var specialReference = referenceProp.GetString();
+        var payment = await db.Payments
+            .Include(p => p.Invoice)
+            .FirstOrDefaultAsync(p => p.Reference == specialReference && p.Status == PaymentStatus.Pending, ct);
+        if (payment is null) return; // مفيش دفعة مستنية بهذا المرجع (تكرار callback أو مرجع غير معروف)
+
+        var success = transaction.TryGetProperty("success", out var successProp) && successProp.GetBoolean();
+        var pending = transaction.TryGetProperty("pending", out var pendingProp) && pendingProp.GetBoolean();
+
+        payment.Status = success ? PaymentStatus.Completed : pending ? PaymentStatus.Pending : PaymentStatus.Failed;
+        if (payment.Status != PaymentStatus.Pending)
+            payment.Invoice.RecalculateStatus();
+
+        await db.SaveChangesAsync(ct);
     }
 
     public async Task<IReadOnlyList<PaymentDto>> GetPaymentsAsync(int invoiceId, CancellationToken ct = default)

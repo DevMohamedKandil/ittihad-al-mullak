@@ -57,4 +57,15 @@ public class AuthController(IAuthService auth) : ControllerBase
     [Authorize]
     public Task<AuthResponse> CreateBuilding(CreateBuildingRequest request, CancellationToken ct)
         => auth.CreateBuildingAsync(request, ct);
+
+    /// <summary>تسجيل دخول بديل بكود يوصل عبر SMS بدل كلمة المرور.</summary>
+    [HttpPost("otp/request")]
+    [AllowAnonymous]
+    public Task RequestOtp(RequestOtpRequest request, CancellationToken ct)
+        => auth.RequestOtpAsync(request, ct);
+
+    [HttpPost("otp/verify")]
+    [AllowAnonymous]
+    public Task<AuthResponse> VerifyOtp(VerifyOtpRequest request, CancellationToken ct)
+        => auth.VerifyOtpAsync(request, ct);
 }

@@ -26,3 +26,7 @@ public record AuthResponse(string AccessToken, string RefreshToken, UserDto User
 public record BuildingSummaryDto(int Id, string Code, string Name);
 
 public record SwitchBuildingRequest([Required] int BuildingId);
+
+public record RequestOtpRequest([Required] string Phone, OtpChannel Channel = OtpChannel.Sms);
+
+public record VerifyOtpRequest([Required] string Phone, [Required, MinLength(4)] string Code);

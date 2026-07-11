@@ -29,6 +29,14 @@ public enum PaymentMethod
     BankTransfer = 4,  // تحويل بنكي
 }
 
+public enum PaymentStatus
+{
+    /// <summary>دفعة أونلاين لسه مستنية تأكيد من بوابة الدفع (بعد إعادة التوجيه، قبل الـ webhook).</summary>
+    Pending = 1,
+    Completed = 2,
+    Failed = 3,
+}
+
 public enum MaintenanceStatus
 {
     Pending = 1,     // قيد الانتظار
@@ -57,4 +65,11 @@ public enum NotificationChannel
     WhatsApp = 2,
     Sms = 3,
     Push = 4,
+}
+
+/// <summary>قناة إرسال كود تسجيل الدخول (OTP) — المستخدم يختار الأنسب له وقت الطلب.</summary>
+public enum OtpChannel
+{
+    Sms = 1,
+    Email = 2,
 }

@@ -12,6 +12,7 @@ public interface IApplicationDbContext
     DbSet<User> Users { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
     DbSet<DeviceToken> DeviceTokens { get; }
+    DbSet<OtpCode> OtpCodes { get; }
     DbSet<UserBuilding> UserBuildings { get; }
     DbSet<Building> Buildings { get; }
     DbSet<Apartment> Apartments { get; }

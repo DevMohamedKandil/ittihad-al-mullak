@@ -1,6 +1,8 @@
+using System.Security.Cryptography;
 using IttihadAlMullak.Application.Common;
 using IttihadAlMullak.Application.Dtos;
 using IttihadAlMullak.Application.Interfaces;
+using IttihadAlMullak.Domain;
 using IttihadAlMullak.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +12,14 @@ public class AuthService(
     IApplicationDbContext db,
     ITokenService tokens,
     IPasswordHasherService hasher,
-    ICurrentUser currentUser) : IAuthService
+    ICurrentUser currentUser,
+    ISmsGateway sms,
+    IEmailSender email) : IAuthService
 {
     private const int RefreshTokenDays = 60; // جلسة طويلة عشان تطبيق الموبايل
+    private const int OtpValidMinutes = 5;
+    private const int OtpCooldownSeconds = 60;
+    private const int OtpMaxAttempts = 5;
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken ct = default)
     {
@@ -128,6 +135,73 @@ public class AuthService(
         });
         await db.SaveChangesAsync(ct);
     }
+
+    public async Task RequestOtpAsync(RequestOtpRequest request, CancellationToken ct = default)
+    {
+        var phone = request.Phone.Trim();
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Phone == phone, ct)
+            ?? throw new BusinessRuleException(Msg.Get("PhoneNotRegistered"));
+        if (!user.IsActive)
+            throw new ForbiddenException(Msg.Get("AccountSuspended"));
+        if (request.Channel == OtpChannel.Email && string.IsNullOrWhiteSpace(user.Email))
+            throw new BusinessRuleException(Msg.Get("EmailNotRegistered"));
+
+        var recent = await db.OtpCodes
+            .Where(o => o.Phone == phone)
+            .OrderByDescending(o => o.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+        if (recent is not null && recent.CreatedAt > DateTime.UtcNow.AddSeconds(-OtpCooldownSeconds))
+            throw new BusinessRuleException(Msg.Get("OtpCooldown"));
+
+        var code = GenerateOtp();
+        db.OtpCodes.Add(new OtpCode
+        {
+            Phone = phone,
+            CodeHash = hasher.Hash(code),
+            Channel = request.Channel,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(OtpValidMinutes),
+        });
+        await db.SaveChangesAsync(ct);
+
+        if (request.Channel == OtpChannel.Email)
+            await email.SendOtpAsync(user.Email!, code, ct);
+        else
+            await sms.SendOtpAsync(phone, code, ct);
+    }
+
+    public async Task<AuthResponse> VerifyOtpAsync(VerifyOtpRequest request, CancellationToken ct = default)
+    {
+        var phone = request.Phone.Trim();
+        var otp = await db.OtpCodes
+            .Where(o => o.Phone == phone && !o.Consumed)
+            .OrderByDescending(o => o.CreatedAt)
+            .FirstOrDefaultAsync(ct)
+            ?? throw new BusinessRuleException(Msg.Get("OtpExpired"));
+
+        if (otp.ExpiresAt < DateTime.UtcNow)
+            throw new BusinessRuleException(Msg.Get("OtpExpired"));
+        if (otp.Attempts >= OtpMaxAttempts)
+            throw new BusinessRuleException(Msg.Get("TooManyOtpAttempts"));
+
+        if (!hasher.Verify(otp.CodeHash, request.Code.Trim()))
+        {
+            otp.Attempts++;
+            await db.SaveChangesAsync(ct);
+            throw new BusinessRuleException(Msg.Get("InvalidOtp"));
+        }
+
+        otp.Consumed = true;
+
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Phone == phone, ct)
+            ?? throw new NotFoundException(Msg.Get("UserNotFound"));
+        if (!user.IsActive)
+            throw new ForbiddenException(Msg.Get("AccountSuspended"));
+
+        await db.SaveChangesAsync(ct);
+        return await IssueTokensAsync(user, user.BuildingId, ct);
+    }
+
+    private static string GenerateOtp() => RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
 
     private async Task<AuthResponse> IssueTokensAsync(User user, int? activeBuildingId, CancellationToken ct)
     {

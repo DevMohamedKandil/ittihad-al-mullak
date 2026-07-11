@@ -54,3 +54,16 @@ public class DeviceToken
     public string Platform { get; set; } = string.Empty; // android | ios | web
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
+
+/// <summary>كود تسجيل دخول لمرة واحدة (OTP) عبر SMS أو إيميل — الكود نفسه متخزن مُشفّر (Hash) مش نص واضح.</summary>
+public class OtpCode
+{
+    public int Id { get; set; }
+    public string Phone { get; set; } = string.Empty;
+    public string CodeHash { get; set; } = string.Empty;
+    public OtpChannel Channel { get; set; }
+    public int Attempts { get; set; }
+    public bool Consumed { get; set; }
+    public DateTime ExpiresAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}

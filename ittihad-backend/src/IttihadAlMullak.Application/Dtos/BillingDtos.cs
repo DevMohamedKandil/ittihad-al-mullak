@@ -33,6 +33,11 @@ public record AddPaymentRequest(
 
 public record PaymentDto(int Id, decimal Amount, PaymentMethod Method, string? PaidByName, DateTime PaidAt, string? Reference);
 
+public record CreateCheckoutRequest([Range(0.01, double.MaxValue)] decimal Amount);
+
+/// <summary>رابط صفحة الدفع المستضافة عند بوابة الدفع — الفرونت بيحوّل المستخدم ليه مباشرة.</summary>
+public record CheckoutResponseDto(string CheckoutUrl);
+
 public record InvoicesSummaryDto(
     int TotalCount,
     decimal TotalAmount,

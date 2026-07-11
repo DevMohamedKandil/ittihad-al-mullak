@@ -1,12 +1,12 @@
+using System.Text.Json;
+using IttihadAlMullak.Application.Common;
 using IttihadAlMullak.Application.Interfaces;
 using IttihadAlMullak.Domain;
 
 namespace IttihadAlMullak.Infrastructure.Payments;
 
 /// <summary>
-/// بوابة دفع تجريبية — بترجع مرجع عملية وهمي.
-/// التكامل الحقيقي مع فوري/Paymob هيكون class جديد لنفس IPaymentGateway
-/// (محتاج حساب تاجر + مفاتيح API في appsettings).
+/// بوابة دفع تجريبية — بترجع مرجع عملية وهمي بدل التكامل الحقيقي مع فوري/Paymob (PaymobGateway).
 /// </summary>
 public class MockPaymentGateway : IPaymentGateway
 {
@@ -21,4 +21,11 @@ public class MockPaymentGateway : IPaymentGateway
         };
         return Task.FromResult($"{prefix}-{Guid.NewGuid().ToString("N")[..10].ToUpperInvariant()}");
     }
+
+    public Task<string> CreateCheckoutAsync(
+        decimal amount, string specialReference, string payerName, string payerPhone, string? payerEmail,
+        CancellationToken ct = default)
+        => throw new BusinessRuleException("بوابة الدفع الحقيقية (Paymob) مش متصلة بعد — راجع dotnet user-secrets");
+
+    public bool VerifyWebhookSignature(JsonElement transaction, string providedHmac) => false;
 }

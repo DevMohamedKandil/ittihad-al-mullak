@@ -18,7 +18,8 @@ public class Invoice
 
     public ICollection<Payment> Payments { get; set; } = [];
 
-    public decimal PaidAmount => Payments.Sum(p => p.Amount);
+    /// <summary>الدفعات المؤكدة بس (Pending من بوابة دفع أونلاين لسه مستنية الـ webhook مش بتتحسب).</summary>
+    public decimal PaidAmount => Payments.Where(p => p.Status == PaymentStatus.Completed).Sum(p => p.Amount);
     public bool IsOverdue => Status != InvoiceStatus.Paid && DueDate < DateTime.UtcNow;
 
     /// <summary>الدفع الجزئي: مجموع الدفعات هو اللي بيحدد حالة الفاتورة.</summary>
@@ -42,6 +43,8 @@ public class Payment
     public User? PaidBy { get; set; }
     public DateTime PaidAt { get; set; } = DateTime.UtcNow;
     public string? Reference { get; set; }
+    /// <summary>Completed افتراضيًا (تسجيل يدوي/كاش) — Pending بس لدفعات أونلاين حقيقية لحد ما الـ webhook يأكّدها.</summary>
+    public PaymentStatus Status { get; set; } = PaymentStatus.Completed;
 }
 
 public class Expense

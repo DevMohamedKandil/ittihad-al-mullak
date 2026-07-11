@@ -6,7 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IttihadAlMullak.Application.Services;
 
-public class NotificationService(IApplicationDbContext db, ICurrentUser currentUser) : INotificationService
+public class NotificationService(
+    IApplicationDbContext db,
+    ICurrentUser currentUser,
+    IPushNotificationSender push) : INotificationService
 {
     public async Task<IReadOnlyList<NotificationDto>> MyNotificationsAsync(CancellationToken ct = default)
     {
@@ -38,9 +41,13 @@ public class NotificationService(IApplicationDbContext db, ICurrentUser currentU
 
     public async Task NotifyAsync(int userId, string title, string body, CancellationToken ct = default)
     {
-        // حالياً: إشعار داخل التطبيق فقط.
-        // لاحقاً: نفس النقطة دي هتبعت Push (بالـ DeviceTokens) و WhatsApp/SMS.
         db.Notifications.Add(new Notification { UserId = userId, Title = title, Body = body });
         await db.SaveChangesAsync(ct);
+
+        var deviceTokens = await db.DeviceTokens
+            .Where(d => d.UserId == userId)
+            .Select(d => d.Token)
+            .ToListAsync(ct);
+        await push.SendAsync(deviceTokens, title, body, ct);
     }
 }

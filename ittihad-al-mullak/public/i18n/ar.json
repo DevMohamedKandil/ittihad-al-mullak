@@ -538,5 +538,16 @@
   "buildingSwitcher.addNew": "إضافة عمارة جديدة",
   "buildingSwitcher.createTitle": "تسجيل عمارة جديدة",
   "buildingSwitcher.create": "إنشاء العمارة",
-  "buildingSwitcher.creating": "جاري الإنشاء..."
+  "buildingSwitcher.creating": "جاري الإنشاء...",
+  "login.useOtpInstead": "تسجيل الدخول بكود بدل كلمة المرور",
+  "login.otpChannel": "إرسال الكود عبر",
+  "login.otpChannelSms": "رسالة SMS",
+  "login.otpChannelEmail": "الإيميل",
+  "login.sending": "جاري الإرسال...",
+  "login.sendCode": "إرسال الكود",
+  "login.backToPassword": "الرجوع لتسجيل الدخول بكلمة المرور",
+  "login.otpSentTo": "تم إرسال كود إلى",
+  "login.otpCode": "كود الدخول",
+  "login.confirmCode": "تأكيد الكود",
+  "login.resendCode": "إعادة إرسال الكود"
 }

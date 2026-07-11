@@ -50,4 +50,10 @@ public class InvoicesController(IInvoiceService invoices) : ControllerBase
     [HasPermission("Invoices.SendReminders")]
     public Task<SendRemindersResult> SendReminders(CancellationToken ct)
         => invoices.SendRemindersAsync(ct);
+
+    /// <summary>بدء دفعة أونلاين حقيقية (بطاقة/فوري عبر Paymob) — بيرجع رابط صفحة الدفع.</summary>
+    [HttpPost("{id:int}/checkout")]
+    [HasPermission("Invoices.Pay")]
+    public Task<CheckoutResponseDto> CreateCheckout(int id, CreateCheckoutRequest request, CancellationToken ct)
+        => invoices.CreateCheckoutAsync(id, request, ct);
 }

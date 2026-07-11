@@ -18,6 +18,11 @@ public interface IAuthService
     Task<AuthResponse> SwitchBuildingAsync(SwitchBuildingRequest request, CancellationToken ct = default);
     /// <summary>تسجيل عمارة جديدة لنفس حساب الأدمن — بيرجع توكن نشط على العمارة الجديدة على طول.</summary>
     Task<AuthResponse> CreateBuildingAsync(CreateBuildingRequest request, CancellationToken ct = default);
+
+    /// <summary>تسجيل دخول بديل: يبعت كود OTP لرقم مسجّل بالفعل عند مستخدم موجود.</summary>
+    Task RequestOtpAsync(RequestOtpRequest request, CancellationToken ct = default);
+    /// <summary>تأكيد كود الـ OTP — بيرجع توكن دخول زي أي تسجيل دخول عادي لو الكود صح.</summary>
+    Task<AuthResponse> VerifyOtpAsync(VerifyOtpRequest request, CancellationToken ct = default);
 }
 
 public interface IDashboardService
@@ -43,6 +48,11 @@ public interface IInvoiceService
     Task<InvoiceDto> AddPaymentAsync(int invoiceId, AddPaymentRequest request, CancellationToken ct = default);
     Task<IReadOnlyList<PaymentDto>> GetPaymentsAsync(int invoiceId, CancellationToken ct = default);
     Task<SendRemindersResult> SendRemindersAsync(CancellationToken ct = default);
+
+    /// <summary>بدء دفعة أونلاين حقيقية (بطاقة/فوري) — بيرجع رابط صفحة الدفع، والتأكيد بيجي بعدين عن طريق webhook.</summary>
+    Task<CheckoutResponseDto> CreateCheckoutAsync(int invoiceId, CreateCheckoutRequest request, CancellationToken ct = default);
+    /// <summary>استقبال تأكيد الدفع من بوابة الدفع — بيتحقق من التوقيع الأول قبل أي تعديل.</summary>
+    Task HandlePaymentWebhookAsync(System.Text.Json.JsonElement transaction, string providedHmac, CancellationToken ct = default);
 }
 
 public interface IExpenseService

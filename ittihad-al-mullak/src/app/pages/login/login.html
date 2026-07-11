@@ -13,83 +13,212 @@
 
     <!-- Card -->
     <div class="rounded-xl border bg-card text-card-foreground shadow-lg">
-      <form class="p-6 space-y-4" (ngSubmit)="submit()">
-        <div class="space-y-2">
-          <label class="text-sm font-medium" for="phone">{{ 'login.phone' | translate }}</label>
-          <div class="relative">
-            <lucide-angular [img]="icons.phone" [size]="16" class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+      @if (mode() === 'password') {
+        <form class="p-6 space-y-4" (ngSubmit)="submit()">
+          <div class="space-y-2">
+            <label class="text-sm font-medium" for="phone">{{ 'login.phone' | translate }}</label>
+            <div class="relative">
+              <lucide-angular [img]="icons.phone" [size]="16" class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="phone"
+                type="tel"
+                dir="ltr"
+                placeholder="01xxxxxxxxx"
+                [ngModel]="phone()"
+                (ngModelChange)="phone.set($event)"
+                name="phone"
+                class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm text-right shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium" for="password">{{ 'login.password' | translate }}</label>
+            <div class="relative">
+              <lucide-angular [img]="icons.lock" [size]="16" class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••"
+                [ngModel]="password()"
+                (ngModelChange)="password.set($event)"
+                name="password"
+                class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
+          </div>
+
+          @if (error(); as message) {
+            <div class="rounded-md bg-destructive/10 text-destructive text-sm px-4 py-3">
+              {{ message }}
+            </div>
+          }
+
+          <button
+            type="submit"
+            [disabled]="loading()"
+            class="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            <lucide-angular [img]="icons.logIn" [size]="16" />
+            {{ (loading() ? 'login.loggingIn' : 'common.login') | translate }}
+          </button>
+
+          <button
+            type="button"
+            (click)="switchToOtp()"
+            class="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {{ 'login.useOtpInstead' | translate }}
+          </button>
+        </form>
+      }
+
+      @if (mode() === 'otp-request') {
+        <form class="p-6 space-y-4" (ngSubmit)="requestOtp()">
+          <div class="space-y-2">
+            <label class="text-sm font-medium" for="otp-phone">{{ 'login.phone' | translate }}</label>
+            <div class="relative">
+              <lucide-angular [img]="icons.phone" [size]="16" class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="otp-phone"
+                type="tel"
+                dir="ltr"
+                placeholder="01xxxxxxxxx"
+                [ngModel]="phone()"
+                (ngModelChange)="phone.set($event)"
+                name="otpPhone"
+                class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm text-right shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium">{{ 'login.otpChannel' | translate }}</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                (click)="otpChannel.set('Sms')"
+                class="inline-flex items-center justify-center gap-2 rounded-md h-10 px-3 text-sm font-medium border transition-colors"
+                [class.border-primary]="otpChannel() === 'Sms'"
+                [class.bg-primary]="otpChannel() === 'Sms'"
+                [class.text-primary-foreground]="otpChannel() === 'Sms'"
+                [class.border-input]="otpChannel() !== 'Sms'"
+              >
+                <lucide-angular [img]="icons.sms" [size]="16" />
+                {{ 'login.otpChannelSms' | translate }}
+              </button>
+              <button
+                type="button"
+                (click)="otpChannel.set('Email')"
+                class="inline-flex items-center justify-center gap-2 rounded-md h-10 px-3 text-sm font-medium border transition-colors"
+                [class.border-primary]="otpChannel() === 'Email'"
+                [class.bg-primary]="otpChannel() === 'Email'"
+                [class.text-primary-foreground]="otpChannel() === 'Email'"
+                [class.border-input]="otpChannel() !== 'Email'"
+              >
+                <lucide-angular [img]="icons.email" [size]="16" />
+                {{ 'login.otpChannelEmail' | translate }}
+              </button>
+            </div>
+          </div>
+
+          @if (error(); as message) {
+            <div class="rounded-md bg-destructive/10 text-destructive text-sm px-4 py-3">
+              {{ message }}
+            </div>
+          }
+
+          <button
+            type="submit"
+            [disabled]="loading()"
+            class="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            {{ (loading() ? 'login.sending' : 'login.sendCode') | translate }}
+          </button>
+
+          <button
+            type="button"
+            (click)="switchToPassword()"
+            class="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {{ 'login.backToPassword' | translate }}
+          </button>
+        </form>
+      }
+
+      @if (mode() === 'otp-verify') {
+        <form class="p-6 space-y-4" (ngSubmit)="verifyOtp()">
+          <p class="text-sm text-muted-foreground">{{ 'login.otpSentTo' | translate }} <span dir="ltr" class="font-medium text-foreground">{{ phone() }}</span></p>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium" for="otp-code">{{ 'login.otpCode' | translate }}</label>
             <input
-              id="phone"
-              type="tel"
+              id="otp-code"
+              type="text"
+              inputmode="numeric"
               dir="ltr"
-              placeholder="01xxxxxxxxx"
-              [ngModel]="phone()"
-              (ngModelChange)="phone.set($event)"
-              name="phone"
-              class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm text-right shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              placeholder="123456"
+              [ngModel]="otpCode()"
+              (ngModelChange)="otpCode.set($event)"
+              name="otpCode"
+              class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 text-center text-lg tracking-[0.3em] shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
           </div>
-        </div>
 
-        <div class="space-y-2">
-          <label class="text-sm font-medium" for="password">{{ 'login.password' | translate }}</label>
-          <div class="relative">
-            <lucide-angular [img]="icons.lock" [size]="16" class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••"
-              [ngModel]="password()"
-              (ngModelChange)="password.set($event)"
-              name="password"
-              class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            />
-          </div>
-        </div>
+          @if (error(); as message) {
+            <div class="rounded-md bg-destructive/10 text-destructive text-sm px-4 py-3">
+              {{ message }}
+            </div>
+          }
 
-        @if (error(); as message) {
-          <div class="rounded-md bg-destructive/10 text-destructive text-sm px-4 py-3">
-            {{ message }}
-          </div>
-        }
+          <button
+            type="submit"
+            [disabled]="loading()"
+            class="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            <lucide-angular [img]="icons.logIn" [size]="16" />
+            {{ (loading() ? 'login.loggingIn' : 'login.confirmCode') | translate }}
+          </button>
 
-        <button
-          type="submit"
-          [disabled]="loading()"
-          class="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-        >
-          <lucide-angular [img]="icons.logIn" [size]="16" />
-          {{ (loading() ? 'login.loggingIn' : 'common.login') | translate }}
-        </button>
-      </form>
+          <button
+            type="button"
+            (click)="requestOtp()"
+            class="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {{ 'login.resendCode' | translate }}
+          </button>
+        </form>
+      }
 
       <!-- Demo accounts -->
-      <div class="border-t p-4">
-        <p class="text-xs text-muted-foreground text-center mb-3">{{ 'login.demoAccounts' | translate }}</p>
-        <div class="flex gap-2">
-          <button
-            type="button"
-            (click)="fillDemo('admin')"
-            class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
-          >
-            {{ 'role.Admin' | translate }}
-          </button>
-          <button
-            type="button"
-            (click)="fillDemo('owner')"
-            class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
-          >
-            {{ 'role.Owner' | translate }}
-          </button>
-          <button
-            type="button"
-            (click)="fillDemo('tenant')"
-            class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
-          >
-            {{ 'role.Tenant' | translate }}
-          </button>
+      @if (mode() === 'password') {
+        <div class="border-t p-4">
+          <p class="text-xs text-muted-foreground text-center mb-3">{{ 'login.demoAccounts' | translate }}</p>
+          <div class="flex gap-2">
+            <button
+              type="button"
+              (click)="fillDemo('admin')"
+              class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
+            >
+              {{ 'role.Admin' | translate }}
+            </button>
+            <button
+              type="button"
+              (click)="fillDemo('owner')"
+              class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
+            >
+              {{ 'role.Owner' | translate }}
+            </button>
+            <button
+              type="button"
+              (click)="fillDemo('tenant')"
+              class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
+            >
+              {{ 'role.Tenant' | translate }}
+            </button>
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 </div>

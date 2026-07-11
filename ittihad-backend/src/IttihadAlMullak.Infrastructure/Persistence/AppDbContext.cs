@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<User> Users => Set<User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<DeviceToken> DeviceTokens => Set<DeviceToken>();
+    public DbSet<OtpCode> OtpCodes => Set<OtpCode>();
     public DbSet<UserBuilding> UserBuildings => Set<UserBuilding>();
     public DbSet<Building> Buildings => Set<Building>();
     public DbSet<Apartment> Apartments => Set<Apartment>();
@@ -39,6 +40,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
         modelBuilder.Entity<RefreshToken>()
             .HasIndex(t => t.Token).IsUnique();
+
+        modelBuilder.Entity<OtpCode>()
+            .HasIndex(o => new { o.Phone, o.Consumed, o.ExpiresAt });
 
         modelBuilder.Entity<UserBuilding>(entity =>
         {
