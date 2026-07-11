@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   LucideAngularModule,
   LucideIconData,
@@ -25,14 +26,16 @@ import { MaintenanceApi } from '../../../core/api.services';
 import { MaintenanceRequest, MaintenanceStatus, MaintenancePriority } from '../../../core/models';
 import { APP_CONFIG } from '../../../core/app-config';
 import { formatRelative, formatDate } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-maintenance-page',
-  imports: [FormsModule, LucideAngularModule],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe],
   templateUrl: './maintenance.html',
 })
 export class MaintenancePage {
   private readonly api = inject(MaintenanceApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly filesBaseUrl = APP_CONFIG.filesUrl;
 
@@ -56,16 +59,16 @@ export class MaintenancePage {
   protected readonly categories = ['سباكة', 'كهرباء', 'مصعد', 'نظافة', 'أمن وسلامة', 'دهانات', 'أخرى'];
 
   protected readonly statusLabels: Record<MaintenanceStatus, string> = {
-    Pending: 'جديد',
-    InProgress: 'قيد التنفيذ',
-    Completed: 'مكتمل',
-    Rejected: 'مرفوض',
+    Pending: this.i18n.t('maintenance.Pending'),
+    InProgress: this.i18n.t('maintenance.InProgress'),
+    Completed: this.i18n.t('maintenance.Completed'),
+    Rejected: this.i18n.t('maintenance.Rejected'),
   };
 
   protected readonly priorityLabels: Record<MaintenancePriority, string> = {
-    Low: 'منخفضة',
-    Medium: 'متوسطة',
-    High: 'عالية',
+    Low: this.i18n.t('priority.Low'),
+    Medium: this.i18n.t('priority.Medium'),
+    High: this.i18n.t('priority.High'),
   };
 
   protected readonly statusBadges: Record<MaintenanceStatus, { class: string; icon: LucideIconData }> = {
@@ -104,28 +107,28 @@ export class MaintenancePage {
     const list = this.requests();
     return [
       {
-        label: 'جديد',
+        label: this.i18n.t('maintenance.Pending'),
         value: list.filter((r) => r.status === 'Pending').length,
         icon: Clock,
         color: 'text-primary',
         bg: 'bg-primary/10',
       },
       {
-        label: 'قيد التنفيذ',
+        label: this.i18n.t('maintenance.InProgress'),
         value: list.filter((r) => r.status === 'InProgress').length,
         icon: Wrench,
         color: 'text-warning-foreground',
         bg: 'bg-warning/10',
       },
       {
-        label: 'مكتمل',
+        label: this.i18n.t('maintenance.Completed'),
         value: list.filter((r) => r.status === 'Completed').length,
         icon: CheckCircle,
         color: 'text-success',
         bg: 'bg-success/10',
       },
       {
-        label: 'أولوية عالية',
+        label: this.i18n.t('maintenanceAdmin.highPriority'),
         value: list.filter((r) => r.priority === 'High' && (r.status === 'Pending' || r.status === 'InProgress'))
           .length,
         icon: AlertTriangle,
@@ -183,7 +186,7 @@ export class MaintenancePage {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });
@@ -238,7 +241,7 @@ export class MaintenancePage {
           this.dialogOpen.set(false);
         },
         error: (err) => {
-          this.saveError.set(err.error?.title ?? 'تعذر حفظ التحديثات');
+          this.saveError.set(err.error?.title ?? this.i18n.t('maintenanceAdmin.saveError'));
           this.saving.set(false);
         },
       });

@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   LucideAngularModule,
   LucideIconData,
@@ -19,12 +20,13 @@ import { AuthService } from '../../../core/auth.service';
 import { PermissionsService } from '../../../core/permissions.service';
 import { Invoice, PaymentMethod, PaymentStatusString } from '../../../core/models';
 import { formatDate } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 type BillTab = 'pending' | 'paid';
 
 @Component({
   selector: 'app-owner-bills',
-  imports: [FormsModule, OwnerHeader, LucideAngularModule],
+  imports: [FormsModule, OwnerHeader, LucideAngularModule, TranslatePipe],
   templateUrl: './bills.html',
 })
 export class OwnerBills {
@@ -32,6 +34,7 @@ export class OwnerBills {
   private readonly invoicesApi = inject(InvoicesApi);
   private readonly auth = inject(AuthService);
   private readonly permissions = inject(PermissionsService);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     creditCard: CreditCard,
@@ -47,25 +50,25 @@ export class OwnerBills {
     { label: string; icon: LucideIconData; class: string; badgeClass: string }
   > = {
     paid: {
-      label: 'مدفوع',
+      label: this.i18n.t('payment.paid'),
       icon: CheckCircle2,
       class: 'bg-success/10 text-success',
       badgeClass: 'bg-success text-success-foreground',
     },
     unpaid: {
-      label: 'مستحق',
+      label: this.i18n.t('owner.bills.statusDue'),
       icon: Clock,
       class: 'bg-warning/10 text-warning',
       badgeClass: 'bg-warning text-warning-foreground',
     },
     overdue: {
-      label: 'متأخر',
+      label: this.i18n.t('payment.overdue'),
       icon: AlertCircle,
       class: 'bg-destructive/10 text-destructive',
       badgeClass: 'bg-destructive text-destructive-foreground',
     },
     partial: {
-      label: 'جزئي',
+      label: this.i18n.t('payment.partial'),
       icon: Clock,
       class: 'bg-primary/10 text-primary',
       badgeClass: 'bg-primary text-primary-foreground',
@@ -78,10 +81,30 @@ export class OwnerBills {
     icon: LucideIconData;
     description: string;
   }[] = [
-    { id: 'Fawry', name: 'فوري', icon: Smartphone, description: 'ادفع عبر أي منفذ فوري' },
-    { id: 'Card', name: 'بطاقة ائتمان', icon: CreditCard, description: 'فيزا أو ماستركارد' },
-    { id: 'BankTransfer', name: 'تحويل بنكي', icon: Building2, description: 'تحويل مباشر للحساب البنكي' },
-    { id: 'Cash', name: 'نقداً', icon: Banknote, description: 'الدفع للجنة الإدارة' },
+    {
+      id: 'Fawry',
+      name: this.i18n.t('method.Fawry'),
+      icon: Smartphone,
+      description: this.i18n.t('owner.bills.methodFawryDesc'),
+    },
+    {
+      id: 'Card',
+      name: this.i18n.t('owner.bills.methodCardName'),
+      icon: CreditCard,
+      description: this.i18n.t('owner.bills.methodCardDesc'),
+    },
+    {
+      id: 'BankTransfer',
+      name: this.i18n.t('method.BankTransfer'),
+      icon: Building2,
+      description: this.i18n.t('owner.bills.methodBankDesc'),
+    },
+    {
+      id: 'Cash',
+      name: this.i18n.t('owner.bills.methodCashName'),
+      icon: Banknote,
+      description: this.i18n.t('owner.bills.methodCashDesc'),
+    },
   ];
 
   protected readonly bills = signal<Invoice[]>([]);
@@ -127,7 +150,7 @@ export class OwnerBills {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });
@@ -163,12 +186,12 @@ export class OwnerBills {
         this.bills.update((bills) => bills.map((b) => (b.id === updated.id ? updated : b)));
         this.paying.set(false);
         this.closePayment();
-        this.successMessage.set('تم الدفع بنجاح');
+        this.successMessage.set(this.i18n.t('owner.bills.paymentSuccess'));
         setTimeout(() => this.successMessage.set(null), 4000);
       },
       error: (err) => {
         this.paying.set(false);
-        this.payError.set(err.error?.title ?? 'تعذر إتمام الدفع');
+        this.payError.set(err.error?.title ?? this.i18n.t('owner.bills.paymentFailed'));
       },
     });
   }

@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   LucideAngularModule,
   LucideIconData,
@@ -21,14 +22,16 @@ import {
 import { AnnouncementsApi } from '../../../core/api.services';
 import { Announcement, AnnouncementType } from '../../../core/models';
 import { formatDate } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-announcements-page',
-  imports: [FormsModule, LucideAngularModule],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe],
   templateUrl: './announcements.html',
 })
 export class AnnouncementsPage {
   private readonly api = inject(AnnouncementsApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     plus: Plus,
@@ -65,9 +68,9 @@ export class AnnouncementsPage {
   protected readonly createError = signal<string | null>(null);
 
   protected readonly typeLabels: Record<AnnouncementType, string> = {
-    General: 'عام',
-    Urgent: 'عاجل',
-    Financial: 'مالي',
+    General: this.i18n.t('announcement.General'),
+    Urgent: this.i18n.t('announcement.Urgent'),
+    Financial: this.i18n.t('announcement.Financial'),
   };
 
   protected readonly stats = computed(() => {
@@ -78,17 +81,29 @@ export class AnnouncementsPage {
       return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     }).length;
     return [
-      { label: 'إجمالي الإعلانات', value: list.length, icon: Megaphone, color: 'text-primary', bg: 'bg-primary/10' },
       {
-        label: 'المثبتة',
+        label: this.i18n.t('announcementsAdmin.total'),
+        value: list.length,
+        icon: Megaphone,
+        color: 'text-primary',
+        bg: 'bg-primary/10',
+      },
+      {
+        label: this.i18n.t('announcementsAdmin.pinned'),
         value: list.filter((a) => a.isPinned).length,
         icon: Pin,
         color: 'text-secondary',
         bg: 'bg-secondary/10',
       },
-      { label: 'هذا الشهر', value: thisMonth, icon: Calendar, color: 'text-warning-foreground', bg: 'bg-warning/10' },
       {
-        label: 'عاجلة',
+        label: this.i18n.t('announcementsAdmin.thisMonth'),
+        value: thisMonth,
+        icon: Calendar,
+        color: 'text-warning-foreground',
+        bg: 'bg-warning/10',
+      },
+      {
+        label: this.i18n.t('announcementsAdmin.urgent'),
         value: list.filter((a) => a.type === 'Urgent').length,
         icon: AlertTriangle,
         color: 'text-destructive',
@@ -127,7 +142,7 @@ export class AnnouncementsPage {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });
@@ -181,7 +196,7 @@ export class AnnouncementsPage {
           this.load();
         },
         error: (err) => {
-          this.createError.set(err.error?.title ?? 'تعذر نشر الإعلان');
+          this.createError.set(err.error?.title ?? this.i18n.t('announcementsAdmin.publishError'));
           this.creating.set(false);
         },
       });
@@ -191,7 +206,7 @@ export class AnnouncementsPage {
     this.closeMenu();
     this.api.delete(id).subscribe({
       next: () => this.load(),
-      error: (err) => this.error.set(err.error?.title ?? 'تعذر حذف الإعلان'),
+      error: (err) => this.error.set(err.error?.title ?? this.i18n.t('announcementsAdmin.deleteError')),
     });
   }
 }

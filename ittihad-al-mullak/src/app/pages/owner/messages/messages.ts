@@ -8,18 +8,21 @@ import {
   Building2,
   Search,
 } from 'lucide-angular';
+import { TranslatePipe } from '@ngx-translate/core';
 import { OwnerHeader } from '../header';
 import { ConversationsApi } from '../../../core/api.services';
 import { ChatMessage, Conversation } from '../../../core/models';
 import { formatRelative } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-owner-messages',
-  imports: [FormsModule, OwnerHeader, LucideAngularModule],
+  imports: [FormsModule, OwnerHeader, LucideAngularModule, TranslatePipe],
   templateUrl: './messages.html',
 })
 export class OwnerMessages {
   private readonly conversationsApi = inject(ConversationsApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     send: Send,
@@ -57,7 +60,7 @@ export class OwnerMessages {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });
@@ -89,7 +92,7 @@ export class OwnerMessages {
         );
         this.selectConversation(conversation.id);
       },
-      error: (err) => this.error.set(err.error?.title ?? 'تعذر بدء المحادثة'),
+      error: (err) => this.error.set(err.error?.title ?? this.i18n.t('owner.messages.startFailed')),
     });
   }
 

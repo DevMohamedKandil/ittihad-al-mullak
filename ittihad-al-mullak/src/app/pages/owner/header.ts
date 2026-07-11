@@ -2,6 +2,7 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { LucideAngularModule, Bell, Building2 } from 'lucide-angular';
 import { NotificationsApi } from '../../core/api.services';
 import { AppNotification } from '../../core/models';
+import { TranslationService } from '../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-owner-header',
@@ -14,8 +15,8 @@ import { AppNotification } from '../../core/models';
             <lucide-angular [img]="icons.building2" [size]="20" />
           </div>
           <div>
-            <h1 class="font-bold text-lg">{{ title() || 'اتحاد الملاك' }}</h1>
-            <p class="text-xs text-muted-foreground">عمارة النيل - المعادي</p>
+            <h1 class="font-bold text-lg">{{ title() || i18n.t('app.name') }}</h1>
+            <p class="text-xs text-muted-foreground">{{ i18n.t('owner.header.buildingSubtitle') }}</p>
           </div>
         </div>
         <button
@@ -40,6 +41,7 @@ export class OwnerHeader {
   readonly title = input<string>();
 
   private readonly notificationsApi = inject(NotificationsApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     bell: Bell,

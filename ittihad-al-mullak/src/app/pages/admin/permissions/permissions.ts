@@ -1,19 +1,24 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { LucideAngularModule, Shield, RefreshCw } from 'lucide-angular';
 import {
   PermissionMatrix,
   PermissionMatrixCell,
+  PermissionScreen,
+  PermissionAction,
   PermissionsApi,
 } from '../../../core/api.services';
 import { UserRole } from '../../../core/models';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-permissions-page',
-  imports: [LucideAngularModule],
+  imports: [LucideAngularModule, TranslatePipe],
   templateUrl: './permissions.html',
 })
 export class PermissionsPage {
   private readonly api = inject(PermissionsApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = { shield: Shield, refresh: RefreshCw };
 
@@ -24,10 +29,19 @@ export class PermissionsPage {
   protected readonly activeRole = signal<UserRole>('Owner');
 
   protected readonly roles: { value: UserRole; label: string }[] = [
-    { value: 'Admin', label: 'لجنة الإدارة' },
-    { value: 'Owner', label: 'مالك' },
-    { value: 'Tenant', label: 'مستأجر' },
+    { value: 'Admin', label: this.i18n.t('role.Admin') },
+    { value: 'Owner', label: this.i18n.t('role.Owner') },
+    { value: 'Tenant', label: this.i18n.t('role.Tenant') },
   ];
+
+  /** أسماء الشاشات والأكشنز جايه من السيرفر بالعربي والإنجليزي معاً */
+  protected screenName(screen: PermissionScreen): string {
+    return this.i18n.isEnglish() ? screen.nameEn : screen.nameAr;
+  }
+
+  protected actionName(action: PermissionAction): string {
+    return this.i18n.isEnglish() ? action.nameEn : action.nameAr;
+  }
 
   protected readonly cellsByScreen = computed(() => {
     const matrix = this.matrix();
@@ -52,7 +66,7 @@ export class PermissionsPage {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });
@@ -92,7 +106,7 @@ export class PermissionsPage {
         this.saving.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر حفظ التعديل');
+        this.error.set(err.error?.title ?? this.i18n.t('permissionsAdmin.saveFailed'));
         this.saving.set(false);
       },
     });

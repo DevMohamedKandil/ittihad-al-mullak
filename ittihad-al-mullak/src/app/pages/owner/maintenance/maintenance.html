@@ -1,4 +1,4 @@
-<app-owner-header title="طلبات الصيانة" />
+<app-owner-header [title]="'nav.maintenance' | translate" />
 
 <div class="p-4 space-y-6">
   <!-- New Request Button -->
@@ -8,21 +8,21 @@
     class="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-8 bg-primary text-primary-foreground hover:bg-primary/90"
   >
     <lucide-angular [img]="icons.plus" [size]="20" />
-    طلب صيانة جديد
+    {{ 'owner.maintenance.newRequest' | translate }}
   </button>
 
   @if (isNewRequestOpen()) {
     <div class="fixed inset-0 bg-black/50 z-40" (click)="closeNewRequest()"></div>
     <div class="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-lg max-h-[90vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-6 shadow-lg">
       <div class="flex flex-col space-y-1.5">
-        <h2 class="text-lg font-semibold">طلب صيانة جديد</h2>
-        <p class="text-sm text-muted-foreground">قم بوصف المشكلة وسيتم الرد عليك في أقرب وقت</p>
+        <h2 class="text-lg font-semibold">{{ 'owner.maintenance.newRequest' | translate }}</h2>
+        <p class="text-sm text-muted-foreground">{{ 'owner.maintenance.newRequestHint' | translate }}</p>
       </div>
 
       <div class="space-y-4 mt-4">
         <!-- Category Selection -->
         <div class="space-y-2">
-          <label class="text-sm font-medium leading-none">التصنيف</label>
+          <label class="text-sm font-medium leading-none">{{ 'owner.maintenance.category' | translate }}</label>
           <div class="grid grid-cols-2 gap-2">
             @for (cat of categories; track cat.value) {
               <button
@@ -45,11 +45,11 @@
 
         <!-- Title -->
         <div class="space-y-2">
-          <label for="title" class="text-sm font-medium leading-none">عنوان المشكلة</label>
+          <label for="title" class="text-sm font-medium leading-none">{{ 'owner.maintenance.issueTitle' | translate }}</label>
           <input
             id="title"
             type="text"
-            placeholder="مثال: تسريب مياه في الحمام"
+            [placeholder]="'owner.maintenance.issueTitlePlaceholder' | translate"
             [ngModel]="title()"
             (ngModelChange)="title.set($event)"
             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -58,10 +58,10 @@
 
         <!-- Description -->
         <div class="space-y-2">
-          <label for="description" class="text-sm font-medium leading-none">وصف تفصيلي</label>
+          <label for="description" class="text-sm font-medium leading-none">{{ 'owner.maintenance.detailedDescription' | translate }}</label>
           <textarea
             id="description"
-            placeholder="اشرح المشكلة بالتفصيل..."
+            [placeholder]="'owner.maintenance.detailedDescriptionPlaceholder' | translate"
             rows="4"
             [ngModel]="description()"
             (ngModelChange)="description.set($event)"
@@ -71,31 +71,31 @@
 
         <!-- Priority -->
         <div class="space-y-2">
-          <label for="priority" class="text-sm font-medium leading-none">الأولوية</label>
+          <label for="priority" class="text-sm font-medium leading-none">{{ 'owner.maintenance.priority' | translate }}</label>
           <select
             id="priority"
-            title="الأولوية"
+            [title]="'owner.maintenance.priority' | translate"
             [ngModel]="priority()"
             (ngModelChange)="priority.set($event)"
             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
-            <option value="" disabled>اختر الأولوية</option>
-            <option value="Low">منخفضة - يمكن الانتظار</option>
-            <option value="Medium">متوسطة - خلال أسبوع</option>
-            <option value="High">عاجلة - تحتاج تدخل فوري</option>
+            <option value="" disabled>{{ 'owner.maintenance.choosePriority' | translate }}</option>
+            <option value="Low">{{ 'owner.maintenance.priorityLowFull' | translate }}</option>
+            <option value="Medium">{{ 'owner.maintenance.priorityMediumFull' | translate }}</option>
+            <option value="High">{{ 'owner.maintenance.priorityHighFull' | translate }}</option>
           </select>
         </div>
 
         <!-- Image Upload -->
         <div class="space-y-2">
-          <label class="text-sm font-medium leading-none">صور (اختياري — حتى ٥ صور)</label>
+          <label class="text-sm font-medium leading-none">{{ 'owner.maintenance.photosOptional' | translate }}</label>
           <input
             #photoInput
             type="file"
             accept="image/jpeg,image/png,image/webp"
             multiple
             class="hidden"
-            title="إضافة صور للمشكلة"
+            [title]="'owner.maintenance.addPhotos' | translate"
             (change)="onPhotosSelected($event)"
           />
           <div
@@ -104,13 +104,13 @@
           >
             <lucide-angular [img]="icons.camera" [size]="32" class="mx-auto text-muted-foreground mb-2" />
             <p class="text-sm text-muted-foreground">
-              {{ selectedPhotos().length > 0 ? 'تم اختيار ' + selectedPhotos().length + ' صورة — اضغط للتغيير' : 'اضغط لإضافة صور للمشكلة' }}
+              {{ (selectedPhotos().length > 0 ? 'owner.maintenance.photosSelected' : 'owner.maintenance.addPhotos') | translate:{ count: selectedPhotos().length } }}
             </p>
           </div>
           @if (photoPreviews().length > 0) {
             <div class="flex gap-2 flex-wrap">
               @for (preview of photoPreviews(); track preview) {
-                <img [src]="preview" alt="صورة مرفقة" class="w-16 h-16 rounded-lg object-cover border" />
+                <img [src]="preview" [alt]="'owner.maintenance.attachedPhoto' | translate" class="w-16 h-16 rounded-lg object-cover border" />
               }
             </div>
           }
@@ -127,7 +127,7 @@
             (click)="closeNewRequest()"
             class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
           >
-            إلغاء
+            {{ 'common.cancel' | translate }}
           </button>
           <button
             type="button"
@@ -135,7 +135,7 @@
             [disabled]="!title().trim() || !description().trim() || !priority() || submitting()"
             class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
           >
-            {{ submitting() ? 'جاري الإرسال...' : 'إرسال الطلب' }}
+            {{ (submitting() ? 'owner.maintenance.sending' : 'owner.maintenance.sendRequest') | translate }}
           </button>
         </div>
       </div>
@@ -143,7 +143,7 @@
   }
 
   @if (loading()) {
-    <p class="text-center text-sm text-muted-foreground py-12">جاري التحميل...</p>
+    <p class="text-center text-sm text-muted-foreground py-12">{{ 'common.loading' | translate }}</p>
   } @else if (error()) {
     <p class="text-center text-sm text-destructive py-12">{{ error() }}</p>
   } @else {
@@ -152,19 +152,19 @@
       <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
         <div class="p-4 text-center">
           <p class="text-2xl font-bold text-warning">{{ pendingCount() }}</p>
-          <p class="text-xs text-muted-foreground">قيد الانتظار</p>
+          <p class="text-xs text-muted-foreground">{{ 'maintenance.Pending' | translate }}</p>
         </div>
       </div>
       <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
         <div class="p-4 text-center">
           <p class="text-2xl font-bold text-primary">{{ inProgressCount() }}</p>
-          <p class="text-xs text-muted-foreground">جاري التنفيذ</p>
+          <p class="text-xs text-muted-foreground">{{ 'maintenance.InProgress' | translate }}</p>
         </div>
       </div>
       <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
         <div class="p-4 text-center">
           <p class="text-2xl font-bold text-success">{{ completedCount() }}</p>
-          <p class="text-xs text-muted-foreground">مكتمل</p>
+          <p class="text-xs text-muted-foreground">{{ 'maintenance.Completed' | translate }}</p>
         </div>
       </div>
     </div>
@@ -178,7 +178,7 @@
           class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
           [class]="activeTab() === 'active' ? 'bg-background text-foreground shadow' : ''"
         >
-          نشطة
+          {{ 'owner.maintenance.tabActive' | translate }}
           @if (activeRequests().length > 0) {
             <span class="inline-flex items-center justify-center rounded-md border border-transparent bg-secondary text-secondary-foreground text-xs font-semibold h-5 w-5 p-0">
               {{ activeRequests().length }}
@@ -191,7 +191,7 @@
           class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
           [class]="activeTab() === 'completed' ? 'bg-background text-foreground shadow' : ''"
         >
-          مكتملة
+          {{ 'owner.maintenance.tabCompleted' | translate }}
         </button>
       </div>
 
@@ -200,16 +200,16 @@
           <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
             <div class="flex flex-col items-center justify-center py-12">
               <lucide-angular [img]="icons.checkCircle2" [size]="48" class="text-success mb-4" />
-              <p class="font-medium text-lg">لا توجد طلبات نشطة</p>
-              <p class="text-sm text-muted-foreground">يمكنك إرسال طلب صيانة جديد</p>
+              <p class="font-medium text-lg">{{ 'owner.maintenance.noActiveRequests' | translate }}</p>
+              <p class="text-sm text-muted-foreground">{{ 'owner.maintenance.noActiveRequestsHint' | translate }}</p>
             </div>
           </div>
         }
         @if (activeTab() === 'completed' && completedRequests().length === 0) {
           <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
             <div class="flex flex-col items-center justify-center py-12">
-              <p class="font-medium text-lg">لا توجد طلبات</p>
-              <p class="text-sm text-muted-foreground">لا توجد طلبات مكتملة بعد</p>
+              <p class="font-medium text-lg">{{ 'owner.maintenance.noRequests' | translate }}</p>
+              <p class="text-sm text-muted-foreground">{{ 'owner.maintenance.noCompletedRequestsHint' | translate }}</p>
             </div>
           </div>
         }
@@ -244,7 +244,7 @@
                     >
                       {{ priorityConfig[request.priority].label }}
                     </span>
-                    <span class="text-xs text-muted-foreground">{{ request.category || 'عام' }}</span>
+                    <span class="text-xs text-muted-foreground">{{ request.category || ('maintenanceAdmin.commonAreas' | translate) }}</span>
                   </div>
                 </div>
                 <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground flex-shrink-0" />
@@ -257,7 +257,7 @@
             <div class="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-lg max-h-[90vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-6 shadow-lg">
               <div class="flex flex-col space-y-1.5">
                 <h2 class="text-lg font-semibold">{{ request.title }}</h2>
-                <p class="text-sm text-muted-foreground">تم الإرسال: {{ formatRelative(request.createdAt) }}</p>
+                <p class="text-sm text-muted-foreground">{{ 'owner.maintenance.sentAt' | translate }}: {{ formatRelative(request.createdAt) }}</p>
               </div>
 
               <div class="space-y-4 mt-4">
@@ -273,32 +273,32 @@
                     class="inline-flex items-center rounded-md border px-2.5 py-0.5 font-semibold text-xs"
                     [class]="priorityConfig[request.priority].class"
                   >
-                    الأولوية: {{ priorityConfig[request.priority].label }}
+                    {{ 'maintenanceAdmin.priorityLabel' | translate }}: {{ priorityConfig[request.priority].label }}
                   </span>
                 </div>
 
                 <!-- Description -->
                 <div>
-                  <h4 class="font-medium mb-2">الوصف</h4>
+                  <h4 class="font-medium mb-2">{{ 'maintenanceAdmin.description' | translate }}</h4>
                   <p class="text-sm text-muted-foreground">{{ request.description }}</p>
                 </div>
 
                 <!-- Category -->
                 <div>
-                  <h4 class="font-medium mb-2">التصنيف</h4>
+                  <h4 class="font-medium mb-2">{{ 'owner.maintenance.category' | translate }}</h4>
                   <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 font-semibold text-foreground text-xs">
-                    {{ request.category || 'عام' }}
+                    {{ request.category || ('maintenanceAdmin.commonAreas' | translate) }}
                   </span>
                 </div>
 
                 <!-- Photos -->
                 @if (request.photos.length > 0) {
                   <div>
-                    <h4 class="font-medium mb-2">الصور المرفقة</h4>
+                    <h4 class="font-medium mb-2">{{ 'maintenanceAdmin.attachedPhotos' | translate }}</h4>
                     <div class="flex gap-2 flex-wrap">
                       @for (photo of request.photos; track photo) {
                         <a [href]="filesBaseUrl + photo" target="_blank">
-                          <img [src]="filesBaseUrl + photo" alt="صورة الطلب" class="w-20 h-20 rounded-lg object-cover border" />
+                          <img [src]="filesBaseUrl + photo" [alt]="'maintenanceAdmin.requestPhoto' | translate" class="w-20 h-20 rounded-lg object-cover border" />
                         </a>
                       }
                     </div>
@@ -308,7 +308,7 @@
                 <!-- Updates Timeline -->
                 @if (updatesFor(request).length > 0) {
                   <div>
-                    <h4 class="font-medium mb-3">التحديثات</h4>
+                    <h4 class="font-medium mb-3">{{ 'owner.maintenance.updates' | translate }}</h4>
                     <div class="space-y-4">
                       @for (update of updatesFor(request); track $index) {
                         <div class="relative pr-6 pb-4 border-r-2 border-border last:pb-0">
@@ -328,14 +328,14 @@
                     class="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
                   >
                     <lucide-angular [img]="icons.messageSquare" [size]="16" />
-                    إضافة تعليق
+                    {{ 'owner.maintenance.addComment' | translate }}
                   </button>
                   @if (request.status !== 'Completed') {
                     <button
                       type="button"
                       class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
-                      إلغاء الطلب
+                      {{ 'owner.maintenance.cancelRequest' | translate }}
                     </button>
                   }
                 </div>

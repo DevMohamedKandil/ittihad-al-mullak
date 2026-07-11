@@ -19,18 +19,21 @@ import {
   Building2,
   MessageSquare,
 } from 'lucide-angular';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ApartmentsApi, InvoicesApi } from '../../../core/api.services';
 import { Apartment, Invoice, InvoiceType, InvoicesSummary, PaymentMethod, PaymentStatusString } from '../../../core/models';
-import { formatCurrency, formatDate } from '../../../core/format';
+import { formatCurrency, formatDate as formatDateUtil } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-invoices-page',
-  imports: [FormsModule, LucideAngularModule],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe],
   templateUrl: './invoices.html',
 })
 export class InvoicesPage implements OnInit {
   private readonly invoicesApi = inject(InvoicesApi);
   private readonly apartmentsApi = inject(ApartmentsApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     plus: Plus,
@@ -50,10 +53,10 @@ export class InvoicesPage implements OnInit {
   };
 
   protected readonly statusBadges: Record<PaymentStatusString, { label: string; class: string; icon: LucideIconData }> = {
-    paid: { label: 'مدفوع', class: 'bg-success/10 text-success hover:bg-success/20 border-0', icon: CheckCircle },
-    overdue: { label: 'متأخر', class: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border-0', icon: XCircle },
-    unpaid: { label: 'غير مدفوع', class: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border-0', icon: XCircle },
-    partial: { label: 'جزئي', class: 'bg-warning/10 text-warning-foreground hover:bg-warning/20 border-0', icon: Clock },
+    paid: { label: this.i18n.t('payment.paid'), class: 'bg-success/10 text-success hover:bg-success/20 border-0', icon: CheckCircle },
+    overdue: { label: this.i18n.t('payment.overdue'), class: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border-0', icon: XCircle },
+    unpaid: { label: this.i18n.t('payment.unpaid'), class: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border-0', icon: XCircle },
+    partial: { label: this.i18n.t('payment.partial'), class: 'bg-warning/10 text-warning-foreground hover:bg-warning/20 border-0', icon: Clock },
   };
 
   protected readonly invoices = signal<Invoice[]>([]);
@@ -116,11 +119,15 @@ export class InvoicesPage implements OnInit {
   }
 
   protected formatDate(value: string): string {
-    return formatDate(value);
+    return formatDateUtil(value);
   }
 
   protected typeLabel(type: InvoiceType): string {
-    return type === 'Monthly' ? 'شهرية' : type === 'Maintenance' ? 'صيانة' : 'خاصة';
+    return type === 'Monthly'
+      ? this.i18n.t('invoices.typeMonthly')
+      : type === 'Maintenance'
+        ? this.i18n.t('invoices.typeMaintenance')
+        : this.i18n.t('invoices.typeSpecial');
   }
 
   protected toggleMenu(id: number) {
@@ -156,7 +163,7 @@ export class InvoicesPage implements OnInit {
     const amount = this.newAmount();
     const dueDate = this.newDueDate();
     if (!title || !period || !amount || !dueDate) {
-      this.createError.set('يرجى إدخال جميع البيانات المطلوبة');
+      this.createError.set(this.i18n.t('invoices.fillAllFields'));
       return;
     }
     this.creating.set(true);
@@ -178,7 +185,7 @@ export class InvoicesPage implements OnInit {
         },
         error: (err) => {
           this.creating.set(false);
-          this.createError.set(err.error?.title ?? 'تعذر إنشاء الفواتير');
+          this.createError.set(err.error?.title ?? this.i18n.t('invoices.createFailed'));
         },
       });
   }
@@ -188,12 +195,12 @@ export class InvoicesPage implements OnInit {
     this.invoicesApi.sendReminders().subscribe({
       next: (res) => {
         this.sendingReminders.set(false);
-        this.remindersResult.set(`تم إرسال التذكيرات إلى ${res.notifiedOwners} من الملاك`);
+        this.remindersResult.set(this.i18n.t('invoices.remindersSent', { count: res.notifiedOwners }));
         this.remindersDialogOpen.set(false);
       },
       error: (err) => {
         this.sendingReminders.set(false);
-        this.remindersResult.set(err.error?.title ?? 'تعذر إرسال التذكيرات');
+        this.remindersResult.set(err.error?.title ?? this.i18n.t('invoices.remindersFailed'));
         this.remindersDialogOpen.set(false);
       },
     });
@@ -202,7 +209,7 @@ export class InvoicesPage implements OnInit {
   protected recordPayment(invoice: Invoice) {
     const amount = this.payAmount();
     if (!amount || amount <= 0) {
-      this.payError.set('يرجى إدخال مبلغ صحيح');
+      this.payError.set(this.i18n.t('invoices.enterValidAmount'));
       return;
     }
     this.paying.set(true);
@@ -217,7 +224,7 @@ export class InvoicesPage implements OnInit {
       },
       error: (err) => {
         this.paying.set(false);
-        this.payError.set(err.error?.title ?? 'تعذر تسجيل الدفعة');
+        this.payError.set(err.error?.title ?? this.i18n.t('invoices.paymentFailed'));
       },
     });
   }
@@ -234,7 +241,7 @@ export class InvoicesPage implements OnInit {
           this.loading.set(false);
         },
         error: (err) => {
-          this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+          this.error.set(err.error?.title ?? this.i18n.t('common.error'));
           this.loading.set(false);
         },
       });
@@ -243,7 +250,7 @@ export class InvoicesPage implements OnInit {
   private loadSummary(): void {
     this.invoicesApi.summary().subscribe({
       next: (summary) => this.summary.set(summary),
-      error: (err) => this.error.set(err.error?.title ?? 'تعذر تحميل البيانات'),
+      error: (err) => this.error.set(err.error?.title ?? this.i18n.t('common.error')),
     });
   }
 }

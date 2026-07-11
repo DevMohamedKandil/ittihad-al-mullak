@@ -16,21 +16,24 @@ import {
   HelpCircle,
   FileText,
 } from 'lucide-angular';
+import { TranslatePipe } from '@ngx-translate/core';
 import { OwnerHeader } from '../header';
 import { AuthService } from '../../../core/auth.service';
 import { OwnerApi } from '../../../core/api.services';
 import { OwnerSummary } from '../../../core/models';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 type NotificationKey = 'bills' | 'maintenance' | 'announcements' | 'whatsapp' | 'sms';
 
 @Component({
   selector: 'app-owner-profile',
-  imports: [OwnerHeader, LucideAngularModule],
+  imports: [OwnerHeader, LucideAngularModule, TranslatePipe],
   templateUrl: './profile.html',
 })
 export class OwnerProfile {
   private readonly auth = inject(AuthService);
   private readonly ownerApi = inject(OwnerApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     home: Home,
@@ -65,7 +68,7 @@ export class OwnerProfile {
   protected readonly summary = signal<OwnerSummary | null>(null);
 
   protected readonly roleLabel = computed(() =>
-    this.user()?.role === 'Tenant' ? 'مستأجر' : 'مالك',
+    this.i18n.t(this.user()?.role === 'Tenant' ? 'role.Tenant' : 'role.Owner'),
   );
 
   protected readonly initial = computed(() => this.user()?.name?.charAt(0) ?? '');

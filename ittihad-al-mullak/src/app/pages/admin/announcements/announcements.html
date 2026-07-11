@@ -2,8 +2,8 @@
   <!-- Header -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold">الإعلانات</h1>
-      <p class="text-muted-foreground">إنشاء وإدارة الإعلانات والتنبيهات</p>
+      <h1 class="text-2xl font-bold">{{ 'nav.announcements' | translate }}</h1>
+      <p class="text-muted-foreground">{{ 'announcementsAdmin.subtitle' | translate }}</p>
     </div>
     <button
       type="button"
@@ -11,7 +11,7 @@
       class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
     >
       <lucide-angular [img]="icons.plus" [size]="16" />
-      إعلان جديد
+      {{ 'announcementsAdmin.newAnnouncement' | translate }}
     </button>
   </div>
 
@@ -46,7 +46,7 @@
           />
           <input
             type="text"
-            placeholder="بحث في الإعلانات..."
+            [placeholder]="'announcementsAdmin.searchPlaceholder' | translate"
             [ngModel]="searchQuery()"
             (ngModelChange)="searchQuery.set($event)"
             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-10 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -55,14 +55,14 @@
         <select
           [ngModel]="typeFilter()"
           (ngModelChange)="typeFilter.set($event)"
-          aria-label="نوع الإعلان"
-          title="نوع الإعلان"
+          [attr.aria-label]="'announcementsAdmin.type' | translate"
+          [title]="'announcementsAdmin.type' | translate"
           class="flex h-9 w-full sm:w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
-          <option value="all">جميع الأنواع</option>
-          <option value="General">عام</option>
-          <option value="Urgent">عاجل</option>
-          <option value="Financial">مالي</option>
+          <option value="all">{{ 'announcementsAdmin.allTypes' | translate }}</option>
+          <option value="General">{{ 'announcement.General' | translate }}</option>
+          <option value="Urgent">{{ 'announcement.Urgent' | translate }}</option>
+          <option value="Financial">{{ 'announcement.Financial' | translate }}</option>
         </select>
       </div>
     </div>
@@ -71,7 +71,7 @@
   <!-- Loading / Error -->
   @if (loading()) {
     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
-      <div class="p-8 text-center text-muted-foreground">جاري التحميل...</div>
+      <div class="p-8 text-center text-muted-foreground">{{ 'common.loading' | translate }}</div>
     </div>
   } @else if (error()) {
     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
@@ -82,7 +82,7 @@
           (click)="load()"
           class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
         >
-          إعادة المحاولة
+          {{ 'announcementsAdmin.retry' | translate }}
         </button>
       </div>
     </div>
@@ -115,7 +115,7 @@
                 <button
                   type="button"
                   (click)="toggleMenu(announcement.id)"
-                  aria-label="خيارات الإعلان"
+                  [attr.aria-label]="'announcementsAdmin.announcementOptions' | translate"
                   class="inline-flex items-center justify-center rounded-md h-8 w-8 transition-colors hover:bg-accent hover:text-accent-foreground"
                 >
                   <lucide-angular [img]="icons.moreVertical" [size]="16" />
@@ -125,7 +125,7 @@
                   <div class="absolute left-0 top-10 z-50 w-40 rounded-md border bg-popover text-popover-foreground p-1 shadow-md">
                     <button type="button" (click)="deleteAnnouncement(announcement.id)" class="w-full flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-destructive hover:bg-accent hover:text-accent-foreground">
                       <lucide-angular [img]="icons.trash2" [size]="16" />
-                      حذف
+                      {{ 'common.delete' | translate }}
                     </button>
                   </div>
                 }
@@ -159,7 +159,7 @@
       <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
         <div class="p-8 text-center">
           <lucide-angular [img]="icons.megaphone" [size]="48" class="text-muted-foreground mx-auto mb-4" />
-          <p class="text-muted-foreground">لا توجد إعلانات</p>
+          <p class="text-muted-foreground">{{ 'announcementsAdmin.noAnnouncements' | translate }}</p>
         </div>
       </div>
     }
@@ -171,16 +171,16 @@
   <div class="fixed inset-0 bg-black/50 z-40" (click)="dialogOpen.set(false)"></div>
   <div class="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-6 shadow-lg max-h-[90vh] overflow-y-auto">
     <div class="space-y-1.5">
-      <h2 class="text-lg font-semibold">إنشاء إعلان جديد</h2>
-      <p class="text-sm text-muted-foreground">أنشئ إعلان جديد وحدد طريقة الإرسال</p>
+      <h2 class="text-lg font-semibold">{{ 'announcementsAdmin.createTitle' | translate }}</h2>
+      <p class="text-sm text-muted-foreground">{{ 'announcementsAdmin.createSubtitle' | translate }}</p>
     </div>
     <div class="space-y-6 py-4">
       <div class="space-y-2">
-        <label for="title" class="text-sm font-medium leading-none">عنوان الإعلان</label>
+        <label for="title" class="text-sm font-medium leading-none">{{ 'announcementsAdmin.titleLabel' | translate }}</label>
         <input
           id="title"
           type="text"
-          placeholder="أدخل عنوان الإعلان"
+          [placeholder]="'announcementsAdmin.titlePlaceholder' | translate"
           [ngModel]="newTitle()"
           (ngModelChange)="newTitle.set($event)"
           class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -188,10 +188,10 @@
       </div>
 
       <div class="space-y-2">
-        <label for="content" class="text-sm font-medium leading-none">محتوى الإعلان</label>
+        <label for="content" class="text-sm font-medium leading-none">{{ 'announcementsAdmin.contentLabel' | translate }}</label>
         <textarea
           id="content"
-          placeholder="اكتب محتوى الإعلان هنا..."
+          [placeholder]="'announcementsAdmin.contentPlaceholder' | translate"
           rows="5"
           [ngModel]="newContent()"
           (ngModelChange)="newContent.set($event)"
@@ -200,33 +200,33 @@
       </div>
 
       <div class="space-y-2">
-        <label for="ann-type" class="text-sm font-medium leading-none">نوع الإعلان</label>
+        <label for="ann-type" class="text-sm font-medium leading-none">{{ 'announcementsAdmin.type' | translate }}</label>
         <select
           id="ann-type"
           [ngModel]="newType()"
           (ngModelChange)="newType.set($event)"
           class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
-          <option value="General">عام</option>
-          <option value="Urgent">عاجل</option>
-          <option value="Financial">مالي</option>
+          <option value="General">{{ 'announcement.General' | translate }}</option>
+          <option value="Urgent">{{ 'announcement.Urgent' | translate }}</option>
+          <option value="Financial">{{ 'announcement.Financial' | translate }}</option>
         </select>
       </div>
 
       <div class="space-y-3 border-t pt-4">
-        <label class="text-sm font-medium leading-none">طريقة الإرسال</label>
+        <label class="text-sm font-medium leading-none">{{ 'announcementsAdmin.deliveryMethod' | translate }}</label>
         <div class="space-y-3">
           <div class="flex items-center gap-3">
             <input type="checkbox" id="app" checked class="h-4 w-4 rounded border-input accent-primary" />
-            <label for="app" class="text-sm font-medium leading-none cursor-pointer">إشعار التطبيق</label>
+            <label for="app" class="text-sm font-medium leading-none cursor-pointer">{{ 'announcementsAdmin.appNotification' | translate }}</label>
           </div>
           <div class="flex items-center gap-3">
             <input type="checkbox" id="whatsapp" class="h-4 w-4 rounded border-input accent-primary" />
-            <label for="whatsapp" class="text-sm font-medium leading-none cursor-pointer">واتساب</label>
+            <label for="whatsapp" class="text-sm font-medium leading-none cursor-pointer">{{ 'announcementsAdmin.whatsapp' | translate }}</label>
           </div>
           <div class="flex items-center gap-3">
             <input type="checkbox" id="sms" class="h-4 w-4 rounded border-input accent-primary" />
-            <label for="sms" class="text-sm font-medium leading-none cursor-pointer">رسالة SMS</label>
+            <label for="sms" class="text-sm font-medium leading-none cursor-pointer">{{ 'announcementsAdmin.sms' | translate }}</label>
           </div>
         </div>
       </div>
@@ -239,7 +239,7 @@
           (change)="newPinned.set(!newPinned())"
           class="h-4 w-4 rounded border-input accent-primary"
         />
-        <label for="pin" class="text-sm font-medium leading-none cursor-pointer">تثبيت الإعلان في أعلى القائمة</label>
+        <label for="pin" class="text-sm font-medium leading-none cursor-pointer">{{ 'announcementsAdmin.pinToTop' | translate }}</label>
       </div>
 
       @if (createError()) {
@@ -252,7 +252,7 @@
         (click)="dialogOpen.set(false)"
         class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent hover:bg-accent hover:text-accent-foreground"
       >
-        إلغاء
+        {{ 'common.cancel' | translate }}
       </button>
       <button
         type="button"
@@ -261,7 +261,7 @@
         class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
       >
         <lucide-angular [img]="icons.send" [size]="16" />
-        {{ creating() ? 'جاري النشر...' : 'نشر الإعلان' }}
+        {{ (creating() ? 'announcementsAdmin.publishing' : 'announcementsAdmin.publish') | translate }}
       </button>
     </div>
   </div>

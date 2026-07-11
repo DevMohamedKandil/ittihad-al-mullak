@@ -17,6 +17,7 @@ import {
   Wind,
   Building,
 } from 'lucide-angular';
+import { TranslatePipe } from '@ngx-translate/core';
 import { OwnerHeader } from '../header';
 import { MaintenanceApi, OwnerApi } from '../../../core/api.services';
 import {
@@ -26,17 +27,19 @@ import {
 } from '../../../core/models';
 import { APP_CONFIG } from '../../../core/app-config';
 import { formatRelative } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 type RequestTab = 'active' | 'completed';
 
 @Component({
   selector: 'app-owner-maintenance',
-  imports: [FormsModule, OwnerHeader, LucideAngularModule],
+  imports: [FormsModule, OwnerHeader, LucideAngularModule, TranslatePipe],
   templateUrl: './maintenance.html',
 })
 export class OwnerMaintenance {
   private readonly ownerApi = inject(OwnerApi);
   private readonly maintenanceApi = inject(MaintenanceApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     plus: Plus,
@@ -54,25 +57,25 @@ export class OwnerMaintenance {
     { label: string; icon: LucideIconData; class: string; badgeClass: string }
   > = {
     Pending: {
-      label: 'قيد الانتظار',
+      label: this.i18n.t('maintenance.Pending'),
       icon: Clock,
       class: 'bg-warning/10 text-warning',
       badgeClass: 'bg-warning text-warning-foreground',
     },
     InProgress: {
-      label: 'جاري التنفيذ',
+      label: this.i18n.t('maintenance.InProgress'),
       icon: Wrench,
       class: 'bg-primary/10 text-primary',
       badgeClass: 'bg-primary text-primary-foreground',
     },
     Completed: {
-      label: 'مكتمل',
+      label: this.i18n.t('maintenance.Completed'),
       icon: CheckCircle2,
       class: 'bg-success/10 text-success',
       badgeClass: 'bg-success text-success-foreground',
     },
     Rejected: {
-      label: 'مرفوض',
+      label: this.i18n.t('maintenance.Rejected'),
       icon: AlertTriangle,
       class: 'bg-destructive/10 text-destructive',
       badgeClass: 'bg-destructive text-destructive-foreground',
@@ -80,16 +83,16 @@ export class OwnerMaintenance {
   };
 
   protected readonly priorityConfig: Record<MaintenancePriority, { label: string; class: string }> = {
-    Low: { label: 'منخفضة', class: 'bg-muted text-muted-foreground' },
-    Medium: { label: 'متوسطة', class: 'bg-warning/10 text-warning' },
-    High: { label: 'عاجلة', class: 'bg-destructive/10 text-destructive' },
+    Low: { label: this.i18n.t('priority.Low'), class: 'bg-muted text-muted-foreground' },
+    Medium: { label: this.i18n.t('priority.Medium'), class: 'bg-warning/10 text-warning' },
+    High: { label: this.i18n.t('priority.High'), class: 'bg-destructive/10 text-destructive' },
   };
 
   protected readonly categories = [
-    { value: 'سباكة', label: 'سباكة', icon: Droplets },
-    { value: 'كهرباء', label: 'كهرباء', icon: Zap },
-    { value: 'تكييف', label: 'تكييف', icon: Wind },
-    { value: 'عام', label: 'عام', icon: Building },
+    { value: 'سباكة', label: this.i18n.t('owner.maintenance.categoryPlumbing'), icon: Droplets },
+    { value: 'كهرباء', label: this.i18n.t('owner.maintenance.categoryElectricity'), icon: Zap },
+    { value: 'تكييف', label: this.i18n.t('owner.maintenance.categoryAc'), icon: Wind },
+    { value: 'عام', label: this.i18n.t('owner.maintenance.categoryGeneral'), icon: Building },
   ];
 
   protected readonly requests = signal<MaintenanceRequest[]>([]);
@@ -144,7 +147,7 @@ export class OwnerMaintenance {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });
@@ -213,7 +216,7 @@ export class OwnerMaintenance {
         },
         error: (err) => {
           this.submitting.set(false);
-          this.submitError.set(err.error?.title ?? 'تعذر إرسال الطلب');
+          this.submitError.set(err.error?.title ?? this.i18n.t('owner.maintenance.submitFailed'));
         },
       });
   }
@@ -231,22 +234,22 @@ export class OwnerMaintenance {
     if (request.status === 'Rejected' && request.rejectionReason) {
       updates.push({
         date: formatRelative(request.resolvedAt ?? request.createdAt),
-        message: `تم رفض الطلب: ${request.rejectionReason}`,
-        by: 'الإدارة',
+        message: this.i18n.t('owner.maintenance.rejectedMessage', { reason: request.rejectionReason }),
+        by: this.i18n.t('owner.maintenance.management'),
       });
     }
     if (request.status === 'Completed') {
       updates.push({
         date: formatRelative(request.resolvedAt),
-        message: 'تم الانتهاء من الصيانة بنجاح',
-        by: request.assignedTo ?? 'الإدارة',
+        message: this.i18n.t('owner.maintenance.completedMessage'),
+        by: request.assignedTo ?? this.i18n.t('owner.maintenance.management'),
       });
     }
     if (request.status === 'InProgress' && request.assignedTo) {
       updates.push({
         date: formatRelative(request.createdAt),
-        message: `تم إسناد الطلب إلى ${request.assignedTo}`,
-        by: 'الإدارة',
+        message: this.i18n.t('owner.maintenance.assignedMessage', { assignedTo: request.assignedTo }),
+        by: this.i18n.t('owner.maintenance.management'),
       });
     }
     return updates;

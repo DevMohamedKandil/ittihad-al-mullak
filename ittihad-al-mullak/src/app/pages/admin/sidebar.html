@@ -29,8 +29,8 @@
         <lucide-angular [img]="icons.building2" [size]="24" />
       </div>
       <div>
-        <h1 class="text-lg font-bold">اتحاد الملاك</h1>
-        <p class="text-sm text-sidebar-foreground/70">لوحة الإدارة</p>
+        <h1 class="text-lg font-bold">{{ i18n.t('app.name') }}</h1>
+        <p class="text-sm text-sidebar-foreground/70">{{ i18n.t('nav.dashboard') }}</p>
       </div>
     </div>
 
@@ -63,11 +63,19 @@
       </div>
       <button
         type="button"
+        (click)="toggleLanguage()"
+        class="w-full inline-flex items-center justify-start gap-3 rounded-md h-9 px-4 py-2 text-sm font-medium transition-colors text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+      >
+        <lucide-angular [img]="icons.languages" [size]="20" />
+        <span>{{ i18n.t('common.language') }}</span>
+      </button>
+      <button
+        type="button"
         (click)="logout()"
         class="w-full inline-flex items-center justify-start gap-3 rounded-md h-9 px-4 py-2 text-sm font-medium transition-colors text-sidebar-foreground/80 hover:text-destructive hover:bg-destructive/10"
       >
         <lucide-angular [img]="icons.logOut" [size]="20" />
-        <span>تسجيل الخروج</span>
+        <span>{{ i18n.t('common.logout') }}</span>
       </button>
     </div>
   </div>

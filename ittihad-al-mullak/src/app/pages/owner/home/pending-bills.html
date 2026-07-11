@@ -2,23 +2,23 @@
   <div class="p-6 pb-3">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold">الفواتير المستحقة</h3>
+        <h3 class="text-lg font-semibold">{{ 'owner.home.pendingBillsTitle' | translate }}</h3>
         <p class="text-sm text-muted-foreground">
-          إجمالي المستحق: {{ totalDue().toLocaleString('ar-EG') }} ج.م
+          {{ 'owner.bills.totalDue' | translate }}: {{ totalDue().toLocaleString('ar-EG') }} {{ 'common.egp' | translate }}
         </p>
       </div>
       <a
         routerLink="/owner/bills"
         class="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-8 px-3 hover:bg-accent hover:text-accent-foreground"
       >
-        الكل
+        {{ 'common.all' | translate }}
         <lucide-angular [img]="icons.chevronLeft" [size]="16" />
       </a>
     </div>
   </div>
   <div class="p-6 pt-0 space-y-3">
     @if (bills().length === 0) {
-      <p class="text-center text-sm text-muted-foreground py-6">لا توجد فواتير مستحقة</p>
+      <p class="text-center text-sm text-muted-foreground py-6">{{ 'owner.bills.noPendingBills' | translate }}</p>
     }
     @for (bill of bills(); track bill.id) {
       <div class="flex items-center gap-4 p-4 rounded-xl border bg-card hover:bg-accent/50 transition-colors">
@@ -38,7 +38,7 @@
           </div>
         </div>
         <div class="text-left">
-          <p class="font-bold text-lg">{{ bill.amount.toLocaleString('ar-EG') }} ج.م</p>
+          <p class="font-bold text-lg">{{ bill.amount.toLocaleString('ar-EG') }} {{ 'common.egp' | translate }}</p>
         </div>
       </div>
     }
@@ -49,21 +49,21 @@
         class="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-8 mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
       >
         <lucide-angular [img]="icons.creditCard" [size]="20" />
-        ادفع الآن
+        {{ 'payment.payNow' | translate }}
       </a>
     }
 
     <div class="flex items-center justify-center gap-4 pt-2">
-      <span class="text-xs text-muted-foreground">طرق الدفع:</span>
+      <span class="text-xs text-muted-foreground">{{ 'owner.bills.paymentMethods' | translate }}</span>
       <div class="flex items-center gap-2">
         <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 font-semibold text-foreground text-xs">
-          فوري
+          {{ 'method.Fawry' | translate }}
         </span>
         <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 font-semibold text-foreground text-xs">
-          بطاقة
+          {{ 'method.Card' | translate }}
         </span>
         <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 font-semibold text-foreground text-xs">
-          تحويل
+          {{ 'owner.bills.methodTransferShort' | translate }}
         </span>
       </div>
     </div>

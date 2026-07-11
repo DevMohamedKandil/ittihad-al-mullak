@@ -2,8 +2,8 @@
   <div class="p-6 pb-3">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold">الإعلانات</h3>
-        <p class="text-sm text-muted-foreground">آخر الإعلانات والتنبيهات</p>
+        <h3 class="text-lg font-semibold">{{ 'nav.announcements' | translate }}</h3>
+        <p class="text-sm text-muted-foreground">{{ 'dashboard.latestAnnouncements' | translate }}</p>
       </div>
       <button
         type="button"
@@ -11,7 +11,7 @@
         class="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-8 px-3 bg-primary text-primary-foreground hover:bg-primary/90"
       >
         <lucide-angular [img]="icons.plus" [size]="16" />
-        إضافة
+        {{ 'common.add' | translate }}
       </button>
     </div>
   </div>
@@ -22,7 +22,7 @@
           <p class="text-sm text-destructive">{{ error() }}</p>
         }
         @if (!loading() && announcements().length === 0) {
-          <p class="text-sm text-muted-foreground text-center py-6">لا توجد بيانات</p>
+          <p class="text-sm text-muted-foreground text-center py-6">{{ 'common.noData' | translate }}</p>
         }
         @for (announcement of announcements(); track announcement.id) {
           <div class="p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer">
@@ -55,7 +55,7 @@
         routerLink="/admin/announcements"
         class="w-full inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 hover:bg-accent hover:text-accent-foreground"
       >
-        عرض كل الإعلانات
+        {{ 'dashboard.viewAllAnnouncements' | translate }}
         <lucide-angular [img]="icons.chevronLeft" [size]="16" />
       </button>
     </div>

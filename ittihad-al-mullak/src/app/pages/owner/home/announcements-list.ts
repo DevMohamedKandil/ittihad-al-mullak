@@ -1,4 +1,5 @@
 import { Component, input } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   LucideAngularModule,
   LucideIconData,
@@ -14,7 +15,7 @@ const NEW_WINDOW_MS = 3 * 24 * 60 * 60 * 1000;
 
 @Component({
   selector: 'app-announcements-list',
-  imports: [LucideAngularModule],
+  imports: [LucideAngularModule, TranslatePipe],
   templateUrl: './announcements-list.html',
 })
 export class AnnouncementsList {

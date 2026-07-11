@@ -2,17 +2,20 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { TranslatePipe } from '@ngx-translate/core';
 import { LucideAngularModule, Building2, Phone, Lock, LogIn } from 'lucide-angular';
 import { AuthService } from '../../core/auth.service';
+import { TranslationService } from '../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, LucideAngularModule],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe],
   templateUrl: './login.html',
 })
 export class Login {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = { building2: Building2, phone: Phone, lock: Lock, logIn: LogIn };
 
@@ -29,7 +32,7 @@ export class Login {
     this.auth.login(this.phone(), this.password()).subscribe({
       next: () => this.router.navigateByUrl(this.auth.homeRoute()),
       error: (err: HttpErrorResponse) => {
-        this.error.set(err.error?.title ?? 'تعذر الاتصال بالخادم، حاول مرة أخرى');
+        this.error.set(err.error?.title ?? this.i18n.t('login.connectionFailed'));
         this.loading.set(false);
       },
     });

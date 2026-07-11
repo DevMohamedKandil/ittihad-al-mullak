@@ -14,17 +14,20 @@ import {
   MapPin,
   Globe,
 } from 'lucide-angular';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SettingsApi } from '../../../core/api.services';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 type Tab = 'building' | 'notifications' | 'payments' | 'security' | 'appearance';
 
 @Component({
   selector: 'app-settings-page',
-  imports: [FormsModule, LucideAngularModule],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe],
   templateUrl: './settings.html',
 })
 export class SettingsPage {
   private readonly api = inject(SettingsApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     building2: Building2,
@@ -40,11 +43,11 @@ export class SettingsPage {
   };
 
   protected readonly tabs: { id: Tab; label: string; icon: LucideIconData }[] = [
-    { id: 'building', label: 'العمارة', icon: Building2 },
-    { id: 'notifications', label: 'الإشعارات', icon: Bell },
-    { id: 'payments', label: 'المدفوعات', icon: CreditCard },
-    { id: 'security', label: 'الأمان', icon: Shield },
-    { id: 'appearance', label: 'المظهر', icon: Palette },
+    { id: 'building', label: this.i18n.t('settingsAdmin.tabBuilding'), icon: Building2 },
+    { id: 'notifications', label: this.i18n.t('settingsAdmin.tabNotifications'), icon: Bell },
+    { id: 'payments', label: this.i18n.t('settingsAdmin.tabPayments'), icon: CreditCard },
+    { id: 'security', label: this.i18n.t('settingsAdmin.tabSecurity'), icon: Shield },
+    { id: 'appearance', label: this.i18n.t('settingsAdmin.tabAppearance'), icon: Palette },
   ];
 
   protected readonly activeTab = signal<Tab>('building');
@@ -112,7 +115,7 @@ export class SettingsPage {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });
@@ -138,12 +141,12 @@ export class SettingsPage {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          this.saveMessage.set('تم الحفظ بنجاح');
+          this.saveMessage.set(this.i18n.t('common.saved'));
           setTimeout(() => this.saveMessage.set(null), 3000);
         },
         error: (err) => {
           this.saving.set(false);
-          this.error.set(err.error?.title ?? 'تعذر حفظ الإعدادات');
+          this.error.set(err.error?.title ?? this.i18n.t('settingsAdmin.saveFailed'));
         },
       });
   }

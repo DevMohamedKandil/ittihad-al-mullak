@@ -1,17 +1,25 @@
-// أدوات تنسيق مشتركة للعرض العربي
+// أدوات تنسيق مشتركة — بتتبع لغة الواجهة الحالية (عربي/إنجليزي)
+
+const LANG_KEY = 'ittihad_lang';
+
+function currentLocale(): 'ar-EG' | 'en-US' {
+  return localStorage.getItem(LANG_KEY) === 'en' ? 'en-US' : 'ar-EG';
+}
 
 export function formatCurrency(amount: number): string {
-  return `${amount.toLocaleString('ar-EG')} ج.م`;
+  const locale = currentLocale();
+  const currencyWord = locale === 'ar-EG' ? 'ج.م' : 'EGP';
+  return `${amount.toLocaleString(locale)} ${currencyWord}`;
 }
 
 export function formatDate(iso: string | null | undefined): string {
   if (!iso) return '-';
-  return new Intl.DateTimeFormat('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso));
+  return new Intl.DateTimeFormat(currentLocale(), { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso));
 }
 
 export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) return '-';
-  return new Intl.DateTimeFormat('ar-EG', {
+  return new Intl.DateTimeFormat(currentLocale(), {
     day: 'numeric',
     month: 'long',
     hour: 'numeric',
@@ -19,12 +27,13 @@ export function formatDateTime(iso: string | null | undefined): string {
   }).format(new Date(iso));
 }
 
-/** "منذ ساعتين" وما شابه */
+/** "منذ ساعتين" / "2 hours ago" حسب لغة الواجهة */
 export function formatRelative(iso: string | null | undefined): string {
   if (!iso) return '-';
+  const locale = currentLocale();
   const seconds = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
-  const rtf = new Intl.RelativeTimeFormat('ar-EG', { numeric: 'auto' });
-  if (seconds < 60) return 'الآن';
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  if (seconds < 60) return locale === 'ar-EG' ? 'الآن' : 'now';
   if (seconds < 3600) return rtf.format(-Math.round(seconds / 60), 'minute');
   if (seconds < 86400) return rtf.format(-Math.round(seconds / 3600), 'hour');
   if (seconds < 2592000) return rtf.format(-Math.round(seconds / 86400), 'day');

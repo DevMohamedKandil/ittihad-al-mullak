@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   LucideAngularModule,
   LucideIconData,
@@ -23,17 +24,19 @@ import {
 import { ApartmentsApi, UsersApi } from '../../../core/api.services';
 import { Apartment, UserListItem, UserRole } from '../../../core/models';
 import { formatDate } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 type Tab = 'all' | 'Admin' | 'Owner' | 'Tenant';
 
 @Component({
   selector: 'app-users-page',
-  imports: [FormsModule, LucideAngularModule],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe],
   templateUrl: './users.html',
 })
 export class UsersPage {
   private readonly api = inject(UsersApi);
   private readonly apartmentsApi = inject(ApartmentsApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     plus: Plus,
@@ -60,31 +63,37 @@ export class UsersPage {
   protected readonly error = signal<string | null>(null);
 
   protected readonly roleLabels: Record<UserRole, string> = {
-    Admin: 'مدير',
-    Owner: 'مالك',
-    Tenant: 'مستأجر',
+    Admin: this.i18n.t('role.Admin'),
+    Owner: this.i18n.t('role.Owner'),
+    Tenant: this.i18n.t('role.Tenant'),
   };
 
   protected readonly stats = computed(() => {
     const list = this.users();
     return [
-      { label: 'إجمالي المستخدمين', value: list.length, icon: UserIcon, color: 'text-primary', bg: 'bg-primary/10' },
       {
-        label: 'المديرين',
+        label: this.i18n.t('usersAdmin.totalUsers'),
+        value: list.length,
+        icon: UserIcon,
+        color: 'text-primary',
+        bg: 'bg-primary/10',
+      },
+      {
+        label: this.i18n.t('usersAdmin.admins'),
         value: list.filter((u) => u.role === 'Admin').length,
         icon: Shield,
         color: 'text-secondary',
         bg: 'bg-secondary/10',
       },
       {
-        label: 'الملاك',
+        label: this.i18n.t('usersAdmin.owners'),
         value: list.filter((u) => u.role === 'Owner').length,
         icon: Home,
         color: 'text-warning-foreground',
         bg: 'bg-warning/10',
       },
       {
-        label: 'المستأجرين',
+        label: this.i18n.t('usersAdmin.tenants'),
         value: list.filter((u) => u.role === 'Tenant').length,
         icon: UserCog,
         color: 'text-success',
@@ -96,10 +105,13 @@ export class UsersPage {
   protected readonly tabs = computed<{ id: Tab; label: string }[]>(() => {
     const list = this.users();
     return [
-      { id: 'all', label: `الكل (${list.length})` },
-      { id: 'Admin', label: `المديرين (${list.filter((u) => u.role === 'Admin').length})` },
-      { id: 'Owner', label: `الملاك (${list.filter((u) => u.role === 'Owner').length})` },
-      { id: 'Tenant', label: `المستأجرين (${list.filter((u) => u.role === 'Tenant').length})` },
+      { id: 'all', label: `${this.i18n.t('common.all')} (${list.length})` },
+      { id: 'Admin', label: `${this.i18n.t('usersAdmin.admins')} (${list.filter((u) => u.role === 'Admin').length})` },
+      { id: 'Owner', label: `${this.i18n.t('usersAdmin.owners')} (${list.filter((u) => u.role === 'Owner').length})` },
+      {
+        id: 'Tenant',
+        label: `${this.i18n.t('usersAdmin.tenants')} (${list.filter((u) => u.role === 'Tenant').length})`,
+      },
     ];
   });
 
@@ -144,9 +156,13 @@ export class UsersPage {
   };
 
   protected readonly statusConfig: Record<'active' | 'inactive', { label: string; icon: LucideIconData; class: string }> = {
-    active: { label: 'نشط', icon: CheckCircle, class: 'bg-success/10 text-success hover:bg-success/20 border-0' },
+    active: {
+      label: this.i18n.t('usersAdmin.active'),
+      icon: CheckCircle,
+      class: 'bg-success/10 text-success hover:bg-success/20 border-0',
+    },
     inactive: {
-      label: 'غير نشط',
+      label: this.i18n.t('usersAdmin.inactive'),
       icon: XCircle,
       class: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border-0',
     },
@@ -169,7 +185,7 @@ export class UsersPage {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });
@@ -200,7 +216,7 @@ export class UsersPage {
     this.closeMenu();
     this.api.update(user.id, { isActive: !user.isActive }).subscribe({
       next: (updated) => this.users.update((list) => list.map((u) => (u.id === updated.id ? updated : u))),
-      error: (err) => this.error.set(err.error?.title ?? 'تعذر تحديث المستخدم'),
+      error: (err) => this.error.set(err.error?.title ?? this.i18n.t('usersAdmin.updateError')),
     });
   }
 
@@ -238,7 +254,7 @@ export class UsersPage {
           this.load();
         },
         error: (err) => {
-          this.addError.set(err.error?.title ?? 'تعذر إضافة المستخدم');
+          this.addError.set(err.error?.title ?? this.i18n.t('usersAdmin.addError'));
           this.adding.set(false);
         },
       });

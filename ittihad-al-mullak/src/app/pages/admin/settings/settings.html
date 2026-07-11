@@ -1,8 +1,8 @@
 <div class="space-y-6">
   <!-- Header -->
   <div>
-    <h1 class="text-2xl font-bold">الإعدادات</h1>
-    <p class="text-muted-foreground">إعدادات النظام والعمارة</p>
+    <h1 class="text-2xl font-bold">{{ 'nav.settings' | translate }}</h1>
+    <p class="text-muted-foreground">{{ 'settingsAdmin.subtitle' | translate }}</p>
   </div>
 
   <div class="space-y-6">
@@ -28,7 +28,7 @@
       <div class="space-y-6">
         @if (loading()) {
           <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
-            <div class="p-8 text-center text-muted-foreground">جاري التحميل...</div>
+            <div class="p-8 text-center text-muted-foreground">{{ 'common.loading' | translate }}</div>
           </div>
         }
         @if (error()) {
@@ -38,13 +38,13 @@
         }
         <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div class="p-6">
-            <h3 class="text-xl font-semibold">معلومات العمارة</h3>
-            <p class="text-sm text-muted-foreground">البيانات الأساسية للعمارة</p>
+            <h3 class="text-xl font-semibold">{{ 'settingsAdmin.buildingInfo' | translate }}</h3>
+            <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.buildingInfoHint' | translate }}</p>
           </div>
           <div class="p-6 pt-0 space-y-4">
             <div class="grid sm:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <label for="building-name" class="text-sm font-medium leading-none">اسم العمارة</label>
+                <label for="building-name" class="text-sm font-medium leading-none">{{ 'settingsAdmin.buildingName' | translate }}</label>
                 <input
                   id="building-name"
                   type="text"
@@ -54,7 +54,7 @@
                 />
               </div>
               <div class="space-y-2">
-                <label for="building-code" class="text-sm font-medium leading-none">كود العمارة</label>
+                <label for="building-code" class="text-sm font-medium leading-none">{{ 'settingsAdmin.buildingCode' | translate }}</label>
                 <input
                   id="building-code"
                   type="text"
@@ -65,7 +65,7 @@
               </div>
             </div>
             <div class="space-y-2">
-              <label for="address" class="text-sm font-medium leading-none">العنوان</label>
+              <label for="address" class="text-sm font-medium leading-none">{{ 'settingsAdmin.address' | translate }}</label>
               <div class="relative">
                 <lucide-angular
                   [img]="icons.mapPin"
@@ -83,7 +83,7 @@
             </div>
             <div class="grid sm:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <label for="floors" class="text-sm font-medium leading-none">عدد الأدوار</label>
+                <label for="floors" class="text-sm font-medium leading-none">{{ 'settingsAdmin.floorsCount' | translate }}</label>
                 <input
                   id="floors"
                   type="number"
@@ -93,7 +93,7 @@
                 />
               </div>
               <div class="space-y-2">
-                <label for="apartments" class="text-sm font-medium leading-none">عدد الشقق</label>
+                <label for="apartments" class="text-sm font-medium leading-none">{{ 'settingsAdmin.apartmentsCount' | translate }}</label>
                 <input
                   id="apartments"
                   type="number"
@@ -105,7 +105,7 @@
             </div>
             <div class="grid sm:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <label for="monthly-subscription" class="text-sm font-medium leading-none">الاشتراك الشهري (ج.م)</label>
+                <label for="monthly-subscription" class="text-sm font-medium leading-none">{{ 'settingsAdmin.monthlySubscription' | translate }}</label>
                 <input
                   id="monthly-subscription"
                   type="number"
@@ -115,7 +115,7 @@
                 />
               </div>
               <div class="space-y-2">
-                <label for="due-day" class="text-sm font-medium leading-none">يوم الاستحقاق الشهري</label>
+                <label for="due-day" class="text-sm font-medium leading-none">{{ 'settingsAdmin.dueDay' | translate }}</label>
                 <input
                   id="due-day"
                   type="number"
@@ -132,13 +132,13 @@
 
         <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div class="p-6">
-            <h3 class="text-xl font-semibold">بيانات التواصل</h3>
-            <p class="text-sm text-muted-foreground">معلومات الاتصال الخاصة بالإدارة</p>
+            <h3 class="text-xl font-semibold">{{ 'settingsAdmin.contactInfo' | translate }}</h3>
+            <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.contactInfoHint' | translate }}</p>
           </div>
           <div class="p-6 pt-0 space-y-4">
             <div class="grid sm:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <label for="contact-phone" class="text-sm font-medium leading-none">رقم الهاتف</label>
+                <label for="contact-phone" class="text-sm font-medium leading-none">{{ 'login.phone' | translate }}</label>
                 <div class="relative">
                   <lucide-angular
                     [img]="icons.phone"
@@ -156,7 +156,7 @@
                 </div>
               </div>
               <div class="space-y-2">
-                <label for="contact-email" class="text-sm font-medium leading-none">البريد الإلكتروني</label>
+                <label for="contact-email" class="text-sm font-medium leading-none">{{ 'settingsAdmin.email' | translate }}</label>
                 <div class="relative">
                   <lucide-angular
                     [img]="icons.mail"
@@ -175,7 +175,7 @@
               </div>
             </div>
             <div class="space-y-2">
-              <label for="whatsapp" class="text-sm font-medium leading-none">رقم الواتساب</label>
+              <label for="whatsapp" class="text-sm font-medium leading-none">{{ 'settingsAdmin.whatsappNumber' | translate }}</label>
               <input
                 id="whatsapp"
                 type="text"
@@ -195,14 +195,14 @@
       <div class="space-y-6">
         <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div class="p-6">
-            <h3 class="text-xl font-semibold">إعدادات الإشعارات</h3>
-            <p class="text-sm text-muted-foreground">تحكم في طريقة إرسال الإشعارات للمستخدمين</p>
+            <h3 class="text-xl font-semibold">{{ 'settingsAdmin.notificationsTitle' | translate }}</h3>
+            <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.notificationsHint' | translate }}</p>
           </div>
           <div class="p-6 pt-0 space-y-6">
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">إشعارات التطبيق</label>
-                <p class="text-sm text-muted-foreground">إرسال إشعارات داخل التطبيق</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.appNotifications' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.appNotificationsHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -221,8 +221,8 @@
             <div class="shrink-0 bg-border h-px w-full"></div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">إشعارات واتساب</label>
-                <p class="text-sm text-muted-foreground">إرسال رسائل عبر واتساب</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.whatsappNotifications' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.whatsappNotificationsHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -241,8 +241,8 @@
             <div class="shrink-0 bg-border h-px w-full"></div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">رسائل SMS</label>
-                <p class="text-sm text-muted-foreground">إرسال رسائل نصية قصيرة</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.smsMessages' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.smsMessagesHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -261,8 +261,8 @@
             <div class="shrink-0 bg-border h-px w-full"></div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">البريد الإلكتروني</label>
-                <p class="text-sm text-muted-foreground">إرسال إشعارات عبر البريد</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.email' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.emailNotificationsHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -283,14 +283,14 @@
 
         <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div class="p-6">
-            <h3 class="text-xl font-semibold">تذكيرات الدفع التلقائية</h3>
-            <p class="text-sm text-muted-foreground">إعدادات التذكيرات التلقائية للمتأخرين</p>
+            <h3 class="text-xl font-semibold">{{ 'settingsAdmin.autoRemindersTitle' | translate }}</h3>
+            <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.autoRemindersHint' | translate }}</p>
           </div>
           <div class="p-6 pt-0 space-y-4">
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">تفعيل التذكيرات التلقائية</label>
-                <p class="text-sm text-muted-foreground">إرسال تذكيرات للمتأخرين تلقائياً</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.enableAutoReminders' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.enableAutoRemindersHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -308,20 +308,20 @@
             </div>
             <div class="grid sm:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <label class="text-sm font-medium leading-none">التذكير الأول بعد</label>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.firstReminderAfter' | translate }}</label>
                 <select class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                  <option value="1">يوم واحد</option>
-                  <option value="3" selected>3 أيام</option>
-                  <option value="5">5 أيام</option>
-                  <option value="7">أسبوع</option>
+                  <option value="1">{{ 'settingsAdmin.oneDay' | translate }}</option>
+                  <option value="3" selected>{{ 'settingsAdmin.threeDays' | translate }}</option>
+                  <option value="5">{{ 'settingsAdmin.fiveDays' | translate }}</option>
+                  <option value="7">{{ 'settingsAdmin.oneWeek' | translate }}</option>
                 </select>
               </div>
               <div class="space-y-2">
-                <label class="text-sm font-medium leading-none">التذكير الثاني بعد</label>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.secondReminderAfter' | translate }}</label>
                 <select class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                  <option value="5">5 أيام</option>
-                  <option value="7" selected>أسبوع</option>
-                  <option value="14">أسبوعين</option>
+                  <option value="5">{{ 'settingsAdmin.fiveDays' | translate }}</option>
+                  <option value="7" selected>{{ 'settingsAdmin.oneWeek' | translate }}</option>
+                  <option value="14">{{ 'settingsAdmin.twoWeeks' | translate }}</option>
                 </select>
               </div>
             </div>
@@ -335,14 +335,14 @@
       <div class="space-y-6">
         <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div class="p-6">
-            <h3 class="text-xl font-semibold">طرق الدفع</h3>
-            <p class="text-sm text-muted-foreground">تفعيل وإعداد طرق الدفع المتاحة</p>
+            <h3 class="text-xl font-semibold">{{ 'settingsAdmin.paymentMethodsTitle' | translate }}</h3>
+            <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.paymentMethodsHint' | translate }}</p>
           </div>
           <div class="p-6 pt-0 space-y-6">
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">الدفع عبر فوري</label>
-                <p class="text-sm text-muted-foreground">السماح بالدفع من خلال منافذ فوري</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.fawryPayment' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.fawryPaymentHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -361,8 +361,8 @@
             <div class="shrink-0 bg-border h-px w-full"></div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">البطاقات الائتمانية</label>
-                <p class="text-sm text-muted-foreground">قبول الدفع ببطاقات Visa و Mastercard</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.creditCards' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.creditCardsHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -381,8 +381,8 @@
             <div class="shrink-0 bg-border h-px w-full"></div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">التحويل البنكي</label>
-                <p class="text-sm text-muted-foreground">السماح بالتحويل البنكي المباشر</p>
+                <label class="text-sm font-medium leading-none">{{ 'method.BankTransfer' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.bankTransferHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -401,8 +401,8 @@
             <div class="shrink-0 bg-border h-px w-full"></div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">الدفع النقدي</label>
-                <p class="text-sm text-muted-foreground">تسجيل المدفوعات النقدية يدوياً</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.cashPayment' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.cashPaymentHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -423,32 +423,32 @@
 
         <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div class="p-6">
-            <h3 class="text-xl font-semibold">إعدادات الفواتير</h3>
-            <p class="text-sm text-muted-foreground">ضبط إعدادات إصدار الفواتير</p>
+            <h3 class="text-xl font-semibold">{{ 'settingsAdmin.invoiceSettingsTitle' | translate }}</h3>
+            <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.invoiceSettingsHint' | translate }}</p>
           </div>
           <div class="p-6 pt-0 space-y-4">
             <div class="grid sm:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <label class="text-sm font-medium leading-none">يوم إصدار الفواتير الشهرية</label>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.monthlyIssueDay' | translate }}</label>
                 <select class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                  <option value="1" selected>اليوم الأول</option>
-                  <option value="15">اليوم الخامس عشر</option>
-                  <option value="25">اليوم الخامس والعشرين</option>
+                  <option value="1" selected>{{ 'settingsAdmin.firstDay' | translate }}</option>
+                  <option value="15">{{ 'settingsAdmin.fifteenthDay' | translate }}</option>
+                  <option value="25">{{ 'settingsAdmin.twentyFifthDay' | translate }}</option>
                 </select>
               </div>
               <div class="space-y-2">
-                <label class="text-sm font-medium leading-none">مهلة السداد (بالأيام)</label>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.paymentGracePeriod' | translate }}</label>
                 <select class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                  <option value="7">7 أيام</option>
-                  <option value="15" selected>15 يوم</option>
-                  <option value="30">30 يوم</option>
+                  <option value="7">{{ 'settingsAdmin.sevenDays' | translate }}</option>
+                  <option value="15" selected>{{ 'settingsAdmin.fifteenDays' | translate }}</option>
+                  <option value="30">{{ 'settingsAdmin.thirtyDays' | translate }}</option>
                 </select>
               </div>
             </div>
             <div class="flex items-center justify-between pt-2">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">إصدار الفواتير تلقائياً</label>
-                <p class="text-sm text-muted-foreground">إنشاء الفواتير الشهرية تلقائياً</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.autoIssueInvoices' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.autoIssueInvoicesHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -474,14 +474,14 @@
       <div class="space-y-6">
         <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div class="p-6">
-            <h3 class="text-xl font-semibold">إعدادات الأمان</h3>
-            <p class="text-sm text-muted-foreground">ضبط إعدادات أمان الحسابات</p>
+            <h3 class="text-xl font-semibold">{{ 'settingsAdmin.securityTitle' | translate }}</h3>
+            <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.securityHint' | translate }}</p>
           </div>
           <div class="p-6 pt-0 space-y-6">
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">المصادقة الثنائية</label>
-                <p class="text-sm text-muted-foreground">طلب رمز تأكيد عند تسجيل الدخول</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.twoFactor' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.twoFactorHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -500,8 +500,8 @@
             <div class="shrink-0 bg-border h-px w-full"></div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">تسجيل الخروج التلقائي</label>
-                <p class="text-sm text-muted-foreground">تسجيل الخروج بعد فترة عدم نشاط</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.autoLogout' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.autoLogoutHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -518,12 +518,12 @@
               </button>
             </div>
             <div class="space-y-2">
-              <label class="text-sm font-medium leading-none">مدة الجلسة (بالدقائق)</label>
+              <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.sessionDuration' | translate }}</label>
               <select class="flex h-9 w-48 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                <option value="15">15 دقيقة</option>
-                <option value="30" selected>30 دقيقة</option>
-                <option value="60">ساعة</option>
-                <option value="120">ساعتين</option>
+                <option value="15">{{ 'settingsAdmin.fifteenMinutes' | translate }}</option>
+                <option value="30" selected>{{ 'settingsAdmin.thirtyMinutes' | translate }}</option>
+                <option value="60">{{ 'settingsAdmin.oneHour' | translate }}</option>
+                <option value="120">{{ 'settingsAdmin.twoHours' | translate }}</option>
               </select>
             </div>
           </div>
@@ -531,22 +531,22 @@
 
         <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div class="p-6">
-            <h3 class="text-xl font-semibold">سياسة كلمة المرور</h3>
-            <p class="text-sm text-muted-foreground">متطلبات كلمة المرور للمستخدمين</p>
+            <h3 class="text-xl font-semibold">{{ 'settingsAdmin.passwordPolicyTitle' | translate }}</h3>
+            <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.passwordPolicyHint' | translate }}</p>
           </div>
           <div class="p-6 pt-0 space-y-4">
             <div class="space-y-2">
-              <label class="text-sm font-medium leading-none">الحد الأدنى لطول كلمة المرور</label>
+              <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.minPasswordLength' | translate }}</label>
               <select class="flex h-9 w-48 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                <option value="6">6 أحرف</option>
-                <option value="8" selected>8 أحرف</option>
-                <option value="10">10 أحرف</option>
-                <option value="12">12 حرف</option>
+                <option value="6">{{ 'settingsAdmin.sixChars' | translate }}</option>
+                <option value="8" selected>{{ 'settingsAdmin.eightChars' | translate }}</option>
+                <option value="10">{{ 'settingsAdmin.tenChars' | translate }}</option>
+                <option value="12">{{ 'settingsAdmin.twelveChars' | translate }}</option>
               </select>
             </div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">اشتراط أحرف كبيرة وصغيرة</label>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.requireMixedCase' | translate }}</label>
               </div>
               <button
                 type="button"
@@ -564,7 +564,7 @@
             </div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">اشتراط أرقام</label>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.requireNumbers' | translate }}</label>
               </div>
               <button
                 type="button"
@@ -582,7 +582,7 @@
             </div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">اشتراط رموز خاصة</label>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.requireSymbols' | translate }}</label>
               </div>
               <button
                 type="button"
@@ -608,29 +608,33 @@
       <div class="space-y-6">
         <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
           <div class="p-6">
-            <h3 class="text-xl font-semibold">المظهر العام</h3>
-            <p class="text-sm text-muted-foreground">تخصيص مظهر التطبيق</p>
+            <h3 class="text-xl font-semibold">{{ 'settingsAdmin.appearanceTitle' | translate }}</h3>
+            <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.appearanceHint' | translate }}</p>
           </div>
           <div class="p-6 pt-0 space-y-6">
             <div class="space-y-2">
-              <label class="text-sm font-medium leading-none">الوضع الافتراضي</label>
+              <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.defaultTheme' | translate }}</label>
               <select class="flex h-9 w-48 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                <option value="light" selected>فاتح</option>
-                <option value="dark">داكن</option>
-                <option value="system">حسب النظام</option>
+                <option value="light" selected>{{ 'settingsAdmin.themeLight' | translate }}</option>
+                <option value="dark">{{ 'settingsAdmin.themeDark' | translate }}</option>
+                <option value="system">{{ 'settingsAdmin.themeSystem' | translate }}</option>
               </select>
             </div>
             <div class="shrink-0 bg-border h-px w-full"></div>
             <div class="space-y-2">
-              <label class="text-sm font-medium leading-none">اللغة</label>
+              <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.language' | translate }}</label>
               <div class="relative w-48">
                 <lucide-angular
                   [img]="icons.globe"
                   [size]="16"
                   class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 />
-                <select class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-9 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                  <option value="ar" selected>العربية</option>
+                <select
+                  [ngModel]="i18n.language()"
+                  (ngModelChange)="i18n.setLanguage($event)"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 pr-9 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="ar">العربية</option>
                   <option value="en">English</option>
                 </select>
               </div>
@@ -638,8 +642,8 @@
             <div class="shrink-0 bg-border h-px w-full"></div>
             <div class="flex items-center justify-between">
               <div class="space-y-0.5">
-                <label class="text-sm font-medium leading-none">عرض التاريخ الهجري</label>
-                <p class="text-sm text-muted-foreground">إظهار التاريخ الهجري بجانب الميلادي</p>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.hijriDate' | translate }}</label>
+                <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.hijriDateHint' | translate }}</p>
               </div>
               <button
                 type="button"
@@ -673,7 +677,7 @@
       class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
     >
       <lucide-angular [img]="icons.save" [size]="16" />
-      {{ saving() ? 'جاري الحفظ...' : 'حفظ الإعدادات' }}
+      {{ (saving() ? 'settingsAdmin.saving' : 'settingsAdmin.saveSettings') | translate }}
     </button>
   </div>
 </div>

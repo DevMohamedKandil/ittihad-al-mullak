@@ -11,11 +11,13 @@ import {
   Settings,
   Shield,
   LogOut,
+  Languages,
   Menu,
   X,
   Building2,
 } from 'lucide-angular';
 import { AuthService } from '../../core/auth.service';
+import { TranslationService } from '../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-admin-sidebar',
@@ -24,9 +26,11 @@ import { AuthService } from '../../core/auth.service';
 })
 export class AdminSidebar {
   private readonly auth = inject(AuthService);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     logOut: LogOut,
+    languages: Languages,
     menu: Menu,
     x: X,
     building2: Building2,
@@ -39,27 +43,19 @@ export class AdminSidebar {
   protected readonly userInitials = computed(() => this.userName().slice(0, 2));
 
   protected readonly roleLabel = computed(() => {
-    switch (this.auth.currentUser()?.role) {
-      case 'Admin':
-        return 'رئيس اللجنة';
-      case 'Owner':
-        return 'مالك';
-      case 'Tenant':
-        return 'مستأجر';
-      default:
-        return '';
-    }
+    const role = this.auth.currentUser()?.role;
+    return role ? this.i18n.t(`role.${role}`) : '';
   });
 
   protected readonly navItems = [
-    { label: 'لوحة التحكم', href: '/admin', icon: LayoutDashboard, exact: true },
-    { label: 'الشقق', href: '/admin/apartments', icon: Home, exact: false },
-    { label: 'الفواتير', href: '/admin/invoices', icon: Receipt, exact: false },
-    { label: 'طلبات الصيانة', href: '/admin/maintenance', icon: Wrench, exact: false },
-    { label: 'الإعلانات', href: '/admin/announcements', icon: Bell, exact: false },
-    { label: 'المستخدمين', href: '/admin/users', icon: Users, exact: false },
-    { label: 'الصلاحيات', href: '/admin/permissions', icon: Shield, exact: false },
-    { label: 'الإعدادات', href: '/admin/settings', icon: Settings, exact: false },
+    { label: this.i18n.t('nav.dashboard'), href: '/admin', icon: LayoutDashboard, exact: true },
+    { label: this.i18n.t('nav.apartments'), href: '/admin/apartments', icon: Home, exact: false },
+    { label: this.i18n.t('nav.invoices'), href: '/admin/invoices', icon: Receipt, exact: false },
+    { label: this.i18n.t('nav.maintenance'), href: '/admin/maintenance', icon: Wrench, exact: false },
+    { label: this.i18n.t('nav.announcements'), href: '/admin/announcements', icon: Bell, exact: false },
+    { label: this.i18n.t('nav.users'), href: '/admin/users', icon: Users, exact: false },
+    { label: this.i18n.t('nav.permissions'), href: '/admin/permissions', icon: Shield, exact: false },
+    { label: this.i18n.t('nav.settings'), href: '/admin/settings', icon: Settings, exact: false },
   ];
 
   protected toggle() {
@@ -68,6 +64,10 @@ export class AdminSidebar {
 
   protected close() {
     this.isOpen.set(false);
+  }
+
+  protected toggleLanguage() {
+    this.i18n.toggle();
   }
 
   protected logout() {

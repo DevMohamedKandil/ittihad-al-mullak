@@ -19,9 +19,11 @@ import {
   DoughnutController,
   ArcElement,
 } from 'chart.js';
+import { TranslatePipe } from '@ngx-translate/core';
 import { themeColor } from '../../../shared/theme-color';
 import { DashboardApi } from '../../../core/api.services';
 import { MonthlyCollection } from '../../../core/models';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 Chart.register(
   LineController,
@@ -37,10 +39,12 @@ Chart.register(
 
 @Component({
   selector: 'app-collection-chart',
+  imports: [TranslatePipe],
   templateUrl: './collection-chart.html',
 })
 export class CollectionChart implements AfterViewInit, OnDestroy {
   private readonly dashboardApi = inject(DashboardApi);
+  protected readonly i18n = inject(TranslationService);
 
   private readonly areaCanvas = viewChild.required<ElementRef<HTMLCanvasElement>>('areaCanvas');
   private readonly pieCanvas = viewChild.required<ElementRef<HTMLCanvasElement>>('pieCanvas');
@@ -56,15 +60,15 @@ export class CollectionChart implements AfterViewInit, OnDestroy {
     this.dashboardApi.collectionChart().subscribe({
       next: (data) => {
         this.paymentStatusData.set([
-          { name: 'مدفوع', value: data.paymentStatus.paid, color: themeColor('--success') },
-          { name: 'جزئي', value: data.paymentStatus.partial, color: themeColor('--warning') },
-          { name: 'غير مدفوع', value: data.paymentStatus.unpaid, color: themeColor('--destructive') },
+          { name: this.i18n.t('payment.paid'), value: data.paymentStatus.paid, color: themeColor('--success') },
+          { name: this.i18n.t('payment.partial'), value: data.paymentStatus.partial, color: themeColor('--warning') },
+          { name: this.i18n.t('payment.unpaid'), value: data.paymentStatus.unpaid, color: themeColor('--destructive') },
         ]);
         this.buildCharts(data.monthly);
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });
@@ -91,7 +95,7 @@ export class CollectionChart implements AfterViewInit, OnDestroy {
         labels: monthlyData.map((d) => d.month),
         datasets: [
           {
-            label: 'المحصل',
+            label: this.i18n.t('dashboard.collected'),
             data: monthlyData.map((d) => d.collected),
             borderColor: success,
             borderWidth: 2,
@@ -102,7 +106,7 @@ export class CollectionChart implements AfterViewInit, OnDestroy {
             pointHoverRadius: 4,
           },
           {
-            label: 'المستهدف',
+            label: this.i18n.t('dashboard.target'),
             data: monthlyData.map((d) => d.target),
             borderColor: primary,
             borderWidth: 2,
@@ -129,7 +133,7 @@ export class CollectionChart implements AfterViewInit, OnDestroy {
             borderWidth: 1,
             cornerRadius: 8,
             callbacks: {
-              label: (item) => `${item.dataset.label}: ${(item.parsed.y ?? 0).toLocaleString('ar-EG')} ج.م`,
+              label: (item) => `${item.dataset.label}: ${(item.parsed.y ?? 0).toLocaleString('ar-EG')} ${this.i18n.t('common.egp')}`,
             },
           },
         },
@@ -182,7 +186,7 @@ export class CollectionChart implements AfterViewInit, OnDestroy {
             borderWidth: 1,
             cornerRadius: 8,
             callbacks: {
-              label: (item) => `${item.label}: ${item.parsed} شقة`,
+              label: (item) => `${item.label}: ${item.parsed} ${this.i18n.t('apartments.unit')}`,
             },
           },
         },

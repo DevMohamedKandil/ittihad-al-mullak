@@ -1,4 +1,4 @@
-<app-owner-header title="حسابي" />
+<app-owner-header [title]="'nav.profile' | translate" />
 
 <div class="p-4 space-y-6">
   <!-- Profile Card -->
@@ -20,7 +20,7 @@
         <div class="flex items-center gap-2 mt-2">
           @if (summary()?.apartmentNumber; as apartmentNumber) {
             <span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold text-foreground">
-              شقة {{ apartmentNumber }}
+              {{ 'apartments.unit' | translate }} {{ apartmentNumber }}
             </span>
           }
           <span class="inline-flex items-center rounded-md border border-transparent px-2.5 py-0.5 text-xs font-semibold bg-success text-success-foreground">
@@ -39,19 +39,19 @@
           class="mt-4 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
         >
           <lucide-angular [img]="icons.pencil" [size]="16" />
-          تعديل الملف الشخصي
+          {{ 'owner.profile.editProfile' | translate }}
         </button>
 
         @if (isEditProfileOpen()) {
           <div class="fixed inset-0 bg-black/50 z-40" (click)="closeEditProfile()"></div>
           <div class="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-6 shadow-lg text-right">
             <div class="flex flex-col space-y-1.5">
-              <h2 class="text-lg font-semibold">تعديل الملف الشخصي</h2>
-              <p class="text-sm text-muted-foreground">قم بتحديث بياناتك الشخصية</p>
+              <h2 class="text-lg font-semibold">{{ 'owner.profile.editProfile' | translate }}</h2>
+              <p class="text-sm text-muted-foreground">{{ 'owner.profile.editProfileHint' | translate }}</p>
             </div>
             <div class="space-y-4 mt-4">
               <div class="space-y-2">
-                <label class="text-sm font-medium leading-none">الاسم</label>
+                <label class="text-sm font-medium leading-none">{{ 'owner.profile.name' | translate }}</label>
                 <input
                   type="text"
                   [value]="user()?.name ?? ''"
@@ -59,7 +59,7 @@
                 />
               </div>
               <div class="space-y-2">
-                <label class="text-sm font-medium leading-none">رقم الهاتف</label>
+                <label class="text-sm font-medium leading-none">{{ 'login.phone' | translate }}</label>
                 <input
                   type="text"
                   [value]="user()?.phone ?? ''"
@@ -68,7 +68,7 @@
                 />
               </div>
               <div class="space-y-2">
-                <label class="text-sm font-medium leading-none">البريد الإلكتروني</label>
+                <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.email' | translate }}</label>
                 <input
                   type="text"
                   [value]="user()?.email ?? ''"
@@ -82,14 +82,14 @@
                   (click)="closeEditProfile()"
                   class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
                 >
-                  إلغاء
+                  {{ 'common.cancel' | translate }}
                 </button>
                 <button
                   type="button"
                   (click)="closeEditProfile()"
                   class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  حفظ التغييرات
+                  {{ 'owner.profile.saveChanges' | translate }}
                 </button>
               </div>
             </div>
@@ -102,7 +102,7 @@
   <!-- Contact Info -->
   <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
     <div class="p-6 pb-2">
-      <h3 class="text-lg font-semibold">معلومات التواصل</h3>
+      <h3 class="text-lg font-semibold">{{ 'owner.profile.contactInfo' | translate }}</h3>
     </div>
     <div class="p-0">
       <div class="flex items-center gap-4 p-4">
@@ -111,7 +111,7 @@
         </div>
         <div class="flex-1 min-w-0">
           <p class="font-medium">{{ user()?.phone }}</p>
-          <p class="text-sm text-muted-foreground">رقم الهاتف</p>
+          <p class="text-sm text-muted-foreground">{{ 'login.phone' | translate }}</p>
         </div>
       </div>
       <div class="h-px w-full bg-border"></div>
@@ -121,7 +121,7 @@
         </div>
         <div class="flex-1 min-w-0">
           <p class="font-medium">{{ user()?.email || '-' }}</p>
-          <p class="text-sm text-muted-foreground">البريد الإلكتروني</p>
+          <p class="text-sm text-muted-foreground">{{ 'settingsAdmin.email' | translate }}</p>
         </div>
       </div>
       <div class="h-px w-full bg-border"></div>
@@ -133,7 +133,7 @@
           @if (summary(); as s) {
             <p class="font-medium">
               @if (s.apartmentNumber) {
-                شقة {{ s.apartmentNumber }}@if (s.floor !== null) { - الطابق {{ s.floor }}}
+                {{ 'apartments.unit' | translate }} {{ s.apartmentNumber }}@if (s.floor !== null) { - {{ 'owner.home.floor' | translate:{ floor: s.floor } }}}
               } @else {
                 {{ s.buildingName }}
               }
@@ -141,7 +141,7 @@
             <p class="text-sm text-muted-foreground">{{ s.buildingName }}</p>
           } @else {
             <p class="font-medium">-</p>
-            <p class="text-sm text-muted-foreground">بيانات السكن</p>
+            <p class="text-sm text-muted-foreground">{{ 'owner.profile.residenceInfo' | translate }}</p>
           }
         </div>
       </div>
@@ -151,7 +151,7 @@
   <!-- Notifications -->
   <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
     <div class="p-6 pb-2">
-      <h3 class="text-lg font-semibold">الإشعارات</h3>
+      <h3 class="text-lg font-semibold">{{ 'owner.profile.notifications' | translate }}</h3>
     </div>
     <div class="p-0">
       <div class="flex items-center gap-4 p-4">
@@ -159,8 +159,8 @@
           <lucide-angular [img]="icons.bell" [size]="20" class="text-muted-foreground" />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="font-medium">إشعارات الفواتير</p>
-          <p class="text-sm text-muted-foreground">تنبيهات عند استحقاق الفواتير</p>
+          <p class="font-medium">{{ 'owner.profile.billNotifications' | translate }}</p>
+          <p class="text-sm text-muted-foreground">{{ 'owner.profile.billNotificationsHint' | translate }}</p>
         </div>
         <button
           type="button"
@@ -182,8 +182,8 @@
           <lucide-angular [img]="icons.bell" [size]="20" class="text-muted-foreground" />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="font-medium">تحديثات الصيانة</p>
-          <p class="text-sm text-muted-foreground">متابعة حالة طلبات الصيانة</p>
+          <p class="font-medium">{{ 'owner.profile.maintenanceUpdates' | translate }}</p>
+          <p class="text-sm text-muted-foreground">{{ 'owner.profile.maintenanceUpdatesHint' | translate }}</p>
         </div>
         <button
           type="button"
@@ -205,8 +205,8 @@
           <lucide-angular [img]="icons.bell" [size]="20" class="text-muted-foreground" />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="font-medium">الإعلانات</p>
-          <p class="text-sm text-muted-foreground">إعلانات وأخبار العمارة</p>
+          <p class="font-medium">{{ 'nav.announcements' | translate }}</p>
+          <p class="text-sm text-muted-foreground">{{ 'owner.profile.announcementsHint' | translate }}</p>
         </div>
         <button
           type="button"
@@ -228,8 +228,8 @@
           <lucide-angular [img]="icons.messageSquare" [size]="20" class="text-success" />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="font-medium">واتساب</p>
-          <p class="text-sm text-muted-foreground">استلام الإشعارات عبر واتساب</p>
+          <p class="font-medium">{{ 'announcementsAdmin.whatsapp' | translate }}</p>
+          <p class="text-sm text-muted-foreground">{{ 'owner.profile.whatsappHint' | translate }}</p>
         </div>
         <button
           type="button"
@@ -251,8 +251,8 @@
           <lucide-angular [img]="icons.phone" [size]="20" class="text-muted-foreground" />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="font-medium">رسائل SMS</p>
-          <p class="text-sm text-muted-foreground">استلام الإشعارات عبر SMS</p>
+          <p class="font-medium">{{ 'announcementsAdmin.sms' | translate }}</p>
+          <p class="text-sm text-muted-foreground">{{ 'owner.profile.smsHint' | translate }}</p>
         </div>
         <button
           type="button"
@@ -274,7 +274,7 @@
   <!-- App Settings -->
   <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
     <div class="p-6 pb-2">
-      <h3 class="text-lg font-semibold">إعدادات التطبيق</h3>
+      <h3 class="text-lg font-semibold">{{ 'owner.profile.appSettings' | translate }}</h3>
     </div>
     <div class="p-0">
       <div class="flex items-center gap-4 p-4">
@@ -282,8 +282,8 @@
           <lucide-angular [img]="icons.moon" [size]="20" class="text-muted-foreground" />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="font-medium">الوضع الليلي</p>
-          <p class="text-sm text-muted-foreground">تفعيل الوضع الداكن</p>
+          <p class="font-medium">{{ 'owner.profile.darkMode' | translate }}</p>
+          <p class="text-sm text-muted-foreground">{{ 'owner.profile.darkModeHint' | translate }}</p>
         </div>
         <button
           type="button"
@@ -300,14 +300,14 @@
         </button>
       </div>
       <div class="h-px w-full bg-border"></div>
-      <button type="button" class="w-full text-right hover:bg-accent transition-colors">
+      <button type="button" (click)="i18n.toggle()" class="w-full text-right hover:bg-accent transition-colors">
         <div class="flex items-center gap-4 p-4">
           <div class="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 bg-muted">
             <lucide-angular [img]="icons.globe" [size]="20" class="text-muted-foreground" />
           </div>
           <div class="flex-1 min-w-0">
-            <p class="font-medium">اللغة</p>
-            <p class="text-sm text-muted-foreground">العربية</p>
+            <p class="font-medium">{{ 'settingsAdmin.language' | translate }}</p>
+            <p class="text-sm text-muted-foreground">{{ i18n.language() === 'ar' ? 'العربية' : 'English' }}</p>
           </div>
           <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground" />
         </div>
@@ -318,7 +318,7 @@
   <!-- Support -->
   <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
     <div class="p-6 pb-2">
-      <h3 class="text-lg font-semibold">الدعم والمساعدة</h3>
+      <h3 class="text-lg font-semibold">{{ 'owner.profile.support' | translate }}</h3>
     </div>
     <div class="p-0">
       <button type="button" class="w-full text-right hover:bg-accent transition-colors">
@@ -327,8 +327,8 @@
             <lucide-angular [img]="icons.helpCircle" [size]="20" class="text-muted-foreground" />
           </div>
           <div class="flex-1 min-w-0">
-            <p class="font-medium">مركز المساعدة</p>
-            <p class="text-sm text-muted-foreground">الأسئلة الشائعة والدعم</p>
+            <p class="font-medium">{{ 'owner.profile.helpCenter' | translate }}</p>
+            <p class="text-sm text-muted-foreground">{{ 'owner.profile.helpCenterHint' | translate }}</p>
           </div>
           <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground" />
         </div>
@@ -340,7 +340,7 @@
             <lucide-angular [img]="icons.fileText" [size]="20" class="text-muted-foreground" />
           </div>
           <div class="flex-1 min-w-0">
-            <p class="font-medium">الشروط والأحكام</p>
+            <p class="font-medium">{{ 'owner.profile.termsAndConditions' | translate }}</p>
           </div>
           <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground" />
         </div>
@@ -352,7 +352,7 @@
             <lucide-angular [img]="icons.shield" [size]="20" class="text-muted-foreground" />
           </div>
           <div class="flex-1 min-w-0">
-            <p class="font-medium">سياسة الخصوصية</p>
+            <p class="font-medium">{{ 'owner.profile.privacyPolicy' | translate }}</p>
           </div>
           <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground" />
         </div>
@@ -369,7 +369,7 @@
             <lucide-angular [img]="icons.logOut" [size]="20" class="text-destructive" />
           </div>
           <div class="flex-1 min-w-0">
-            <p class="font-medium text-destructive">تسجيل الخروج</p>
+            <p class="font-medium text-destructive">{{ 'common.logout' | translate }}</p>
           </div>
           <lucide-angular [img]="icons.chevronLeft" [size]="20" class="text-muted-foreground" />
         </div>
@@ -379,6 +379,6 @@
 
   <!-- Version -->
   <p class="text-center text-xs text-muted-foreground pb-4">
-    اتحاد الملاك - الإصدار ١.٠.٠
+    {{ 'owner.profile.version' | translate }}
   </p>
 </div>

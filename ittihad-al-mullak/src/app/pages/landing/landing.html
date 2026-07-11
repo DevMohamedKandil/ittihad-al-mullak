@@ -6,20 +6,28 @@
         <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
           <lucide-angular [img]="icons.building2" [size]="20" />
         </div>
-        <span class="font-bold text-lg">اتحاد الملاك</span>
+        <span class="font-bold text-lg">{{ 'app.name' | translate }}</span>
       </div>
       <div class="flex items-center gap-2">
+        <button
+          type="button"
+          (click)="toggleLanguage()"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-3 hover:bg-accent hover:text-accent-foreground"
+        >
+          <lucide-angular [img]="icons.languages" [size]="16" />
+          {{ 'common.language' | translate }}
+        </button>
         <a
-          routerLink="/owner"
+          routerLink="/login"
           class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 hover:bg-accent hover:text-accent-foreground"
         >
-          تسجيل الدخول
+          {{ 'common.login' | translate }}
         </a>
         <a
           routerLink="/admin"
           class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
         >
-          لوحة الإدارة
+          {{ 'nav.dashboard' | translate }}
         </a>
       </div>
     </div>
@@ -31,25 +39,25 @@
     <div class="container mx-auto px-4 relative">
       <div class="max-w-3xl mx-auto text-center">
         <h1 class="text-4xl lg:text-6xl font-bold leading-tight text-balance">
-          إدارة العمارات السكنية
-          <span class="text-primary"> بذكاء وسهولة</span>
+          {{ 'landing.heroTitle' | translate }}
+          <span class="text-primary"> {{ 'landing.heroTitleHighlight' | translate }}</span>
         </h1>
         <p class="text-xl text-muted-foreground mt-6 text-pretty max-w-2xl mx-auto">
-          تطبيق متكامل لإدارة المصاريف المشتركة، الصيانة، والتواصل بين ملاك الشقق في مصر
+          {{ 'landing.heroSubtitle' | translate }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
           <a
-            routerLink="/owner"
+            routerLink="/login"
             class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors h-11 text-lg px-8 bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <lucide-angular [img]="icons.smartphone" [size]="20" />
-            جرّب التطبيق
+            {{ 'landing.tryApp' | translate }}
           </a>
           <a
             routerLink="/admin"
             class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors h-11 text-lg px-8 border border-input bg-transparent hover:bg-accent hover:text-accent-foreground"
           >
-            لوحة الإدارة
+            {{ 'nav.dashboard' | translate }}
             <lucide-angular [img]="icons.chevronLeft" [size]="20" />
           </a>
         </div>
@@ -75,8 +83,8 @@
   <section class="py-20">
     <div class="container mx-auto px-4">
       <div class="text-center mb-16">
-        <h2 class="text-3xl lg:text-4xl font-bold">كل ما تحتاجه في مكان واحد</h2>
-        <p class="text-muted-foreground mt-4 text-lg">مميزات متكاملة لتسهيل إدارة العمارات السكنية</p>
+        <h2 class="text-3xl lg:text-4xl font-bold">{{ 'landing.featuresTitle' | translate }}</h2>
+        <p class="text-muted-foreground mt-4 text-lg">{{ 'landing.featuresSubtitle' | translate }}</p>
       </div>
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (feature of features; track feature.title) {
@@ -98,8 +106,8 @@
   <section class="py-20 bg-muted/50">
     <div class="container mx-auto px-4">
       <div class="text-center mb-16">
-        <h2 class="text-3xl lg:text-4xl font-bold">مصمم لجميع المستخدمين</h2>
-        <p class="text-muted-foreground mt-4 text-lg">صلاحيات مختلفة حسب نوع المستخدم</p>
+        <h2 class="text-3xl lg:text-4xl font-bold">{{ 'landing.userTypesTitle' | translate }}</h2>
+        <p class="text-muted-foreground mt-4 text-lg">{{ 'landing.userTypesSubtitle' | translate }}</p>
       </div>
       <div class="grid md:grid-cols-3 gap-6">
         @for (userType of userTypes; track userType.title) {
@@ -135,8 +143,8 @@
   <section class="py-20">
     <div class="container mx-auto px-4">
       <div class="text-center mb-16">
-        <h2 class="text-3xl lg:text-4xl font-bold">مصمم للسوق المصري</h2>
-        <p class="text-muted-foreground mt-4 text-lg">مميزات خاصة تناسب احتياجات المستخدم المصري</p>
+        <h2 class="text-3xl lg:text-4xl font-bold">{{ 'landing.egyptTitle' | translate }}</h2>
+        <p class="text-muted-foreground mt-4 text-lg">{{ 'landing.egyptSubtitle' | translate }}</p>
       </div>
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         @for (feature of egyptianFeatures; track feature.title) {
@@ -154,23 +162,23 @@
   <!-- CTA -->
   <section class="py-20 bg-primary text-primary-foreground">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl lg:text-4xl font-bold">ابدأ الآن مجاناً</h2>
+      <h2 class="text-3xl lg:text-4xl font-bold">{{ 'landing.ctaTitle' | translate }}</h2>
       <p class="text-primary-foreground/80 mt-4 text-lg max-w-2xl mx-auto">
-        جرّب تطبيق اتحاد الملاك واكتشف كيف يمكن أن يسهل إدارة عمارتك
+        {{ 'landing.ctaSubtitle' | translate }}
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
         <a
-          routerLink="/owner"
+          routerLink="/login"
           class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors h-11 text-lg px-8 bg-secondary text-secondary-foreground hover:bg-secondary/80"
         >
           <lucide-angular [img]="icons.smartphone" [size]="20" />
-          تطبيق المالك
+          {{ 'landing.ownerApp' | translate }}
         </a>
         <a
           routerLink="/admin"
           class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors h-11 text-lg px-8 border bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
         >
-          لوحة الإدارة
+          {{ 'nav.dashboard' | translate }}
           <lucide-angular [img]="icons.chevronLeft" [size]="20" />
         </a>
       </div>
@@ -185,9 +193,9 @@
           <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
             <lucide-angular [img]="icons.building2" [size]="20" />
           </div>
-          <span class="font-bold">اتحاد الملاك</span>
+          <span class="font-bold">{{ 'app.name' | translate }}</span>
         </div>
-        <p class="text-sm text-muted-foreground">جميع الحقوق محفوظة {{ year }} - اتحاد الملاك</p>
+        <p class="text-sm text-muted-foreground">{{ 'landing.copyright' | translate:{ year } }}</p>
       </div>
     </div>
   </footer>

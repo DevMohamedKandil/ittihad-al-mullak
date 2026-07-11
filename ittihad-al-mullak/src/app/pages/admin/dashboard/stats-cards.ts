@@ -11,6 +11,7 @@ import {
 } from 'lucide-angular';
 import { DashboardApi } from '../../../core/api.services';
 import { formatCurrency } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 interface Stat {
   title: string;
@@ -66,6 +67,7 @@ interface Stat {
 })
 export class StatsCards implements OnInit {
   private readonly dashboardApi = inject(DashboardApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly trendingUpIcon = TrendingUp;
   protected readonly trendingDownIcon = TrendingDown;
@@ -79,36 +81,36 @@ export class StatsCards implements OnInit {
       next: (data) => {
         this.stats.set([
           {
-            title: 'نسبة التحصيل',
+            title: this.i18n.t('dashboard.collectionRate'),
             value: `${data.collectionRate}%`,
-            change: 'نسبة تحصيل الشهر الحالي',
+            change: this.i18n.t('dashboard.collectionRateHint'),
             trend: 'up',
             icon: Wallet,
             iconClass: 'text-primary',
             iconBg: 'bg-primary/10',
           },
           {
-            title: 'إجمالي المصروفات',
+            title: this.i18n.t('dashboard.totalExpenses'),
             value: formatCurrency(data.totalExpenses),
-            change: 'إجمالي مصروفات العمارة',
+            change: this.i18n.t('dashboard.totalExpensesHint'),
             trend: 'neutral',
             icon: Receipt,
             iconClass: 'text-success',
             iconBg: 'bg-success/10',
           },
           {
-            title: 'طلبات الصيانة',
+            title: this.i18n.t('nav.maintenance'),
             value: `${data.maintenanceCount}`,
-            change: `${data.newMaintenanceCount} طلبات جديدة`,
+            change: this.i18n.t('dashboard.newRequests', { count: data.newMaintenanceCount }),
             trend: 'neutral',
             icon: Wrench,
             iconClass: 'text-warning',
             iconBg: 'bg-warning/10',
           },
           {
-            title: 'عدد السكان',
+            title: this.i18n.t('dashboard.residentsCount'),
             value: `${data.residentsCount}`,
-            change: `في ${data.apartmentsCount} شقة`,
+            change: this.i18n.t('dashboard.inApartments', { count: data.apartmentsCount }),
             trend: 'neutral',
             icon: Users,
             iconClass: 'text-primary',
@@ -118,7 +120,7 @@ export class StatsCards implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });

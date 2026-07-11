@@ -2,15 +2,15 @@
   <div class="p-6 pb-3">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold">طلبات الصيانة</h3>
-        <p class="text-sm text-muted-foreground">آخر الطلبات الواردة</p>
+        <h3 class="text-lg font-semibold">{{ 'nav.maintenance' | translate }}</h3>
+        <p class="text-sm text-muted-foreground">{{ 'dashboard.latestRequests' | translate }}</p>
       </div>
       <button
         type="button"
         routerLink="/admin/maintenance"
         class="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-8 px-3 hover:bg-accent hover:text-accent-foreground"
       >
-        عرض الكل
+        {{ 'common.viewAll' | translate }}
         <lucide-angular [img]="chevronLeftIcon" [size]="16" />
       </button>
     </div>
@@ -21,7 +21,7 @@
         <p class="text-sm text-destructive">{{ error() }}</p>
       }
       @if (!loading() && requests().length === 0) {
-        <p class="text-sm text-muted-foreground text-center py-6">لا توجد بيانات</p>
+        <p class="text-sm text-muted-foreground text-center py-6">{{ 'common.noData' | translate }}</p>
       }
       @for (request of requests(); track request.id) {
         <div class="flex items-start gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer">
@@ -42,7 +42,7 @@
               </span>
             </div>
             <p class="text-sm text-muted-foreground mt-1">
-              شقة {{ request.apartmentLabel }} • {{ request.requesterName }}
+              {{ 'apartments.unit' | translate }} {{ request.apartmentLabel }} • {{ request.requesterName }}
             </p>
             <div class="flex items-center gap-2 mt-2">
               <span

@@ -2,8 +2,8 @@
   <!-- Header -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold">الصلاحيات</h1>
-      <p class="text-muted-foreground">تحكم في صلاحيات كل دور على شاشات النظام — التعديل بيسري فوراً</p>
+      <h1 class="text-2xl font-bold">{{ 'nav.permissions' | translate }}</h1>
+      <p class="text-muted-foreground">{{ 'permissionsAdmin.subtitle' | translate }}</p>
     </div>
     <button
       type="button"
@@ -11,7 +11,7 @@
       class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-8 px-3 border border-input bg-transparent hover:bg-accent hover:text-accent-foreground"
     >
       <lucide-angular [img]="icons.refresh" [size]="16" />
-      تحديث
+      {{ 'common.refresh' | translate }}
     </button>
   </div>
 
@@ -36,21 +36,21 @@
   </div>
 
   @if (loading()) {
-    <p class="text-center text-sm text-muted-foreground py-12">جاري التحميل...</p>
+    <p class="text-center text-sm text-muted-foreground py-12">{{ 'common.loading' | translate }}</p>
   } @else if (matrix(); as m) {
     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
       <div class="p-6 pb-3 flex items-center gap-2">
         <lucide-angular [img]="icons.shield" [size]="20" class="text-primary" />
-        <h3 class="text-lg font-semibold">مصفوفة صلاحيات: {{ activeRole() === 'Admin' ? 'لجنة الإدارة' : activeRole() === 'Owner' ? 'المالك' : 'المستأجر' }}</h3>
+        <h3 class="text-lg font-semibold">{{ 'permissionsAdmin.matrixFor' | translate }}: {{ ('role.' + activeRole()) | translate }}</h3>
       </div>
       <div class="p-6 pt-0 overflow-x-auto">
         <table class="w-full caption-bottom text-sm">
           <thead>
             <tr class="border-b">
-              <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">الشاشة</th>
+              <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">{{ 'permissionsAdmin.screen' | translate }}</th>
               @for (action of m.actions; track action.id) {
                 <th class="h-10 px-2 text-center align-middle font-medium text-muted-foreground whitespace-nowrap">
-                  {{ action.nameAr }}
+                  {{ actionName(action) }}
                 </th>
               }
             </tr>
@@ -58,7 +58,7 @@
           <tbody>
             @for (screen of m.screens; track screen.id) {
               <tr class="border-b transition-colors hover:bg-muted/50">
-                <td class="p-2 align-middle font-medium whitespace-nowrap">{{ screen.nameAr }}</td>
+                <td class="p-2 align-middle font-medium whitespace-nowrap">{{ screenName(screen) }}</td>
                 @for (cell of cellsByScreen().get(screen.id); track cell.actionId) {
                   <td class="p-2 align-middle text-center">
                     <input
@@ -67,7 +67,7 @@
                       (change)="toggle(cell)"
                       [disabled]="saving()"
                       class="h-4 w-4 accent-primary cursor-pointer"
-                      [title]="screen.nameAr"
+                      [title]="screenName(screen)"
                     />
                   </td>
                 }
@@ -78,7 +78,7 @@
       </div>
     </div>
     <p class="text-xs text-muted-foreground">
-      ⚠️ خد بالك وانت بتعدل صلاحيات "لجنة الإدارة" — متسحبش من نفسك صلاحية "الصلاحيات: عرض/تعديل"
+      {{ 'permissionsAdmin.selfLockWarning' | translate }}
     </p>
   }
 </div>

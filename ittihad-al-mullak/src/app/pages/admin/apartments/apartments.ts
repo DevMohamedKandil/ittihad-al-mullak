@@ -19,17 +19,20 @@ import {
   Clock,
   Building2,
 } from 'lucide-angular';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ApartmentsApi } from '../../../core/api.services';
 import { Apartment, PaymentStatusString } from '../../../core/models';
 import { formatCurrency } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-apartments-page',
-  imports: [FormsModule, LucideAngularModule],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe],
   templateUrl: './apartments.html',
 })
 export class ApartmentsPage implements OnInit {
   private readonly apartmentsApi = inject(ApartmentsApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     plus: Plus,
@@ -45,10 +48,10 @@ export class ApartmentsPage implements OnInit {
   };
 
   protected readonly statusBadges: Record<PaymentStatusString, { label: string; class: string; icon: LucideIconData }> = {
-    paid: { label: 'مدفوع', class: 'bg-success/10 text-success hover:bg-success/20 border-0', icon: CheckCircle },
-    overdue: { label: 'متأخر', class: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border-0', icon: XCircle },
-    unpaid: { label: 'غير مدفوع', class: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border-0', icon: XCircle },
-    partial: { label: 'جزئي', class: 'bg-warning/10 text-warning-foreground hover:bg-warning/20 border-0', icon: Clock },
+    paid: { label: this.i18n.t('payment.paid'), class: 'bg-success/10 text-success hover:bg-success/20 border-0', icon: CheckCircle },
+    overdue: { label: this.i18n.t('payment.overdue'), class: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border-0', icon: XCircle },
+    unpaid: { label: this.i18n.t('payment.unpaid'), class: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border-0', icon: XCircle },
+    partial: { label: this.i18n.t('payment.partial'), class: 'bg-warning/10 text-warning-foreground hover:bg-warning/20 border-0', icon: Clock },
   };
 
   protected readonly apartments = signal<Apartment[]>([]);
@@ -73,10 +76,10 @@ export class ApartmentsPage implements OnInit {
   protected readonly stats = computed(() => {
     const items = this.apartments();
     return [
-      { label: 'إجمالي الشقق', value: `${items.length}`, icon: Building2, color: 'text-primary', bg: 'bg-primary/10' },
-      { label: 'ملاك', value: `${items.filter((a) => a.residentType === 'owner').length}`, icon: User, color: 'text-secondary', bg: 'bg-secondary/10' },
-      { label: 'مستأجرين', value: `${items.filter((a) => a.residentType === 'tenant').length}`, icon: Home, color: 'text-warning', bg: 'bg-warning/10' },
-      { label: 'شقق متأخرة', value: `${items.filter((a) => a.paymentStatus === 'overdue' || a.paymentStatus === 'unpaid').length}`, icon: Clock, color: 'text-destructive', bg: 'bg-destructive/10' },
+      { label: this.i18n.t('apartmentsAdmin.totalApartments'), value: `${items.length}`, icon: Building2, color: 'text-primary', bg: 'bg-primary/10' },
+      { label: this.i18n.t('usersAdmin.owners'), value: `${items.filter((a) => a.residentType === 'owner').length}`, icon: User, color: 'text-secondary', bg: 'bg-secondary/10' },
+      { label: this.i18n.t('usersAdmin.tenants'), value: `${items.filter((a) => a.residentType === 'tenant').length}`, icon: Home, color: 'text-warning', bg: 'bg-warning/10' },
+      { label: this.i18n.t('apartmentsAdmin.overdueApartments'), value: `${items.filter((a) => a.paymentStatus === 'overdue' || a.paymentStatus === 'unpaid').length}`, icon: Clock, color: 'text-destructive', bg: 'bg-destructive/10' },
     ];
   });
 
@@ -127,7 +130,7 @@ export class ApartmentsPage implements OnInit {
     const number = this.newNumber().trim();
     const floor = this.newFloor();
     if (!number || floor === null) {
-      this.addError.set('يرجى إدخال رقم الشقة والدور');
+      this.addError.set(this.i18n.t('apartmentsAdmin.fillNumberAndFloor'));
       return;
     }
     this.saving.set(true);
@@ -139,7 +142,7 @@ export class ApartmentsPage implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
-        this.addError.set(err.error?.title ?? 'تعذر حفظ الشقة');
+        this.addError.set(err.error?.title ?? this.i18n.t('apartmentsAdmin.saveFailed'));
       },
     });
   }
@@ -153,7 +156,7 @@ export class ApartmentsPage implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });

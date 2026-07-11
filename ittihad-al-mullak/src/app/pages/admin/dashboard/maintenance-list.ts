@@ -9,17 +9,20 @@ import {
   XCircle,
   ChevronLeft,
 } from 'lucide-angular';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MaintenanceApi } from '../../../core/api.services';
 import { MaintenanceRequest, MaintenancePriority, MaintenanceStatus } from '../../../core/models';
 import { formatRelative } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-maintenance-list',
-  imports: [LucideAngularModule, RouterLink],
+  imports: [LucideAngularModule, RouterLink, TranslatePipe],
   templateUrl: './maintenance-list.html',
 })
 export class MaintenanceList implements OnInit {
   private readonly maintenanceApi = inject(MaintenanceApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly chevronLeftIcon = ChevronLeft;
 
@@ -28,16 +31,16 @@ export class MaintenanceList implements OnInit {
   protected readonly error = signal<string | null>(null);
 
   protected readonly statusConfig: Record<MaintenanceStatus, { label: string; icon: LucideIconData; class: string }> = {
-    Pending: { label: 'قيد الانتظار', icon: Clock, class: 'text-warning bg-warning/10' },
-    InProgress: { label: 'جاري التنفيذ', icon: Wrench, class: 'text-primary bg-primary/10' },
-    Completed: { label: 'مكتمل', icon: CheckCircle2, class: 'text-success bg-success/10' },
-    Rejected: { label: 'مرفوض', icon: XCircle, class: 'text-destructive bg-destructive/10' },
+    Pending: { label: this.i18n.t('maintenance.Pending'), icon: Clock, class: 'text-warning bg-warning/10' },
+    InProgress: { label: this.i18n.t('maintenance.InProgress'), icon: Wrench, class: 'text-primary bg-primary/10' },
+    Completed: { label: this.i18n.t('maintenance.Completed'), icon: CheckCircle2, class: 'text-success bg-success/10' },
+    Rejected: { label: this.i18n.t('maintenance.Rejected'), icon: XCircle, class: 'text-destructive bg-destructive/10' },
   };
 
   protected readonly priorityConfig: Record<MaintenancePriority, { label: string; class: string }> = {
-    Low: { label: 'منخفض', class: 'bg-muted text-muted-foreground' },
-    Medium: { label: 'متوسط', class: 'bg-warning/10 text-warning' },
-    High: { label: 'عاجل', class: 'bg-destructive/10 text-destructive' },
+    Low: { label: this.i18n.t('priority.Low'), class: 'bg-muted text-muted-foreground' },
+    Medium: { label: this.i18n.t('priority.Medium'), class: 'bg-warning/10 text-warning' },
+    High: { label: this.i18n.t('priority.High'), class: 'bg-destructive/10 text-destructive' },
   };
 
   ngOnInit(): void {
@@ -47,7 +50,7 @@ export class MaintenanceList implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });

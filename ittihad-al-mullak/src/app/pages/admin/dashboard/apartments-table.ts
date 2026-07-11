@@ -10,21 +10,24 @@ import {
   Phone,
   X,
 } from 'lucide-angular';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ApartmentsApi, ConversationsApi, InvoicesApi } from '../../../core/api.services';
 import { Apartment } from '../../../core/models';
 import { formatCurrency } from '../../../core/format';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 const ARABIC_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
 @Component({
   selector: 'app-apartments-table',
-  imports: [FormsModule, LucideAngularModule],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe],
   templateUrl: './apartments-table.html',
 })
 export class ApartmentsTable implements OnInit {
   private readonly apartmentsApi = inject(ApartmentsApi);
   private readonly invoicesApi = inject(InvoicesApi);
   private readonly conversationsApi = inject(ConversationsApi);
+  protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
     search: Search,
@@ -49,7 +52,7 @@ export class ApartmentsTable implements OnInit {
   protected readonly messageFor = signal<Apartment | null>(null);
 
   // Invoice form
-  protected readonly invoiceTitle = signal('اشتراك شهري');
+  protected readonly invoiceTitle = signal(this.i18n.t('invoices.monthlySubscription'));
   protected readonly invoiceAmount = signal(500);
   protected readonly invoicePeriod = signal('');
   protected readonly invoiceDueDate = signal('');
@@ -62,10 +65,10 @@ export class ApartmentsTable implements OnInit {
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly statusConfig = {
-    paid: { label: 'مدفوع', class: 'border-transparent bg-success text-success-foreground' },
-    partial: { label: 'جزئي', class: 'border-transparent bg-warning text-warning-foreground' },
-    unpaid: { label: 'غير مدفوع', class: 'border-transparent bg-destructive text-destructive-foreground' },
-    overdue: { label: 'متأخر', class: 'border-transparent bg-destructive text-destructive-foreground' },
+    paid: { label: this.i18n.t('payment.paid'), class: 'border-transparent bg-success text-success-foreground' },
+    partial: { label: this.i18n.t('payment.partial'), class: 'border-transparent bg-warning text-warning-foreground' },
+    unpaid: { label: this.i18n.t('payment.unpaid'), class: 'border-transparent bg-destructive text-destructive-foreground' },
+    overdue: { label: this.i18n.t('payment.overdue'), class: 'border-transparent bg-destructive text-destructive-foreground' },
   };
 
   ngOnInit(): void {
@@ -104,7 +107,7 @@ export class ApartmentsTable implements OnInit {
   protected openInvoice(apartment: Apartment) {
     this.closeMenu();
     const now = new Date();
-    this.invoiceTitle.set('اشتراك شهري');
+    this.invoiceTitle.set(this.i18n.t('invoices.monthlySubscription'));
     this.invoiceAmount.set(500);
     this.invoicePeriod.set(`${ARABIC_MONTHS[now.getMonth()]} ${now.getFullYear()}`);
     this.invoiceDueDate.set(new Date(now.getFullYear(), now.getMonth(), 15).toISOString().slice(0, 10));
@@ -130,12 +133,12 @@ export class ApartmentsTable implements OnInit {
         next: () => {
           this.submitting.set(false);
           this.invoiceFor.set(null);
-          this.showSuccess(`تم إصدار فاتورة لشقة ${apartment.number}`);
+          this.showSuccess(this.i18n.t('dashboard.invoiceIssued', { number: apartment.number }));
           this.load();
         },
         error: (err) => {
           this.submitting.set(false);
-          this.dialogError.set(err.error?.title ?? 'تعذر إصدار الفاتورة');
+          this.dialogError.set(err.error?.title ?? this.i18n.t('invoices.issueFailed'));
         },
       });
   }
@@ -162,17 +165,17 @@ export class ApartmentsTable implements OnInit {
           next: () => {
             this.submitting.set(false);
             this.messageFor.set(null);
-            this.showSuccess(`تم إرسال الرسالة لساكن شقة ${apartment.number}`);
+            this.showSuccess(this.i18n.t('dashboard.messageSent', { number: apartment.number }));
           },
           error: (err) => {
             this.submitting.set(false);
-            this.dialogError.set(err.error?.title ?? 'تعذر إرسال الرسالة');
+            this.dialogError.set(err.error?.title ?? this.i18n.t('dashboard.messageSendFailed'));
           },
         });
       },
       error: (err) => {
         this.submitting.set(false);
-        this.dialogError.set(err.error?.title ?? 'تعذر فتح المحادثة');
+        this.dialogError.set(err.error?.title ?? this.i18n.t('dashboard.conversationOpenFailed'));
       },
     });
   }
@@ -197,7 +200,7 @@ export class ApartmentsTable implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(err.error?.title ?? 'تعذر تحميل البيانات');
+        this.error.set(err.error?.title ?? this.i18n.t('common.error'));
         this.loading.set(false);
       },
     });

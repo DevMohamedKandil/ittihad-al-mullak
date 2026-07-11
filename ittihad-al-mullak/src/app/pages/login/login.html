@@ -7,15 +7,15 @@
       <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-primary-foreground mb-4">
         <lucide-angular [img]="icons.building2" [size]="32" />
       </div>
-      <h1 class="text-2xl font-bold">اتحاد الملاك</h1>
-      <p class="text-muted-foreground mt-1">سجّل دخولك لإدارة عمارتك</p>
+      <h1 class="text-2xl font-bold">{{ 'app.name' | translate }}</h1>
+      <p class="text-muted-foreground mt-1">{{ 'login.subtitle' | translate }}</p>
     </div>
 
     <!-- Card -->
     <div class="rounded-xl border bg-card text-card-foreground shadow-lg">
       <form class="p-6 space-y-4" (ngSubmit)="submit()">
         <div class="space-y-2">
-          <label class="text-sm font-medium" for="phone">رقم الهاتف</label>
+          <label class="text-sm font-medium" for="phone">{{ 'login.phone' | translate }}</label>
           <div class="relative">
             <lucide-angular [img]="icons.phone" [size]="16" class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -32,7 +32,7 @@
         </div>
 
         <div class="space-y-2">
-          <label class="text-sm font-medium" for="password">كلمة المرور</label>
+          <label class="text-sm font-medium" for="password">{{ 'login.password' | translate }}</label>
           <div class="relative">
             <lucide-angular [img]="icons.lock" [size]="16" class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -59,34 +59,34 @@
           class="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
         >
           <lucide-angular [img]="icons.logIn" [size]="16" />
-          {{ loading() ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول' }}
+          {{ (loading() ? 'login.loggingIn' : 'common.login') | translate }}
         </button>
       </form>
 
       <!-- Demo accounts -->
       <div class="border-t p-4">
-        <p class="text-xs text-muted-foreground text-center mb-3">حسابات تجريبية (كلمة المرور: 123456)</p>
+        <p class="text-xs text-muted-foreground text-center mb-3">{{ 'login.demoAccounts' | translate }}</p>
         <div class="flex gap-2">
           <button
             type="button"
             (click)="fillDemo('admin')"
             class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
           >
-            لجنة الإدارة
+            {{ 'role.Admin' | translate }}
           </button>
           <button
             type="button"
             (click)="fillDemo('owner')"
             class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
           >
-            مالك شقة
+            {{ 'role.Owner' | translate }}
           </button>
           <button
             type="button"
             (click)="fillDemo('tenant')"
             class="flex-1 inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors h-8 px-3 border border-input hover:bg-accent hover:text-accent-foreground"
           >
-            مستأجر
+            {{ 'role.Tenant' | translate }}
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-<app-owner-header title="الفواتير" />
+<app-owner-header [title]="'nav.invoices' | translate" />
 
 <div class="p-4 space-y-6">
   @if (successMessage()) {
@@ -8,16 +8,16 @@
   }
 
   @if (loading()) {
-    <p class="text-center text-sm text-muted-foreground py-12">جاري التحميل...</p>
+    <p class="text-center text-sm text-muted-foreground py-12">{{ 'common.loading' | translate }}</p>
   } @else if (error()) {
     <p class="text-center text-sm text-destructive py-12">{{ error() }}</p>
   } @else {
     <!-- Summary Card -->
     <div class="rounded-xl bg-gradient-to-l from-primary to-primary/80 text-primary-foreground shadow-sm border-0">
       <div class="p-5">
-        <p class="text-sm opacity-90">إجمالي المستحق</p>
-        <p class="text-3xl font-bold mt-1">{{ totalDue().toLocaleString('ar-EG') }} ج.م</p>
-        <p class="text-sm opacity-90 mt-2">{{ pendingBills().length }} فواتير مستحقة</p>
+        <p class="text-sm opacity-90">{{ 'owner.bills.totalDue' | translate }}</p>
+        <p class="text-3xl font-bold mt-1">{{ totalDue().toLocaleString('ar-EG') }} {{ 'common.egp' | translate }}</p>
+        <p class="text-sm opacity-90 mt-2">{{ 'owner.bills.pendingCount' | translate: { count: pendingBills().length } }}</p>
         @if (canPay() && totalDue() > 0 && pendingBills().length > 0) {
           <button
             type="button"
@@ -25,7 +25,7 @@
             class="w-full mt-4 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-8 bg-secondary text-secondary-foreground hover:bg-secondary/80"
           >
             <lucide-angular [img]="icons.creditCard" [size]="20" />
-            ادفع كل المستحقات
+            {{ 'owner.bills.payAll' | translate }}
           </button>
         }
       </div>
@@ -40,7 +40,7 @@
           class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
           [class]="activeTab() === 'pending' ? 'bg-background text-foreground shadow' : ''"
         >
-          مستحقة
+          {{ 'owner.bills.tabPending' | translate }}
           @if (pendingBills().length > 0) {
             <span class="inline-flex items-center justify-center rounded-md border border-transparent bg-secondary text-secondary-foreground text-xs font-semibold h-5 w-5 p-0">
               {{ pendingBills().length }}
@@ -53,7 +53,7 @@
           class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium transition-all"
           [class]="activeTab() === 'paid' ? 'bg-background text-foreground shadow' : ''"
         >
-          مدفوعة
+          {{ 'owner.bills.tabPaid' | translate }}
         </button>
       </div>
 
@@ -62,16 +62,16 @@
           <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
             <div class="flex flex-col items-center justify-center py-12">
               <lucide-angular [img]="icons.checkCircle2" [size]="48" class="text-success mb-4" />
-              <p class="font-medium text-lg">لا توجد فواتير مستحقة</p>
-              <p class="text-sm text-muted-foreground">جميع الفواتير مدفوعة</p>
+              <p class="font-medium text-lg">{{ 'owner.bills.noPendingBills' | translate }}</p>
+              <p class="text-sm text-muted-foreground">{{ 'owner.bills.allPaid' | translate }}</p>
             </div>
           </div>
         }
         @if (activeTab() === 'paid' && paidBills().length === 0) {
           <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
             <div class="flex flex-col items-center justify-center py-12">
-              <p class="font-medium text-lg">لا توجد فواتير</p>
-              <p class="text-sm text-muted-foreground">لا توجد فواتير مدفوعة بعد</p>
+              <p class="font-medium text-lg">{{ 'owner.bills.noBills' | translate }}</p>
+              <p class="text-sm text-muted-foreground">{{ 'owner.bills.noPaidBillsYet' | translate }}</p>
             </div>
           </div>
         }
@@ -95,15 +95,15 @@
                       {{ statusConfig[bill.status].label }}
                     </span>
                   </div>
-                  <p class="text-sm text-muted-foreground mb-2">فاتورة رقم {{ bill.number }} - الفترة {{ bill.period }}</p>
+                  <p class="text-sm text-muted-foreground mb-2">{{ 'owner.bills.billMeta' | translate: { number: bill.number, period: bill.period } }}</p>
                   <div class="flex items-center gap-1 text-sm text-muted-foreground">
                     <lucide-angular [img]="icons.calendar" [size]="16" />
-                    <span>تاريخ الاستحقاق: {{ formatDate(bill.dueDate) }}</span>
+                    <span>{{ 'owner.bills.dueDate' | translate }}: {{ formatDate(bill.dueDate) }}</span>
                   </div>
                 </div>
                 <div class="text-left">
                   <p class="font-bold text-xl">{{ bill.amount.toLocaleString('ar-EG') }}</p>
-                  <p class="text-xs text-muted-foreground">جنيه</p>
+                  <p class="text-xs text-muted-foreground">{{ 'owner.bills.egpWord' | translate }}</p>
                 </div>
               </div>
 
@@ -116,11 +116,11 @@
                       class="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       <lucide-angular [img]="icons.creditCard" [size]="16" />
-                      ادفع الآن
+                      {{ 'payment.payNow' | translate }}
                     </button>
                     <button
                       type="button"
-                      title="تحميل الفاتورة"
+                      [title]="'owner.bills.downloadInvoice' | translate"
                       class="inline-flex items-center justify-center rounded-md h-9 w-9 border border-input bg-transparent shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
                     >
                       <lucide-angular [img]="icons.download" [size]="16" />
@@ -132,9 +132,9 @@
                   <div class="fixed inset-0 bg-black/50 z-40" (click)="closePayment()"></div>
                   <div class="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-6 shadow-lg">
                     <div class="flex flex-col space-y-1.5">
-                      <h2 class="text-lg font-semibold">اختر طريقة الدفع</h2>
+                      <h2 class="text-lg font-semibold">{{ 'owner.bills.choosePaymentMethod' | translate }}</h2>
                       <p class="text-sm text-muted-foreground">
-                        المبلغ المستحق: {{ remaining(bill).toLocaleString('ar-EG') }} ج.م
+                        {{ 'owner.bills.amountDue' | translate }}: {{ remaining(bill).toLocaleString('ar-EG') }} {{ 'common.egp' | translate }}
                       </p>
                     </div>
                     <div class="space-y-3 mt-4">
@@ -156,7 +156,7 @@
                       }
                     </div>
                     <div class="space-y-2 mt-4">
-                      <label for="pay-amount" class="text-sm font-medium leading-none">المبلغ</label>
+                      <label for="pay-amount" class="text-sm font-medium leading-none">{{ 'owner.bills.amount' | translate }}</label>
                       <input
                         id="pay-amount"
                         type="number"
@@ -176,7 +176,7 @@
                         (click)="closePayment()"
                         class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
                       >
-                        إلغاء
+                        {{ 'common.cancel' | translate }}
                       </button>
                       <button
                         type="button"
@@ -185,7 +185,7 @@
                         class="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
                       >
                         <lucide-angular [img]="icons.creditCard" [size]="16" />
-                        {{ paying() ? 'جاري الدفع...' : 'تأكيد الدفع' }}
+                        {{ (paying() ? 'owner.bills.paying' : 'owner.bills.confirmPayment') | translate }}
                       </button>
                     </div>
                   </div>
@@ -199,7 +199,7 @@
                     class="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
                   >
                     <lucide-angular [img]="icons.download" [size]="16" />
-                    تحميل الإيصال
+                    {{ 'owner.bills.downloadReceipt' | translate }}
                   </button>
                 </div>
               }
