@@ -98,6 +98,11 @@ export class AuthService {
       });
   }
 
+  /** تسجيل توكن جهاز الموبايل عشان يوصله إشعارات Push — بيتنادى من PushNotificationsService بس. */
+  registerDevice(token: string, platform: string): Observable<void> {
+    return this.http.post<void>(`${APP_CONFIG.apiUrl}/auth/devices`, { token, platform });
+  }
+
   /** تسجيل عمارة جديدة يديرها نفس حساب الأدمن، ويتم التنقل لها فوراً. */
   createBuilding(request: CreateBuildingRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${APP_CONFIG.apiUrl}/auth/buildings`, request).pipe(

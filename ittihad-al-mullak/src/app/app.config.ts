@@ -8,6 +8,7 @@ import { routes } from './app.routes';
 import { authInterceptor } from './core/auth.interceptor';
 import { loadAppConfig } from './core/app-config';
 import { loadTranslations } from './core/i18n/translation.service';
+import { PushNotificationsService } from './core/push-notifications.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +22,8 @@ export const appConfig: ApplicationConfig = {
     // تحميل api-config.json ثم ملف الترجمة قبل إقلاع التطبيق
     provideAppInitializer(loadAppConfig),
     provideAppInitializer(() => loadTranslations(inject(TranslateService))),
+    // بلا تأثير في المتصفح العادي — بيشتغل بس جوه تطبيق موبايل حقيقي (Capacitor)
+    provideAppInitializer(() => inject(PushNotificationsService).init()),
     provideRouter(routes),
   ],
 };
