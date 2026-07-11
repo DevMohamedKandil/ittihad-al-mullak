@@ -549,5 +549,6 @@
   "login.otpSentTo": "A code was sent to",
   "login.otpCode": "Login code",
   "login.confirmCode": "Confirm code",
-  "login.resendCode": "Resend code"
+  "login.resendCode": "Resend code",
+  "dashboard.greeting": "Welcome back,"
 }

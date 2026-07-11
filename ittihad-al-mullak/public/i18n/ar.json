@@ -549,5 +549,6 @@
   "login.otpSentTo": "تم إرسال كود إلى",
   "login.otpCode": "كود الدخول",
   "login.confirmCode": "تأكيد الكود",
-  "login.resendCode": "إعادة إرسال الكود"
+  "login.resendCode": "إعادة إرسال الكود",
+  "dashboard.greeting": "أهلاً بيك يا"
 }

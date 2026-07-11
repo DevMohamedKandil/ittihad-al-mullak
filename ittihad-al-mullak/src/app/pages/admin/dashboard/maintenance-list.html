@@ -1,9 +1,14 @@
-<div class="rounded-xl border bg-card text-card-foreground shadow-sm h-full">
+<div class="rounded-xl border bg-card text-card-foreground shadow-sm">
   <div class="p-6 pb-3">
     <div class="flex items-center justify-between">
-      <div>
-        <h3 class="text-lg font-semibold">{{ 'nav.maintenance' | translate }}</h3>
-        <p class="text-sm text-muted-foreground">{{ 'dashboard.latestRequests' | translate }}</p>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-warning/10 flex-shrink-0">
+          <lucide-angular [img]="wrenchIcon" [size]="18" class="text-warning" />
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold">{{ 'nav.maintenance' | translate }}</h3>
+          <p class="text-sm text-muted-foreground">{{ 'dashboard.latestRequests' | translate }}</p>
+        </div>
       </div>
       <button
         type="button"

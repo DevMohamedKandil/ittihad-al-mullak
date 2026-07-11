@@ -21,7 +21,13 @@ interface Stat {
   icon: LucideIconData;
   iconClass: string;
   iconBg: string;
+  accent: string;
+  /** موجودة بس لكارت نسبة التحصيل — بيرسم حلقة تقدّم بدل الأيقونة */
+  progress?: number;
 }
+
+const RING_RADIUS = 26;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
 @Component({
   selector: 'app-stats-cards',
@@ -32,12 +38,13 @@ interface Stat {
     }
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       @for (stat of stats(); track stat.title) {
-        <div class="rounded-xl border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow">
+        <div class="group overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+          <div class="h-1.5" [class]="stat.accent"></div>
           <div class="p-6">
             <div class="flex items-start justify-between">
               <div class="space-y-2">
                 <p class="text-sm text-muted-foreground">{{ stat.title }}</p>
-                <p class="text-2xl font-bold">{{ stat.value }}</p>
+                <p class="text-3xl font-bold tabular-nums">{{ stat.value }}</p>
                 <div class="flex items-center gap-1">
                   @if (stat.trend === 'up') {
                     <lucide-angular [img]="trendingUpIcon" [size]="16" class="text-success" />
@@ -55,9 +62,25 @@ interface Stat {
                   </span>
                 </div>
               </div>
-              <div class="flex items-center justify-center w-12 h-12 rounded-xl" [class]="stat.iconBg">
-                <lucide-angular [img]="stat.icon" [size]="24" [class]="stat.iconClass" />
-              </div>
+
+              @if (stat.progress !== undefined) {
+                <svg viewBox="0 0 64 64" class="w-14 h-14 -rotate-90 flex-shrink-0">
+                  <circle cx="32" cy="32" [attr.r]="ringRadius" fill="none" stroke="currentColor" stroke-width="7" class="text-primary/15" />
+                  <circle
+                    cx="32" cy="32" [attr.r]="ringRadius" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"
+                    class="text-primary transition-all duration-700"
+                    [attr.stroke-dasharray]="ringCircumference"
+                    [attr.stroke-dashoffset]="ringCircumference * (1 - stat.progress / 100)"
+                  />
+                </svg>
+              } @else {
+                <div
+                  class="flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0 transition-transform group-hover:scale-105"
+                  [class]="stat.iconBg"
+                >
+                  <lucide-angular [img]="stat.icon" [size]="24" [class]="stat.iconClass" />
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -71,6 +94,8 @@ export class StatsCards implements OnInit {
 
   protected readonly trendingUpIcon = TrendingUp;
   protected readonly trendingDownIcon = TrendingDown;
+  protected readonly ringRadius = RING_RADIUS;
+  protected readonly ringCircumference = RING_CIRCUMFERENCE;
 
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
@@ -87,7 +112,9 @@ export class StatsCards implements OnInit {
             trend: 'up',
             icon: Wallet,
             iconClass: 'text-primary',
-            iconBg: 'bg-primary/10',
+            iconBg: 'bg-gradient-to-br from-primary/20 to-primary/5',
+            accent: 'bg-gradient-to-l from-primary to-primary/40',
+            progress: data.collectionRate,
           },
           {
             title: this.i18n.t('dashboard.totalExpenses'),
@@ -96,7 +123,8 @@ export class StatsCards implements OnInit {
             trend: 'neutral',
             icon: Receipt,
             iconClass: 'text-success',
-            iconBg: 'bg-success/10',
+            iconBg: 'bg-gradient-to-br from-success/20 to-success/5',
+            accent: 'bg-gradient-to-l from-success to-success/40',
           },
           {
             title: this.i18n.t('nav.maintenance'),
@@ -105,7 +133,8 @@ export class StatsCards implements OnInit {
             trend: 'neutral',
             icon: Wrench,
             iconClass: 'text-warning',
-            iconBg: 'bg-warning/10',
+            iconBg: 'bg-gradient-to-br from-warning/25 to-warning/5',
+            accent: 'bg-gradient-to-l from-warning to-warning/40',
           },
           {
             title: this.i18n.t('dashboard.residentsCount'),
@@ -113,8 +142,9 @@ export class StatsCards implements OnInit {
             change: this.i18n.t('dashboard.inApartments', { count: data.apartmentsCount }),
             trend: 'neutral',
             icon: Users,
-            iconClass: 'text-primary',
-            iconBg: 'bg-primary/10',
+            iconClass: 'text-secondary',
+            iconBg: 'bg-gradient-to-br from-secondary/20 to-secondary/5',
+            accent: 'bg-gradient-to-l from-secondary to-secondary/40',
           },
         ]);
         this.loading.set(false);

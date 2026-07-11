@@ -20,6 +20,7 @@ import {
   ArcElement,
 } from 'chart.js';
 import { TranslatePipe } from '@ngx-translate/core';
+import { LucideAngularModule, TrendingUp, PieChart } from 'lucide-angular';
 import { themeColor } from '../../../shared/theme-color';
 import { DashboardApi } from '../../../core/api.services';
 import { MonthlyCollection } from '../../../core/models';
@@ -39,12 +40,15 @@ Chart.register(
 
 @Component({
   selector: 'app-collection-chart',
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, LucideAngularModule],
   templateUrl: './collection-chart.html',
 })
 export class CollectionChart implements AfterViewInit, OnDestroy {
   private readonly dashboardApi = inject(DashboardApi);
   protected readonly i18n = inject(TranslationService);
+
+  protected readonly trendingUpIcon = TrendingUp;
+  protected readonly pieChartIcon = PieChart;
 
   private readonly areaCanvas = viewChild.required<ElementRef<HTMLCanvasElement>>('areaCanvas');
   private readonly pieCanvas = viewChild.required<ElementRef<HTMLCanvasElement>>('pieCanvas');
@@ -55,15 +59,18 @@ export class CollectionChart implements AfterViewInit, OnDestroy {
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly paymentStatusData = signal<{ name: string; value: number; color: string }[]>([]);
+  protected readonly totalUnits = signal(0);
 
   ngAfterViewInit(): void {
     this.dashboardApi.collectionChart().subscribe({
       next: (data) => {
+        const { paid, partial, unpaid } = data.paymentStatus;
         this.paymentStatusData.set([
-          { name: this.i18n.t('payment.paid'), value: data.paymentStatus.paid, color: themeColor('--success') },
-          { name: this.i18n.t('payment.partial'), value: data.paymentStatus.partial, color: themeColor('--warning') },
-          { name: this.i18n.t('payment.unpaid'), value: data.paymentStatus.unpaid, color: themeColor('--destructive') },
+          { name: this.i18n.t('payment.paid'), value: paid, color: themeColor('--success') },
+          { name: this.i18n.t('payment.partial'), value: partial, color: themeColor('--warning') },
+          { name: this.i18n.t('payment.unpaid'), value: unpaid, color: themeColor('--destructive') },
         ]);
+        this.totalUnits.set(paid + partial + unpaid);
         this.buildCharts(data.monthly);
         this.loading.set(false);
       },

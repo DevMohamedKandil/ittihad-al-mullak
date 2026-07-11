@@ -1,9 +1,14 @@
 <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
   <div class="p-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <h3 class="text-xl font-semibold">{{ 'dashboard.apartmentsList' | translate }}</h3>
-        <p class="text-sm text-muted-foreground">{{ 'dashboard.apartmentsListHint' | translate }}</p>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-secondary/10 flex-shrink-0">
+          <lucide-angular [img]="icons.building2" [size]="18" class="text-secondary" />
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold">{{ 'dashboard.apartmentsList' | translate }}</h3>
+          <p class="text-sm text-muted-foreground">{{ 'dashboard.apartmentsListHint' | translate }}</p>
+        </div>
       </div>
       <div class="relative w-full sm:w-64">
         <lucide-angular

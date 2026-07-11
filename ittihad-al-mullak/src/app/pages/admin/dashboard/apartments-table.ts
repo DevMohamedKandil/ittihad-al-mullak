@@ -9,6 +9,7 @@ import {
   MessageSquare,
   Phone,
   X,
+  Building2,
 } from 'lucide-angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ApartmentsApi, ConversationsApi, InvoicesApi } from '../../../core/api.services';
@@ -37,6 +38,7 @@ export class ApartmentsTable implements OnInit {
     messageSquare: MessageSquare,
     phone: Phone,
     x: X,
+    building2: Building2,
   };
 
   protected readonly search = signal('');

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LucideAngularModule, Plus, Download } from 'lucide-angular';
@@ -8,7 +8,8 @@ import { ApartmentsTable } from './apartments-table';
 import { MaintenanceList } from './maintenance-list';
 import { AnnouncementsCard } from './announcements-card';
 import { ApartmentsApi } from '../../../core/api.services';
-import { downloadCsv } from '../../../core/format';
+import { AuthService } from '../../../core/auth.service';
+import { downloadCsv, formatFullDate } from '../../../core/format';
 import { TranslationService } from '../../../core/i18n/translation.service';
 
 @Component({
@@ -25,30 +26,37 @@ import { TranslationService } from '../../../core/i18n/translation.service';
   ],
   template: `
     <div class="space-y-6">
-      <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 class="text-2xl font-bold">{{ 'nav.dashboard' | translate }}</h1>
-          <p class="text-muted-foreground">{{ 'dashboard.welcome' | translate }}</p>
-        </div>
-        <div class="flex gap-2">
-          <button
-            type="button"
-            (click)="exportReport()"
-            [disabled]="exporting()"
-            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-8 px-3 border border-input bg-transparent hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
-          >
-            <lucide-angular [img]="downloadIcon" [size]="16" />
-            {{ 'dashboard.exportReport' | translate }}
-          </button>
-          <button
-            type="button"
-            routerLink="/admin/invoices"
-            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors h-8 px-3 bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            <lucide-angular [img]="plusIcon" [size]="16" />
-            {{ 'dashboard.addInvoice' | translate }}
-          </button>
+      <!-- Hero -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-l from-primary to-secondary p-6 sm:p-8 text-primary-foreground shadow-lg">
+        <div
+          class="pointer-events-none absolute inset-0 opacity-[0.12]"
+          style="background-image: radial-gradient(circle at 15% 25%, white, transparent 32%), radial-gradient(circle at 85% 70%, white, transparent 28%)"
+        ></div>
+        <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <div>
+            <p class="text-sm text-primary-foreground/80">{{ 'dashboard.greeting' | translate }} {{ userName() }}</p>
+            <h1 class="text-2xl sm:text-3xl font-bold mt-1">{{ 'nav.dashboard' | translate }}</h1>
+            <p class="text-sm text-primary-foreground/70 mt-1">{{ today }}</p>
+          </div>
+          <div class="flex gap-2">
+            <button
+              type="button"
+              (click)="exportReport()"
+              [disabled]="exporting()"
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors h-9 px-3.5 bg-white/10 text-primary-foreground border border-white/20 backdrop-blur-sm hover:bg-white/20 disabled:opacity-50"
+            >
+              <lucide-angular [img]="downloadIcon" [size]="16" />
+              {{ 'dashboard.exportReport' | translate }}
+            </button>
+            <button
+              type="button"
+              routerLink="/admin/invoices"
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors h-9 px-3.5 bg-white text-primary shadow-sm hover:bg-white/90"
+            >
+              <lucide-angular [img]="plusIcon" [size]="16" />
+              {{ 'dashboard.addInvoice' | translate }}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -63,7 +71,7 @@ import { TranslationService } from '../../../core/i18n/translation.service';
       <app-collection-chart />
 
       <!-- Main Content Grid -->
-      <div class="grid gap-6 lg:grid-cols-5">
+      <div class="grid gap-6 lg:grid-cols-5 items-start">
         <div class="lg:col-span-3">
           <app-apartments-table />
         </div>
@@ -77,10 +85,14 @@ import { TranslationService } from '../../../core/i18n/translation.service';
 })
 export class Dashboard {
   private readonly apartmentsApi = inject(ApartmentsApi);
+  private readonly auth = inject(AuthService);
   protected readonly i18n = inject(TranslationService);
 
   protected readonly plusIcon = Plus;
   protected readonly downloadIcon = Download;
+
+  protected readonly userName = computed(() => this.auth.currentUser()?.name ?? '');
+  protected readonly today = formatFullDate();
 
   protected readonly exporting = signal(false);
   protected readonly error = signal<string | null>(null);

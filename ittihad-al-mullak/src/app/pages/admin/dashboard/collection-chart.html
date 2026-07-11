@@ -4,8 +4,15 @@
 <div class="grid gap-4 lg:grid-cols-2">
   <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
     <div class="p-6 pb-2">
-      <h3 class="text-lg font-semibold">{{ 'dashboard.monthlyCollection' | translate }}</h3>
-      <p class="text-sm text-muted-foreground">{{ 'dashboard.monthlyCollectionHint' | translate }}</p>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-success/10 flex-shrink-0">
+          <lucide-angular [img]="trendingUpIcon" [size]="18" class="text-success" />
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold">{{ 'dashboard.monthlyCollection' | translate }}</h3>
+          <p class="text-sm text-muted-foreground">{{ 'dashboard.monthlyCollectionHint' | translate }}</p>
+        </div>
+      </div>
     </div>
     <div class="p-6 pt-4">
       <div class="h-[250px] relative">
@@ -16,12 +23,23 @@
 
   <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
     <div class="p-6 pb-2">
-      <h3 class="text-lg font-semibold">{{ 'dashboard.paymentStatus' | translate }}</h3>
-      <p class="text-sm text-muted-foreground">{{ 'dashboard.paymentStatusHint' | translate }}</p>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 flex-shrink-0">
+          <lucide-angular [img]="pieChartIcon" [size]="18" class="text-primary" />
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold">{{ 'dashboard.paymentStatus' | translate }}</h3>
+          <p class="text-sm text-muted-foreground">{{ 'dashboard.paymentStatusHint' | translate }}</p>
+        </div>
+      </div>
     </div>
     <div class="p-6 pt-4">
-      <div class="h-[220px] relative">
+      <div class="h-[220px] relative flex items-center justify-center">
         <canvas #pieCanvas></canvas>
+        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <span class="text-2xl font-bold tabular-nums">{{ totalUnits() }}</span>
+          <span class="text-xs text-muted-foreground">{{ 'apartments.unit' | translate }}</span>
+        </div>
       </div>
       <div class="flex justify-center gap-6 mt-4">
         @for (item of paymentStatusData(); track item.name) {

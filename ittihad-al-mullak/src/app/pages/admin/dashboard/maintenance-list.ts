@@ -25,6 +25,7 @@ export class MaintenanceList implements OnInit {
   protected readonly i18n = inject(TranslationService);
 
   protected readonly chevronLeftIcon = ChevronLeft;
+  protected readonly wrenchIcon = Wrench;
 
   protected readonly requests = signal<MaintenanceRequest[]>([]);
   protected readonly loading = signal(true);

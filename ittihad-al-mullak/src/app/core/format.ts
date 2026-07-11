@@ -17,6 +17,11 @@ export function formatDate(iso: string | null | undefined): string {
   return new Intl.DateTimeFormat(currentLocale(), { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso));
 }
 
+/** "الأحد ١٢ يوليو ٢٠٢٦" — لبانر الترحيب في الداشبورد */
+export function formatFullDate(date: Date = new Date()): string {
+  return new Intl.DateTimeFormat(currentLocale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+}
+
 export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) return '-';
   return new Intl.DateTimeFormat(currentLocale(), {
