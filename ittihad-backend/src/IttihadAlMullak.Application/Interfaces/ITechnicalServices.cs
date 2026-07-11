@@ -6,7 +6,7 @@ namespace IttihadAlMullak.Application.Interfaces;
 /// <summary>إصدار وقراءة توكنات JWT — التنفيذ في Infrastructure.</summary>
 public interface ITokenService
 {
-    string CreateAccessToken(User user);
+    string CreateAccessToken(User user, int? activeBuildingId = null);
     string CreateRefreshToken();
 }
 

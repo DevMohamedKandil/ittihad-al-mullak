@@ -2,7 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { AuthResponse, User } from './models';
+import { AuthResponse, BuildingSummary, CreateBuildingRequest, User } from './models';
 import { APP_CONFIG } from './app-config';
 import { PermissionsService } from './permissions.service';
 import { hasAnyAdminAccess } from './admin-screens';
@@ -65,6 +65,35 @@ export class AuthService {
     if (this.isAdmin()) return '/admin';
     await this.permissions.ensureLoaded();
     return hasAnyAdminAccess(this.permissions) ? '/admin' : '/owner';
+  }
+
+  /** العمارات اللي المستخدم الحالي عضو فيها — لعرض مبدّل العمارة. */
+  myBuildings(): Observable<BuildingSummary[]> {
+    return this.http.get<BuildingSummary[]>(`${APP_CONFIG.apiUrl}/auth/my-buildings`);
+  }
+
+  /**
+   * تبديل العمارة النشطة. بيعمل reload كامل للصفحة بعد النجاح عشان كل الشاشات
+   * (الداشبورد، الشقق، الفواتير...) تعيد التحميل من الصفر بالعمارة الجديدة —
+   * أغلبها بيجيب بياناته مرة واحدة بس عند التحميل ومش هيلاحظ تغيير التوكن لوحده.
+   */
+  switchBuilding(buildingId: number): void {
+    this.http
+      .post<AuthResponse>(`${APP_CONFIG.apiUrl}/auth/switch-building`, { buildingId })
+      .subscribe((res) => {
+        this.storeSession(res);
+        window.location.href = '/admin';
+      });
+  }
+
+  /** تسجيل عمارة جديدة يديرها نفس حساب الأدمن، ويتم التنقل لها فوراً. */
+  createBuilding(request: CreateBuildingRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${APP_CONFIG.apiUrl}/auth/buildings`, request).pipe(
+      tap((res) => {
+        this.storeSession(res);
+        window.location.href = '/admin';
+      }),
+    );
   }
 
   private storeSession(res: AuthResponse): void {

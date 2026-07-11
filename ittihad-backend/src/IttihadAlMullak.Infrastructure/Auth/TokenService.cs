@@ -11,7 +11,7 @@ namespace IttihadAlMullak.Infrastructure.Auth;
 
 public class TokenService(IConfiguration configuration) : ITokenService
 {
-    public string CreateAccessToken(User user)
+    public string CreateAccessToken(User user, int? activeBuildingId = null)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -22,7 +22,7 @@ public class TokenService(IConfiguration configuration) : ITokenService
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.Name),
             new(ClaimTypes.Role, user.Role.ToString()),
-            new("buildingId", user.BuildingId?.ToString() ?? "0"),
+            new("buildingId", (activeBuildingId ?? user.BuildingId)?.ToString() ?? "0"),
         };
 
         var token = new JwtSecurityToken(

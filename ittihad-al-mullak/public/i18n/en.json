@@ -534,5 +534,9 @@
   "owner.bills.paying": "Paying...",
   "owner.bills.confirmPayment": "Confirm payment",
   "owner.maintenance.sending": "Sending...",
-  "owner.maintenance.sendRequest": "Send request"
+  "owner.maintenance.sendRequest": "Send request",
+  "buildingSwitcher.addNew": "Add new building",
+  "buildingSwitcher.createTitle": "Register a new building",
+  "buildingSwitcher.create": "Create building",
+  "buildingSwitcher.creating": "Creating..."
 }

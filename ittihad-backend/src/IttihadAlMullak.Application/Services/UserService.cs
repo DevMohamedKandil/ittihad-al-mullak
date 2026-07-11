@@ -45,6 +45,8 @@ public class UserService(
             Role = request.Role,
             BuildingId = currentUser.BuildingId,
         };
+        if (user.BuildingId is int buildingId)
+            user.UserBuildings.Add(new UserBuilding { BuildingId = buildingId });
         db.Users.Add(user);
         await db.SaveChangesAsync(ct);
 

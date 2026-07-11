@@ -534,5 +534,9 @@
   "owner.bills.paying": "جاري الدفع...",
   "owner.bills.confirmPayment": "تأكيد الدفع",
   "owner.maintenance.sending": "جاري الإرسال...",
-  "owner.maintenance.sendRequest": "إرسال الطلب"
+  "owner.maintenance.sendRequest": "إرسال الطلب",
+  "buildingSwitcher.addNew": "إضافة عمارة جديدة",
+  "buildingSwitcher.createTitle": "تسجيل عمارة جديدة",
+  "buildingSwitcher.create": "إنشاء العمارة",
+  "buildingSwitcher.creating": "جاري الإنشاء..."
 }

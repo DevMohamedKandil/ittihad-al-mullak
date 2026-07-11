@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<User> Users => Set<User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<DeviceToken> DeviceTokens => Set<DeviceToken>();
+    public DbSet<UserBuilding> UserBuildings => Set<UserBuilding>();
     public DbSet<Building> Buildings => Set<Building>();
     public DbSet<Apartment> Apartments => Set<Apartment>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
@@ -38,6 +39,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
         modelBuilder.Entity<RefreshToken>()
             .HasIndex(t => t.Token).IsUnique();
+
+        modelBuilder.Entity<UserBuilding>(entity =>
+        {
+            entity.HasIndex(ub => new { ub.UserId, ub.BuildingId }).IsUnique();
+            entity.HasOne(ub => ub.User).WithMany(u => u.UserBuildings).HasForeignKey(ub => ub.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(ub => ub.Building).WithMany().HasForeignKey(ub => ub.BuildingId).OnDelete(DeleteBehavior.NoAction);
+        });
 
         modelBuilder.Entity<Apartment>(entity =>
         {

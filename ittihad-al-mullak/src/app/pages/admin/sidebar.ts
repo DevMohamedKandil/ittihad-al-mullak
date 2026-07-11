@@ -19,10 +19,11 @@ import {
 import { AuthService } from '../../core/auth.service';
 import { TranslationService } from '../../core/i18n/translation.service';
 import { PermissionsService } from '../../core/permissions.service';
+import { BuildingSwitcher } from './building-switcher';
 
 @Component({
   selector: 'app-admin-sidebar',
-  imports: [RouterLink, RouterLinkActive, LucideAngularModule],
+  imports: [RouterLink, RouterLinkActive, LucideAngularModule, BuildingSwitcher],
   templateUrl: './sidebar.html',
 })
 export class AdminSidebar {

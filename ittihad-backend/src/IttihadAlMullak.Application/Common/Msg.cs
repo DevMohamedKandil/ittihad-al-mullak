@@ -33,6 +33,8 @@ public static class Msg
         ["PhoneTaken"] = ("رقم الهاتف مسجل بالفعل", "Phone number is already registered"),
         ["CannotDeactivateSelf"] = ("لا يمكنك إيقاف حسابك الشخصي", "You cannot deactivate your own account"),
         ["BuildingNotFound"] = ("العمارة غير موجودة", "Building not found"),
+        ["NotBuildingMember"] = ("أنت لست عضواً في هذه العمارة", "You are not a member of this building"),
+        ["AdminOnly"] = ("هذا الإجراء متاح لمدير العمارة فقط", "This action is available to building admins only"),
         ["EmptyMessage"] = ("لا يمكن إرسال رسالة فارغة", "Cannot send an empty message"),
         ["ConversationNotFound"] = ("المحادثة غير موجودة", "Conversation not found"),
         ["NotYourConversation"] = ("لا يمكنك الوصول لمحادثة لا تخصك", "You cannot access a conversation that is not yours"),

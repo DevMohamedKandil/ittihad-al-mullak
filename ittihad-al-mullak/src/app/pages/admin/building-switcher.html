@@ -1,0 +1,141 @@
+<div class="px-4 pb-3 relative">
+  <button
+    type="button"
+    (click)="toggle()"
+    class="w-full flex items-center justify-between gap-2 rounded-lg border border-sidebar-border px-3 py-2 text-sm hover:bg-sidebar-accent transition-colors"
+  >
+    <span class="flex items-center gap-2 truncate">
+      <lucide-angular [img]="icons.building2" [size]="16" />
+      <span class="truncate">{{ currentBuildingName() }}</span>
+    </span>
+    @if (canSwitch()) {
+      <lucide-angular [img]="icons.chevronDown" [size]="16" />
+    }
+  </button>
+
+  @if (isOpen()) {
+    <div class="absolute inset-x-4 z-50 mt-1 rounded-lg border bg-popover text-popover-foreground shadow-md overflow-hidden">
+      @for (b of buildings(); track b.id) {
+        <button
+          type="button"
+          (click)="select(b)"
+          class="w-full flex items-center justify-between gap-2 px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground text-start"
+        >
+          <span class="truncate">{{ b.name }}</span>
+          @if (b.id === currentBuildingId()) {
+            <lucide-angular [img]="icons.check" [size]="14" />
+          }
+        </button>
+      }
+      @if (isAdmin()) {
+        <div class="shrink-0 bg-border h-px w-full"></div>
+        <button
+          type="button"
+          (click)="openCreate()"
+          class="w-full flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-accent"
+        >
+          <lucide-angular [img]="icons.plus" [size]="14" />
+          {{ 'buildingSwitcher.addNew' | translate }}
+        </button>
+      }
+    </div>
+  }
+</div>
+
+@if (showCreateModal()) {
+  <div class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" (click)="closeCreate()">
+    <div
+      class="bg-card text-card-foreground rounded-xl shadow-lg max-w-md w-full max-h-[85vh] overflow-y-auto"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="p-6 flex items-center justify-between border-b">
+        <h3 class="text-lg font-semibold">{{ 'buildingSwitcher.createTitle' | translate }}</h3>
+        <button type="button" (click)="closeCreate()">
+          <lucide-angular [img]="icons.x" [size]="18" />
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        @if (createError()) {
+          <div class="text-sm text-destructive">{{ createError() }}</div>
+        }
+        <div class="space-y-2">
+          <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.buildingName' | translate }}</label>
+          <input
+            type="text"
+            [ngModel]="name()"
+            (ngModelChange)="name.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.address' | translate }}</label>
+          <input
+            type="text"
+            [ngModel]="address()"
+            (ngModelChange)="address.set($event)"
+            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.floorsCount' | translate }}</label>
+            <input
+              type="number"
+              [ngModel]="floorsCount()"
+              (ngModelChange)="floorsCount.set($event)"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.apartmentsCount' | translate }}</label>
+            <input
+              type="number"
+              [ngModel]="apartmentsCount()"
+              (ngModelChange)="apartmentsCount.set($event)"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.monthlySubscription' | translate }}</label>
+            <input
+              type="number"
+              [ngModel]="monthlySubscription()"
+              (ngModelChange)="monthlySubscription.set($event)"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium leading-none">{{ 'settingsAdmin.dueDay' | translate }}</label>
+            <input
+              type="number"
+              min="1"
+              max="28"
+              [ngModel]="dueDay()"
+              (ngModelChange)="dueDay.set($event)"
+              class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="p-6 pt-0 flex justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeCreate()"
+          class="inline-flex items-center justify-center rounded-md h-9 px-4 text-sm font-medium border border-input hover:bg-accent hover:text-accent-foreground"
+        >
+          {{ 'common.cancel' | translate }}
+        </button>
+        <button
+          type="button"
+          (click)="submitCreate()"
+          [disabled]="creating()"
+          class="inline-flex items-center justify-center gap-2 rounded-md h-9 px-4 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        >
+          {{ (creating() ? 'buildingSwitcher.creating' : 'buildingSwitcher.create') | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

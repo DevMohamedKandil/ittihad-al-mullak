@@ -115,6 +115,7 @@ using (var scope = app.Services.CreateScope())
     await db.Database.MigrateAsync();
     await DbSeeder.SeedAsync(db, scope.ServiceProvider.GetRequiredService<IPasswordHasherService>());
     await PermissionSeeder.SeedAsync(db); // منفصل — بيشتغل حتى على قواعد بيانات قديمة
+    await UserBuildingSeeder.SeedAsync(db); // بيربط المستخدمين القدام بعضوية تعدد العمارات
 
     // DbUp: تنفيذ سكريبتات SQL اليدوية من فولدر SqlScripts (مرة واحدة لكل سكريبت)
     SqlScriptRunner.Run(

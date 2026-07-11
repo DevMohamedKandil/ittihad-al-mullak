@@ -27,6 +27,24 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface BuildingSummary {
+  id: number;
+  code: string;
+  name: string;
+}
+
+export interface CreateBuildingRequest {
+  name: string;
+  address: string;
+  floorsCount: number;
+  apartmentsCount: number;
+  monthlySubscription: number;
+  dueDay: number;
+  phone: string | null;
+  whatsApp: string | null;
+  email: string | null;
+}
+
 export interface DashboardStats {
   collectionRate: number;
   totalExpenses: number;

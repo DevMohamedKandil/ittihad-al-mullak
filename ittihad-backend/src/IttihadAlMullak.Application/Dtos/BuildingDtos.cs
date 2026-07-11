@@ -46,3 +46,15 @@ public record UpdateBuildingSettingsRequest(
     string? Phone,
     string? WhatsApp,
     string? Email);
+
+/// <summary>إنشاء عمارة جديدة يديرها نفس حساب الأدمن — تسجيل ذاتي لعمارة إضافية.</summary>
+public record CreateBuildingRequest(
+    [Required] string Name,
+    [Required] string Address,
+    int FloorsCount,
+    int ApartmentsCount,
+    decimal MonthlySubscription,
+    int DueDay,
+    string? Phone,
+    string? WhatsApp,
+    string? Email);

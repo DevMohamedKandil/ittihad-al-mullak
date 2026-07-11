@@ -41,4 +41,20 @@ public class AuthController(IAuthService auth) : ControllerBase
     [Authorize]
     public Task RegisterDevice(RegisterDeviceRequest request, CancellationToken ct)
         => auth.RegisterDeviceAsync(request, ct);
+
+    /// <summary>العمارات اللي المستخدم الحالي عضو فيها — لعرض مبدّل العمارة في الواجهة.</summary>
+    [HttpGet("my-buildings")]
+    [Authorize]
+    public Task<IReadOnlyList<BuildingSummaryDto>> MyBuildings(CancellationToken ct)
+        => auth.MyBuildingsAsync(ct);
+
+    [HttpPost("switch-building")]
+    [Authorize]
+    public Task<AuthResponse> SwitchBuilding(SwitchBuildingRequest request, CancellationToken ct)
+        => auth.SwitchBuildingAsync(request, ct);
+
+    [HttpPost("buildings")]
+    [Authorize]
+    public Task<AuthResponse> CreateBuilding(CreateBuildingRequest request, CancellationToken ct)
+        => auth.CreateBuildingAsync(request, ct);
 }

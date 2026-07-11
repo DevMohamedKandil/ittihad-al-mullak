@@ -22,3 +22,7 @@ public record UserDto(
     DateTime CreatedAt);
 
 public record AuthResponse(string AccessToken, string RefreshToken, UserDto User);
+
+public record BuildingSummaryDto(int Id, string Code, string Name);
+
+public record SwitchBuildingRequest([Required] int BuildingId);

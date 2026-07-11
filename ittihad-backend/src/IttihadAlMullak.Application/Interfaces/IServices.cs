@@ -11,6 +11,13 @@ public interface IAuthService
     Task<UserDto> MeAsync(CancellationToken ct = default);
     Task ChangePasswordAsync(ChangePasswordRequest request, CancellationToken ct = default);
     Task RegisterDeviceAsync(RegisterDeviceRequest request, CancellationToken ct = default);
+
+    /// <summary>العمارات اللي المستخدم الحالي عضو فيها (يقدر يتنقل بينها).</summary>
+    Task<IReadOnlyList<BuildingSummaryDto>> MyBuildingsAsync(CancellationToken ct = default);
+    /// <summary>تبديل العمارة النشطة — بيتحقق إن المستخدم فعلاً عضو فيها قبل ما يصدر توكن جديد.</summary>
+    Task<AuthResponse> SwitchBuildingAsync(SwitchBuildingRequest request, CancellationToken ct = default);
+    /// <summary>تسجيل عمارة جديدة لنفس حساب الأدمن — بيرجع توكن نشط على العمارة الجديدة على طول.</summary>
+    Task<AuthResponse> CreateBuildingAsync(CreateBuildingRequest request, CancellationToken ct = default);
 }
 
 public interface IDashboardService
