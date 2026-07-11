@@ -54,14 +54,15 @@ builder.Services.AddAuthorization();
 builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationPolicyProvider, IttihadAlMullak.Api.Authorization.PermissionPolicyProvider>();
 builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, IttihadAlMullak.Api.Authorization.PermissionAuthorizationHandler>();
 
-// CORS: الويب (ng serve) + الموبايل (Capacitor)
+// CORS: الويب (ng serve) + الموبايل (Capacitor) + الوصول من الشبكة المحلية وقت التجربة
 builder.Services.AddCors(options => options.AddPolicy("Frontend", policy => policy
     .WithOrigins(
         "http://localhost:4200",
         "http://localhost:4300",
         "capacitor://localhost",
         "http://localhost",
-        "https://localhost")
+        "https://localhost",
+        "http://10.10.11.202:4300")
     .AllowAnyHeader()
     .AllowAnyMethod()));
 

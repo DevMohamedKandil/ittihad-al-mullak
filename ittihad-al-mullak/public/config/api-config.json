@@ -1,5 +1,5 @@
 {
-  "apiUrl": "http://localhost:5301/api/v1",
-  "filesUrl": "http://localhost:5301",
+  "apiUrl": "http://10.10.11.202:5301/api/v1",
+  "filesUrl": "http://10.10.11.202:5301",
   "timeoutInMinutes": 20
 }
