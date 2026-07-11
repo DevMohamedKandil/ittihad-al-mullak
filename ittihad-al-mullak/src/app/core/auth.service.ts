@@ -5,6 +5,7 @@ import { Observable, tap } from 'rxjs';
 import { AuthResponse, User } from './models';
 import { APP_CONFIG } from './app-config';
 import { PermissionsService } from './permissions.service';
+import { hasAnyAdminAccess } from './admin-screens';
 
 const ACCESS_KEY = 'ittihad_access_token';
 const REFRESH_KEY = 'ittihad_refresh_token';
@@ -19,8 +20,11 @@ export class AuthService {
   readonly currentUser = signal<User | null>(this.readStoredUser());
 
   constructor() {
-    // جلسة موجودة من قبل؟ حمّل صلاحياتها
-    if (this.currentUser() !== null) this.permissions.load();
+    // جلسة موجودة من قبل (فتح التطبيق تاني أو عمل refresh للصفحة)؟ حمّل صلاحياتها.
+    // بنأجلها لـ microtask تالي عشان لو نادينا permissions.load() هنا على طول، الطلب بيعدي
+    // على authInterceptor اللي بيعمل inject(AuthService) — وإحنا لسه جوه constructor بتاعها،
+    // فده بيسبب NG0200 (circular dependency) وبيفشل تحميل الصلاحيات بصمت بعد كل refresh للصفحة.
+    if (this.currentUser() !== null) queueMicrotask(() => this.permissions.ensureLoaded());
   }
   readonly isLoggedIn = computed(() => this.currentUser() !== null);
   readonly isAdmin = computed(() => this.currentUser()?.role === 'Admin');
@@ -52,9 +56,15 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  /* التوجيه بعد تسجيل الدخول حسب الدور */
-  homeRoute(): string {
-    return this.isAdmin() ? '/admin' : '/owner';
+  /**
+   * التوجيه بعد تسجيل الدخول: الأدمن دايماً للوحة الإدارة، أي دور تاني بيتوجه للوحة الإدارة
+   * برضه لو عنده صلاحية View على شاشة إدارة واحدة على الأقل (ممنوحة من شاشة الصلاحيات)،
+   * غير كده لتطبيق المالك العادي.
+   */
+  async homeRoute(): Promise<string> {
+    if (this.isAdmin()) return '/admin';
+    await this.permissions.ensureLoaded();
+    return hasAnyAdminAccess(this.permissions) ? '/admin' : '/owner';
   }
 
   private storeSession(res: AuthResponse): void {

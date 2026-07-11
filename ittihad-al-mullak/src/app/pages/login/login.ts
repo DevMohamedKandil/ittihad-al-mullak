@@ -30,7 +30,7 @@ export class Login {
     this.error.set(null);
 
     this.auth.login(this.phone(), this.password()).subscribe({
-      next: () => this.router.navigateByUrl(this.auth.homeRoute()),
+      next: () => this.auth.homeRoute().then((url) => this.router.navigateByUrl(url)),
       error: (err: HttpErrorResponse) => {
         this.error.set(err.error?.title ?? this.i18n.t('login.connectionFailed'));
         this.loading.set(false);

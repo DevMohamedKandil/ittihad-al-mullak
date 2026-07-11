@@ -36,7 +36,7 @@
 
     <!-- Navigation -->
     <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-      @for (item of navItems; track item.href) {
+      @for (item of navItems(); track item.href) {
         <a
           [routerLink]="item.href"
           routerLinkActive="bg-sidebar-primary text-sidebar-primary-foreground"
