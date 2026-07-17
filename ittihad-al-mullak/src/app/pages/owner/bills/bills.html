@@ -60,19 +60,22 @@
       <div class="mt-4 space-y-4">
         @if (activeTab() === 'pending' && pendingBills().length === 0) {
           <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
-            <div class="flex flex-col items-center justify-center py-12">
-              <lucide-angular [img]="icons.checkCircle2" [size]="48" class="text-success mb-4" />
-              <p class="font-medium text-lg">{{ 'owner.bills.noPendingBills' | translate }}</p>
-              <p class="text-sm text-muted-foreground">{{ 'owner.bills.allPaid' | translate }}</p>
-            </div>
+            <app-empty-state
+              [icon]="icons.checkCircle2"
+              [title]="'owner.bills.noPendingBills' | translate"
+              [hint]="'owner.bills.allPaid' | translate"
+              iconBg="bg-success/10"
+              iconClass="text-success"
+            />
           </div>
         }
         @if (activeTab() === 'paid' && paidBills().length === 0) {
           <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
-            <div class="flex flex-col items-center justify-center py-12">
-              <p class="font-medium text-lg">{{ 'owner.bills.noBills' | translate }}</p>
-              <p class="text-sm text-muted-foreground">{{ 'owner.bills.noPaidBillsYet' | translate }}</p>
-            </div>
+            <app-empty-state
+              [icon]="icons.receipt"
+              [title]="'owner.bills.noBills' | translate"
+              [hint]="'owner.bills.noPaidBillsYet' | translate"
+            />
           </div>
         }
         @for (bill of shownBills(); track bill.id) {

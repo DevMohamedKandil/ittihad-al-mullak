@@ -13,9 +13,11 @@ import {
   Smartphone,
   Building2,
   Banknote,
+  Receipt,
 } from 'lucide-angular';
 import { OwnerHeader } from '../header';
 import { InvoicesApi, OwnerApi } from '../../../core/api.services';
+import { EmptyState } from '../../../shared/empty-state';
 import { AuthService } from '../../../core/auth.service';
 import { PermissionsService } from '../../../core/permissions.service';
 import { Invoice, PaymentMethod, PaymentStatusString } from '../../../core/models';
@@ -26,7 +28,7 @@ type BillTab = 'pending' | 'paid';
 
 @Component({
   selector: 'app-owner-bills',
-  imports: [FormsModule, OwnerHeader, LucideAngularModule, TranslatePipe],
+  imports: [FormsModule, OwnerHeader, LucideAngularModule, TranslatePipe, EmptyState],
   templateUrl: './bills.html',
 })
 export class OwnerBills {
@@ -41,6 +43,7 @@ export class OwnerBills {
     calendar: Calendar,
     checkCircle2: CheckCircle2,
     download: Download,
+    receipt: Receipt,
   };
 
   protected readonly formatDate = formatDate;

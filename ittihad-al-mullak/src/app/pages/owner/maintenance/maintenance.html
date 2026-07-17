@@ -198,19 +198,22 @@
       <div class="mt-4 space-y-4">
         @if (activeTab() === 'active' && activeRequests().length === 0) {
           <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
-            <div class="flex flex-col items-center justify-center py-12">
-              <lucide-angular [img]="icons.checkCircle2" [size]="48" class="text-success mb-4" />
-              <p class="font-medium text-lg">{{ 'owner.maintenance.noActiveRequests' | translate }}</p>
-              <p class="text-sm text-muted-foreground">{{ 'owner.maintenance.noActiveRequestsHint' | translate }}</p>
-            </div>
+            <app-empty-state
+              [icon]="icons.checkCircle2"
+              [title]="'owner.maintenance.noActiveRequests' | translate"
+              [hint]="'owner.maintenance.noActiveRequestsHint' | translate"
+              iconBg="bg-success/10"
+              iconClass="text-success"
+            />
           </div>
         }
         @if (activeTab() === 'completed' && completedRequests().length === 0) {
           <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
-            <div class="flex flex-col items-center justify-center py-12">
-              <p class="font-medium text-lg">{{ 'owner.maintenance.noRequests' | translate }}</p>
-              <p class="text-sm text-muted-foreground">{{ 'owner.maintenance.noCompletedRequestsHint' | translate }}</p>
-            </div>
+            <app-empty-state
+              [icon]="icons.wrench"
+              [title]="'owner.maintenance.noRequests' | translate"
+              [hint]="'owner.maintenance.noCompletedRequestsHint' | translate"
+            />
           </div>
         }
         @for (request of shownRequests(); track request.id) {

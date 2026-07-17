@@ -1,9 +1,14 @@
 <div class="space-y-6">
   <!-- Header -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-bold">{{ 'apartmentsAdmin.title' | translate }}</h1>
-      <p class="text-muted-foreground">{{ 'apartmentsAdmin.subtitle' | translate }}</p>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-secondary/10 flex-shrink-0">
+        <lucide-angular [img]="icons.building2" [size]="20" class="text-secondary" />
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold">{{ 'apartmentsAdmin.title' | translate }}</h1>
+        <p class="text-muted-foreground">{{ 'apartmentsAdmin.subtitle' | translate }}</p>
+      </div>
     </div>
     <button
       type="button"
@@ -91,7 +96,12 @@
       </div>
 
       @if (!loading() && filteredApartments().length === 0) {
-        <p class="text-sm text-muted-foreground text-center py-6">{{ 'common.noData' | translate }}</p>
+        <app-empty-state
+          [icon]="icons.building2"
+          [title]="'common.noData' | translate"
+          iconBg="bg-secondary/10"
+          iconClass="text-secondary"
+        />
       }
 
       @if (activeTab() === 'table') {

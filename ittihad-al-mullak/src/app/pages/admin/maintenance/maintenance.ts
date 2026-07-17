@@ -27,10 +27,11 @@ import { MaintenanceRequest, MaintenanceStatus, MaintenancePriority } from '../.
 import { APP_CONFIG } from '../../../core/app-config';
 import { formatRelative, formatDate } from '../../../core/format';
 import { TranslationService } from '../../../core/i18n/translation.service';
+import { EmptyState } from '../../../shared/empty-state';
 
 @Component({
   selector: 'app-maintenance-page',
-  imports: [FormsModule, LucideAngularModule, TranslatePipe],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe, EmptyState],
   templateUrl: './maintenance.html',
 })
 export class MaintenancePage {

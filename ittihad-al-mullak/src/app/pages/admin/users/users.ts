@@ -25,12 +25,13 @@ import { ApartmentsApi, UsersApi } from '../../../core/api.services';
 import { Apartment, UserListItem, UserRole } from '../../../core/models';
 import { formatDate } from '../../../core/format';
 import { TranslationService } from '../../../core/i18n/translation.service';
+import { EmptyState } from '../../../shared/empty-state';
 
 type Tab = 'all' | 'Admin' | 'Owner' | 'Tenant';
 
 @Component({
   selector: 'app-users-page',
-  imports: [FormsModule, LucideAngularModule, TranslatePipe],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe, EmptyState],
   templateUrl: './users.html',
 })
 export class UsersPage {

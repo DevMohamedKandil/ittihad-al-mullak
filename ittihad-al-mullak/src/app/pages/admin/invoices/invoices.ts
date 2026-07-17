@@ -24,10 +24,11 @@ import { ApartmentsApi, InvoicesApi } from '../../../core/api.services';
 import { Apartment, Invoice, InvoiceType, InvoicesSummary, PaymentMethod, PaymentStatusString } from '../../../core/models';
 import { formatCurrency, formatDate as formatDateUtil } from '../../../core/format';
 import { TranslationService } from '../../../core/i18n/translation.service';
+import { EmptyState } from '../../../shared/empty-state';
 
 @Component({
   selector: 'app-invoices-page',
-  imports: [FormsModule, LucideAngularModule, TranslatePipe],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe, EmptyState],
   templateUrl: './invoices.html',
 })
 export class InvoicesPage implements OnInit {

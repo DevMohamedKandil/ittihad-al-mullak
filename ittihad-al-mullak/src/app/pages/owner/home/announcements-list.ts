@@ -10,12 +10,13 @@ import {
 } from 'lucide-angular';
 import { Announcement, AnnouncementType } from '../../../core/models';
 import { formatDate } from '../../../core/format';
+import { EmptyState } from '../../../shared/empty-state';
 
 const NEW_WINDOW_MS = 3 * 24 * 60 * 60 * 1000;
 
 @Component({
   selector: 'app-announcements-list',
-  imports: [LucideAngularModule, TranslatePipe],
+  imports: [LucideAngularModule, TranslatePipe, EmptyState],
   templateUrl: './announcements-list.html',
 })
 export class AnnouncementsList {
@@ -24,6 +25,7 @@ export class AnnouncementsList {
   protected readonly icons = {
     chevronLeft: ChevronLeft,
     calendar: Calendar,
+    megaphone: Megaphone,
   };
 
   protected readonly formatDate = formatDate;

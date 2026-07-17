@@ -7,6 +7,7 @@ import {
   Users,
   Building2,
   Search,
+  MessageSquare,
 } from 'lucide-angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { OwnerHeader } from '../header';
@@ -14,10 +15,11 @@ import { ConversationsApi } from '../../../core/api.services';
 import { ChatMessage, Conversation } from '../../../core/models';
 import { formatRelative } from '../../../core/format';
 import { TranslationService } from '../../../core/i18n/translation.service';
+import { EmptyState } from '../../../shared/empty-state';
 
 @Component({
   selector: 'app-owner-messages',
-  imports: [FormsModule, OwnerHeader, LucideAngularModule, TranslatePipe],
+  imports: [FormsModule, OwnerHeader, LucideAngularModule, TranslatePipe, EmptyState],
   templateUrl: './messages.html',
 })
 export class OwnerMessages {
@@ -30,6 +32,7 @@ export class OwnerMessages {
     users: Users,
     building2: Building2,
     search: Search,
+    messageSquare: MessageSquare,
   };
 
   protected readonly formatRelative = formatRelative;

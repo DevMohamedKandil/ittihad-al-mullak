@@ -24,10 +24,11 @@ import { ApartmentsApi } from '../../../core/api.services';
 import { Apartment, PaymentStatusString } from '../../../core/models';
 import { formatCurrency } from '../../../core/format';
 import { TranslationService } from '../../../core/i18n/translation.service';
+import { EmptyState } from '../../../shared/empty-state';
 
 @Component({
   selector: 'app-apartments-page',
-  imports: [FormsModule, LucideAngularModule, TranslatePipe],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe, EmptyState],
   templateUrl: './apartments.html',
 })
 export class ApartmentsPage implements OnInit {
@@ -45,6 +46,7 @@ export class ApartmentsPage implements OnInit {
     edit: Edit,
     trash2: Trash2,
     eye: Eye,
+    building2: Building2,
   };
 
   protected readonly statusBadges: Record<PaymentStatusString, { label: string; class: string; icon: LucideIconData }> = {

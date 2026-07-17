@@ -38,7 +38,10 @@
         @if (messagesLoading()) {
           <p class="text-center text-sm text-muted-foreground py-6">{{ 'common.loading' | translate }}</p>
         } @else if (messages().length === 0) {
-          <p class="text-center text-sm text-muted-foreground py-6">{{ 'owner.messages.noMessagesYet' | translate }}</p>
+          <app-empty-state
+            [icon]="icons.messageSquare"
+            [title]="'owner.messages.noMessagesYet' | translate"
+          />
         }
         @for (msg of messages(); track msg.id) {
           <div class="flex" [class]="msg.mine ? 'justify-start' : 'justify-end'">
@@ -143,7 +146,10 @@
           } @else if (error()) {
             <p class="text-center text-sm text-destructive py-8">{{ error() }}</p>
           } @else if (filteredConversations().length === 0) {
-            <p class="text-center text-sm text-muted-foreground py-8">{{ 'owner.messages.noConversations' | translate }}</p>
+            <app-empty-state
+              [icon]="icons.messageSquare"
+              [title]="'owner.messages.noConversations' | translate"
+            />
           }
           @for (conversation of filteredConversations(); track conversation.id) {
             <button

@@ -13,6 +13,7 @@ import {
   Mail,
   MapPin,
   Globe,
+  Settings as SettingsIcon,
 } from 'lucide-angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SettingsApi } from '../../../core/api.services';
@@ -30,6 +31,7 @@ export class SettingsPage {
   protected readonly i18n = inject(TranslationService);
 
   protected readonly icons = {
+    settings: SettingsIcon,
     building2: Building2,
     bell: Bell,
     creditCard: CreditCard,

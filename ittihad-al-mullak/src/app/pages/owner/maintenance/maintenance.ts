@@ -28,12 +28,13 @@ import {
 import { APP_CONFIG } from '../../../core/app-config';
 import { formatRelative } from '../../../core/format';
 import { TranslationService } from '../../../core/i18n/translation.service';
+import { EmptyState } from '../../../shared/empty-state';
 
 type RequestTab = 'active' | 'completed';
 
 @Component({
   selector: 'app-owner-maintenance',
-  imports: [FormsModule, OwnerHeader, LucideAngularModule, TranslatePipe],
+  imports: [FormsModule, OwnerHeader, LucideAngularModule, TranslatePipe, EmptyState],
   templateUrl: './maintenance.html',
 })
 export class OwnerMaintenance {
@@ -47,6 +48,7 @@ export class OwnerMaintenance {
     camera: Camera,
     messageSquare: MessageSquare,
     chevronLeft: ChevronLeft,
+    wrench: Wrench,
   };
 
   protected readonly formatRelative = formatRelative;

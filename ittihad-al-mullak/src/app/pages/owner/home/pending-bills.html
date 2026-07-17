@@ -1,11 +1,16 @@
 <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
   <div class="p-6 pb-3">
     <div class="flex items-center justify-between">
-      <div>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 flex-shrink-0">
+          <lucide-angular [img]="icons.creditCard" [size]="18" class="text-primary" />
+        </div>
+        <div>
         <h3 class="text-lg font-semibold">{{ 'owner.home.pendingBillsTitle' | translate }}</h3>
         <p class="text-sm text-muted-foreground">
           {{ 'owner.bills.totalDue' | translate }}: {{ totalDue().toLocaleString('ar-EG') }} {{ 'common.egp' | translate }}
         </p>
+        </div>
       </div>
       <a
         routerLink="/owner/bills"
@@ -18,7 +23,12 @@
   </div>
   <div class="p-6 pt-0 space-y-3">
     @if (bills().length === 0) {
-      <p class="text-center text-sm text-muted-foreground py-6">{{ 'owner.bills.noPendingBills' | translate }}</p>
+      <app-empty-state
+        [icon]="icons.checkCircle2"
+        [title]="'owner.bills.noPendingBills' | translate"
+        iconBg="bg-success/10"
+        iconClass="text-success"
+      />
     }
     @for (bill of bills(); track bill.id) {
       <div class="flex items-center gap-4 p-4 rounded-xl border bg-card hover:bg-accent/50 transition-colors">

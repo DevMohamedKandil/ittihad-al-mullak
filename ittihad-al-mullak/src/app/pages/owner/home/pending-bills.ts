@@ -1,16 +1,17 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { LucideAngularModule, ChevronLeft, CreditCard, Calendar } from 'lucide-angular';
+import { LucideAngularModule, ChevronLeft, CreditCard, Calendar, CheckCircle2 } from 'lucide-angular';
 import { Invoice, PaymentStatusString } from '../../../core/models';
 import { formatDate } from '../../../core/format';
 import { AuthService } from '../../../core/auth.service';
 import { PermissionsService } from '../../../core/permissions.service';
 import { TranslationService } from '../../../core/i18n/translation.service';
+import { EmptyState } from '../../../shared/empty-state';
 
 @Component({
   selector: 'app-pending-bills',
-  imports: [RouterLink, LucideAngularModule, TranslatePipe],
+  imports: [RouterLink, LucideAngularModule, TranslatePipe, EmptyState],
   templateUrl: './pending-bills.html',
 })
 export class PendingBills {
@@ -24,6 +25,7 @@ export class PendingBills {
     chevronLeft: ChevronLeft,
     creditCard: CreditCard,
     calendar: Calendar,
+    checkCircle2: CheckCircle2,
   };
 
   protected readonly formatDate = formatDate;

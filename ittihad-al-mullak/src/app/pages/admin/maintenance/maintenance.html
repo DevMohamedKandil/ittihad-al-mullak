@@ -1,8 +1,13 @@
 <div class="space-y-6">
   <!-- Header -->
-  <div>
-    <h1 class="text-2xl font-bold">{{ 'maintenanceAdmin.title' | translate }}</h1>
-    <p class="text-muted-foreground">{{ 'maintenanceAdmin.subtitle' | translate }}</p>
+  <div class="flex items-center gap-3">
+    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-warning/10 flex-shrink-0">
+      <lucide-angular [img]="icons.wrench" [size]="20" class="text-warning" />
+    </div>
+    <div>
+      <h1 class="text-2xl font-bold">{{ 'maintenanceAdmin.title' | translate }}</h1>
+      <p class="text-muted-foreground">{{ 'maintenanceAdmin.subtitle' | translate }}</p>
+    </div>
   </div>
 
   <!-- Stats -->
@@ -125,10 +130,12 @@
 
       @if (visibleRequests().length === 0) {
         <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
-          <div class="p-8 text-center">
-            <lucide-angular [img]="icons.wrench" [size]="48" class="text-muted-foreground mx-auto mb-4" />
-            <p class="text-muted-foreground">{{ 'maintenanceAdmin.noRequests' | translate }}</p>
-          </div>
+          <app-empty-state
+            [icon]="icons.wrench"
+            [title]="'maintenanceAdmin.noRequests' | translate"
+            iconBg="bg-warning/10"
+            iconClass="text-warning"
+          />
         </div>
       }
 

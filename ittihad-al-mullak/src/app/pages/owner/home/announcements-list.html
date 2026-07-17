@@ -1,9 +1,14 @@
 <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
   <div class="p-6 pb-3">
     <div class="flex items-center justify-between">
-      <div>
-        <h3 class="text-lg font-semibold">{{ 'nav.announcements' | translate }}</h3>
-        <p class="text-sm text-muted-foreground">{{ 'owner.home.announcementsSubtitle' | translate }}</p>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 flex-shrink-0">
+          <lucide-angular [img]="icons.megaphone" [size]="18" class="text-primary" />
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold">{{ 'nav.announcements' | translate }}</h3>
+          <p class="text-sm text-muted-foreground">{{ 'owner.home.announcementsSubtitle' | translate }}</p>
+        </div>
       </div>
       <button
         type="button"
@@ -16,7 +21,12 @@
   </div>
   <div class="p-6 pt-0 space-y-3">
     @if (announcements().length === 0) {
-      <p class="text-center text-sm text-muted-foreground py-6">{{ 'owner.home.noAnnouncements' | translate }}</p>
+      <app-empty-state
+        [icon]="icons.megaphone"
+        [title]="'owner.home.noAnnouncements' | translate"
+        iconBg="bg-primary/10"
+        iconClass="text-primary"
+      />
     }
     @for (announcement of announcements(); track announcement.id) {
       <div class="p-4 rounded-xl border bg-card hover:bg-accent/50 transition-colors cursor-pointer">

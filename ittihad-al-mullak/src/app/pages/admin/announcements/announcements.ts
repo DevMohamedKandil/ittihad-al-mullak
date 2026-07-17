@@ -23,10 +23,11 @@ import { AnnouncementsApi } from '../../../core/api.services';
 import { Announcement, AnnouncementType } from '../../../core/models';
 import { formatDate } from '../../../core/format';
 import { TranslationService } from '../../../core/i18n/translation.service';
+import { EmptyState } from '../../../shared/empty-state';
 
 @Component({
   selector: 'app-announcements-page',
-  imports: [FormsModule, LucideAngularModule, TranslatePipe],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe, EmptyState],
   templateUrl: './announcements.html',
 })
 export class AnnouncementsPage {
