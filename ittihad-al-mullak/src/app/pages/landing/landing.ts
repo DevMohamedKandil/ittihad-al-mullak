@@ -17,10 +17,11 @@ import {
   Users,
 } from 'lucide-angular';
 import { TranslationService } from '../../core/i18n/translation.service';
+import { BuildingIllustration } from '../../shared/building-illustration';
 
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink, LucideAngularModule, TranslatePipe],
+  imports: [RouterLink, LucideAngularModule, TranslatePipe, BuildingIllustration],
   templateUrl: './landing.html',
 })
 export class Landing {

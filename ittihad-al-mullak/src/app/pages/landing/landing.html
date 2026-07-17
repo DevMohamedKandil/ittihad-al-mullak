@@ -34,32 +34,37 @@
   </header>
 
   <!-- Hero Section -->
-  <section class="relative py-20 lg:py-32 overflow-hidden">
+  <section class="relative py-16 lg:py-24 overflow-hidden">
     <div class="absolute inset-0 bg-gradient-to-bl from-primary/5 via-transparent to-secondary/5"></div>
     <div class="container mx-auto px-4 relative">
-      <div class="max-w-3xl mx-auto text-center">
-        <h1 class="text-4xl lg:text-6xl font-bold leading-tight text-balance">
-          {{ 'landing.heroTitle' | translate }}
-          <span class="text-primary"> {{ 'landing.heroTitleHighlight' | translate }}</span>
-        </h1>
-        <p class="text-xl text-muted-foreground mt-6 text-pretty max-w-2xl mx-auto">
-          {{ 'landing.heroSubtitle' | translate }}
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-          <a
-            routerLink="/login"
-            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors h-11 text-lg px-8 bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            <lucide-angular [img]="icons.smartphone" [size]="20" />
-            {{ 'landing.tryApp' | translate }}
-          </a>
-          <a
-            routerLink="/admin"
-            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors h-11 text-lg px-8 border border-input bg-transparent hover:bg-accent hover:text-accent-foreground"
-          >
-            {{ 'nav.dashboard' | translate }}
-            <lucide-angular [img]="icons.chevronLeft" [size]="20" />
-          </a>
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div class="text-center lg:text-start">
+          <h1 class="text-4xl lg:text-6xl font-bold leading-tight text-balance">
+            {{ 'landing.heroTitle' | translate }}
+            <span class="text-primary"> {{ 'landing.heroTitleHighlight' | translate }}</span>
+          </h1>
+          <p class="text-xl text-muted-foreground mt-6 text-pretty max-w-2xl mx-auto lg:mx-0">
+            {{ 'landing.heroSubtitle' | translate }}
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-10">
+            <a
+              routerLink="/login"
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors h-11 text-lg px-8 bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <lucide-angular [img]="icons.smartphone" [size]="20" />
+              {{ 'landing.tryApp' | translate }}
+            </a>
+            <a
+              routerLink="/admin"
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors h-11 text-lg px-8 border border-input bg-transparent hover:bg-accent hover:text-accent-foreground"
+            >
+              {{ 'nav.dashboard' | translate }}
+              <lucide-angular [img]="icons.chevronLeft" [size]="20" />
+            </a>
+          </div>
+        </div>
+        <div class="hidden lg:block max-w-md mx-auto">
+          <app-building-illustration />
         </div>
       </div>
     </div>

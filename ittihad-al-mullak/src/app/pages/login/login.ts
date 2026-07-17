@@ -6,12 +6,13 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { LucideAngularModule, Building2, Phone, Lock, LogIn, MessageSquare, Mail } from 'lucide-angular';
 import { AuthService } from '../../core/auth.service';
 import { TranslationService } from '../../core/i18n/translation.service';
+import { BuildingIllustration } from '../../shared/building-illustration';
 
 type LoginMode = 'password' | 'otp-request' | 'otp-verify';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, LucideAngularModule, TranslatePipe],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe, BuildingIllustration],
   templateUrl: './login.html',
 })
 export class Login {
